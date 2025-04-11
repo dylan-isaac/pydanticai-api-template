@@ -1,0 +1,28 @@
+FROM python:3.12-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y git curl make
+
+# Set the working directory
+WORKDIR /app
+
+# Set up Python environment variables for development
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app
+
+# Copy project files for dependency installation
+COPY pyproject.toml README.md ./
+
+# Install development tools and project in editable mode
+RUN pip install uv && \
+    pip install mypy && \
+    pip install -e .
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# The rest of the setup happens in docker-compose.yml
+# We mount the code as a volume and install the package at runtime
+
+# Default command - overridden by docker-compose.yml
+CMD ["bash", "-c", "echo 'Dev Container ready! Use VS Code tasks or terminal to start the app.'; trap 'echo Container stopping' TERM INT; tail -f /dev/null & wait"] 

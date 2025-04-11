@@ -1,0 +1,33 @@
+version: 2.0.0
+tasks:
+- label: Run API (Dev)
+  type: shell
+  command: pydanticai-api-template run --reload
+  problemMatcher: []
+  presentation:
+    reveal: always
+    panel: new
+  group:
+    kind: build
+    isDefault: true
+- label: Run Validation
+  type: shell
+  command: pydanticai-api-template validate
+  problemMatcher: []
+  presentation:
+    reveal: always
+    panel: new
+- label: Install Shell Completion
+  type: shell
+  command: pydanticai-api-template install-completion
+  problemMatcher: []
+  presentation:
+    reveal: always
+    panel: new
+- label: Run Cleanup
+  type: shell
+  command: pydanticai-api-template cleanup
+  problemMatcher: []
+  presentation:
+    reveal: always
+    panel: new

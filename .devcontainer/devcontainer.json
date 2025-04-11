@@ -1,0 +1,41 @@
+{
+    "name": "PydanticAI API Template Development",
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
+    "service": "pydanticai-api-template-dev",
+    "workspaceFolder": "/app",
+    "runArgs": [
+        "--env-file",
+        ".env"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+                "tamasfe.even-better-toml",
+                "njpwerner.autodocstring",
+                "matangover.mypy"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.testing.pytestEnabled": true,
+                "editor.formatOnSave": true,
+                "python.formatting.provider": "black",
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter",
+                    "editor.codeActionsOnSave": {
+                        "source.organizeImports": true
+                    }
+                },
+                "git.path": "/usr/bin/git",
+                "mypy.dmypyExecutable": "/usr/local/bin/dmypy"
+            }
+        }
+    },
+    "postCreateCommand": "apt-get update && apt-get install -y git && pip install mypy && pip install -e . && pydanticai-api-template cleanup && pydanticai-api-template validate",
+    "remoteUser": "root"
+}

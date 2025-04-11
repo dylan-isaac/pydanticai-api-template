@@ -1,0 +1,52 @@
+name: pydanticai-api-template
+
+services:
+  # Development service with hot reload
+  pydanticai-api-template-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      # Don't mount cache directories like .venv, __pycache__, etc.
+      - /app/.venv
+      - /app/**/__pycache__
+      # Mount Git config and credentials from host
+      - ~/.gitconfig:/root/.gitconfig
+      - ~/.git-credentials:/root/.git-credentials
+    environment:
+      - PYTHONPATH=/app
+      # Disable Python bytecode generation in development for faster reloads
+      - PYTHONDONTWRITEBYTECODE=1
+      # Raise exceptions on ByteWarnings
+      - PYTHONBYTEWARNFLAGS=0
+      # Enable traceback for all warnings
+      - PYTHONWARNINGS=always
+      # Git environment variables from host
+      - GIT_AUTHOR_NAME
+      - GIT_AUTHOR_EMAIL
+      - GIT_COMMITTER_NAME
+      - GIT_COMMITTER_EMAIL
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/docs" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    command: pydanticai-api-template run --reload
+
+  # Production-like service
+  pydanticai-api-template:
+    build:
+      context: .
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/docs" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
