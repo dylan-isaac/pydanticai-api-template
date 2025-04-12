@@ -1,25 +1,96 @@
 FROM python:3.12-slim
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y git curl make
+# Set frontend to noninteractive to avoid prompts during apt-get installs
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies, core utilities, Zsh, Git, and modern CLI tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    wget \
+    ca-certificates \
+    sudo \
+    gnupg \
+    build-essential \
+    zsh \
+    ripgrep \
+    make \
+    # Bat (may be named batcat on Debian/Ubuntu)
+    bat \
+    && \
+    # Install Eza (modern ls) - instructions from https://github.com/eza-community/eza/blob/main/INSTALL.md#debian-and-ubuntu
+    mkdir -p /etc/apt/keyrings && \
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | tee /etc/apt/sources.list.d/gierens.list && \
+    chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list && \
+    apt-get update && apt-get install -y --no-install-recommends eza && \
+    # Install Oh My Zsh non-interactively
+    # Running as root, so install for root user
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended" && \
+    # Install Oh My Zsh plugins (zsh-autosuggestions, zsh-syntax-highlighting)
+    ZSH_CUSTOM="/root/.oh-my-zsh/custom" && \
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM}/plugins/zsh-autosuggestions && \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting && \
+    # Activate plugins in .zshrc (Oh My Zsh default template should source custom plugins)
+    # Modify the default Oh My Zsh template's plugin line
+    sed -i 's/^plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' /root/.zshrc && \
+    # Install Starship prompt
+    curl -sS https://starship.rs/install.sh | sh -s -- --yes && \
+    # Install Zoxide (smarter cd)
+    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash && \
+    # Set zsh as the default shell for root user (or the user you intend to run as)
+    chsh -s $(which zsh) root && \
+    # Clean up apt cache
+    rm -rf /var/lib/apt/lists/*
+
+# Add user bin directory to PATH (for tools like zoxide installed via script)
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Fix bat command name if needed (Debian uses batcat)
+RUN if [ -x "/usr/bin/batcat" ]; then ln -s /usr/bin/batcat /usr/local/bin/bat; fi
+
+# Append aliases to .zshrc (Initialization moved to /etc/profile.d)
+RUN echo '\n# Modern CLI Aliases\n\
+    alias ls="eza --icons --group-directories-first"\
+    alias la="eza -a --icons --group-directories-first"\
+    alias ll="eza -l --icons --group-directories-first"\
+    alias lt="eza --tree --level=2 --icons"\
+    alias cat="bat --paging=never --style=plain"\
+    alias grep="rg"\
+    ' >> /root/.zshrc
+
+# Create profile scripts for Starship and Zoxide initialization
+RUN mkdir -p /etc/profile.d && \
+    echo '# Starship Prompt Initialization\neval "$(starship init zsh)"' > /etc/profile.d/starship.sh && \
+    echo '# Zoxide Initialization\neval "$(zoxide init zsh --no-aliases)"' > /etc/profile.d/zoxide.sh && \
+    chmod +x /etc/profile.d/starship.sh /etc/profile.d/zoxide.sh
 
 # Set the working directory
 WORKDIR /app
 
 # Set up Python environment variables for development
 ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app
 
-# Copy project files for dependency installation
-COPY pyproject.toml README.md ./
+# Copy the entire project context first (needed for uv install)
+# .dockerignore should exclude unnecessary files
+COPY . .
 
-# Install development tools and project in editable mode
-RUN pip install uv && \
-    pip install mypy && \
-    pip install -e .
+# Install uv globally and then install project dependencies (including dev/test)
+# Using --system to install in the main Python environment within the container
+# Explicitly add uv to PATH for this RUN command after installation
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    export PATH="/root/.cargo/bin:$PATH" && \
+    echo "Installing project dependencies using uv..." && \
+    uv pip install --system --no-cache --editable ".[dev,test]"
 
 # Expose the port the app runs on
 EXPOSE 8000
+
+# Default command is now Zsh (provides a better interactive shell)
+# The actual FastAPI server run command is specified in docker-compose.yml
+CMD ["zsh"]
 
 # The rest of the setup happens in docker-compose.yml
 # We mount the code as a volume and install the package at runtime

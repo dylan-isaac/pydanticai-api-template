@@ -1,6 +1,7 @@
-.PHONY: install dev shell run validate lint test clean docker-build docker-up docker-down sync-configs logs
+.PHONY: install dev shell-completion run validate lint test clean docker-build docker-up docker-down docker-shell sync-configs logs setup
 
-# Local development
+# Local development commands (primarily for direct host machine use)
+# Note: When using Dev Containers, dependencies are already installed
 install:
 	uv sync && uv pip install -e .
 
@@ -13,10 +14,12 @@ shell-completion:
 validate:
 	pydanticai-api-template validate
 
+# Code quality commands - note: dependencies are already installed in the container
+# If running locally outside the container, these will install dependencies first
 lint:
 	uv pip install -e ".[dev]"
 	ruff check .
-	black --check .
+	ruff format --check .
 
 test:
 	uv pip install -e ".[dev,test]"
@@ -26,7 +29,7 @@ clean:
 	rm -rf .venv dist build *.egg-info
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
-# Docker commands
+# Docker workflow commands
 docker-build:
 	docker compose build
 
@@ -38,19 +41,21 @@ docker-down:
 
 # Enter container shell
 docker-shell:
-	docker compose exec pydanticai-api-template-dev bash
+	docker compose exec pydanticai-api-template-dev zsh
 
-# Config management
+# Configuration management
+# Use this when you:
+# 1. Add/change CLI commands in src/pydanticai_api_template/cli.py (updates VS Code tasks)
+# 2. Update development tool versions in pyproject.toml (syncs pre-commit hooks)
 sync-configs:
-	python -m pip install tomli pyyaml
 	python scripts/update_configs.py
 
 # View logs for the development container
 logs:
 	docker compose logs -f pydanticai-api-template-dev
 
-# One command to rule them all - for new developers
+# Complete setup command (for new developers, primarily outside Dev Containers)
 setup: install docker-build shell-completion validate
 	@echo "Setup complete! 🚀"
-	@echo "Run 'make dev' to start local development"
-	@echo "Run 'make docker-up' to start in Docker" 
+	@echo "Run 'make dev' to start local development (outside container)"
+	@echo "Run 'make docker-up' to start in Docker (or use Dev Containers)" 

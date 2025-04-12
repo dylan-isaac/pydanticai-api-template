@@ -79,6 +79,6 @@ docker-compose.yml
 .idea/
 .DS_Store
 
-# DO NOT IGNORE the app directory - required for package installation
-!app/
-!app/**/*.py 
+# DO NOT IGNORE the src directory - required for package installation
+!src/
+!src/**/*.py 

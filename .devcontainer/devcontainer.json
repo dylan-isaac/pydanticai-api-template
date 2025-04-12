@@ -1,41 +1,56 @@
 {
-    "name": "PydanticAI API Template Development",
+    "name": "PydanticAI API Template Dev Container",
     "dockerComposeFile": [
-        "../docker-compose.yml"
+        "../docker-compose.dev.yml"
     ],
     "service": "pydanticai-api-template-dev",
     "workspaceFolder": "/app",
-    "runArgs": [
-        "--env-file",
-        ".env"
+    "forwardPorts": [
+        8000
     ],
     "customizations": {
         "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll": "explicit",
+                        "source.organizeImports": "explicit"
+                    }
+                },
+                "ruff.path": [
+                    "/usr/local/bin/ruff"
+                ],
+                "mypy-type-checker.path": [
+                    "/usr/local/bin/mypy"
+                ],
+                "terminal.integrated.fontFamily": "MesloLGS NF",
+                "terminal.integrated.fontSize": 14,
+                "files.eol": "\n",
+                "files.trimTrailingWhitespace": true,
+                "files.insertFinalNewline": true
+            },
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "charliermarsh.ruff",
-                "tamasfe.even-better-toml",
+                "ms-python.mypy-type-checker",
                 "njpwerner.autodocstring",
-                "matangover.mypy"
-            ],
-            "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python",
-                "python.testing.pytestEnabled": true,
-                "editor.formatOnSave": true,
-                "python.formatting.provider": "black",
-                "terminal.integrated.defaultProfile.linux": "bash",
-                "[python]": {
-                    "editor.defaultFormatter": "ms-python.black-formatter",
-                    "editor.codeActionsOnSave": {
-                        "source.organizeImports": true
-                    }
-                },
-                "git.path": "/usr/bin/git",
-                "mypy.dmypyExecutable": "/usr/local/bin/dmypy"
-            }
+                "streetsidesoftware.code-spell-checker",
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens",
+                "github.vscode-pull-request-github",
+                "tamasfe.even-better-toml",
+                "redhat.vscode-yaml",
+                "editorconfig.editorconfig",
+                "ms-vsliveshare.vsliveshare",
+                "gruntfuggly.todo-tree"
+            ]
         }
     },
-    "postCreateCommand": "apt-get update && apt-get install -y git && pip install mypy && pip install -e . && pydanticai-api-template cleanup && pydanticai-api-template validate",
+    "postCreateCommand": "echo \"Dev container created! Use Cmd+Shift+B to start the server or run 'pydanticai-api-template run --reload' in the terminal.\"",
     "remoteUser": "root"
 }

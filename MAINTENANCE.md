@@ -7,7 +7,7 @@ This document explains how the project's configuration files are structured, how
 The project uses several configuration files that work together to create a seamless developer experience:
 
 1. **pyproject.toml** - Primary configuration file (dependencies, project metadata, tool configs)
-2. **Makefile** - Universal command interface 
+2. **Makefile** - Universal command interface
 3. **Docker** files (Dockerfile, Dockerfile.dev, docker-compose.yml)
 4. **VS Code** configurations (.devcontainer/devcontainer.json, .vscode/tasks.json)
 5. **Pre-commit** configuration (.pre-commit-config.yaml)
@@ -54,7 +54,7 @@ When adding new dependencies:
    ```bash
    # For regular dependencies
    uv add <package-name>
-   
+
    # For dev dependencies
    uv add --dev <package-name>
    ```
@@ -74,7 +74,7 @@ When adding new dependencies:
 
 When modifying the CLI:
 
-1. Update `app/cli.py` to add or modify commands
+1. Update `src/pydanticai_api_template/cli.py` to add or modify commands
 2. Update automated tests as needed
 3. Run the config sync tool to update VS Code tasks:
    ```bash
@@ -105,7 +105,7 @@ When enhancing VS Code experience:
 
 When changing code quality tools:
 
-1. Update configurations in `pyproject.toml` (ruff, black, mypy sections)
+1. Update configurations in `pyproject.toml` (ruff, ruff format, mypy sections)
 2. Run the config sync tool to update pre-commit hook versions:
    ```bash
    make sync-configs
@@ -117,7 +117,7 @@ When changing code quality tools:
 When updating major dependencies like Python, FastAPI, or UV:
 
 1.  **Review Changelogs**: Check the official changelogs for breaking changes or important migration notes.
-2.  **Update `pyproject.toml`**: Modify the version constraints as needed (e.g., `python = "^3.12"`). Use `uv add <package>@latest` or specify versions.
+2.  **Update `pyproject.toml`**: Modify the version constraints as needed (e.g., `python = ">=3.12"`). Use `uv add <package>@latest` or specify versions.
 3.  **Update `Dockerfile` / `.devcontainer`**: Ensure the base images (e.g., `python:3.12-slim`) or setup steps reflect the new versions.
 4.  **Run `uv sync`**: Update the `uv.lock` file.
 5.  **Run `make sync-configs`**: Update any related config files.
@@ -163,9 +163,10 @@ When adding new development tools:
 ### Container-related Issues
 
 If the CLI doesn't work in containers:
-1. Verify the symlink in the Dockerfile: `RUN ... && ln -s $(which pydanticai-api-template) /usr/local/bin/pydanticai-api-template`
-2. Check Python path and installation: `python -m app.cli`
+1. Verify the installation path in the Dockerfile or check if it's on PATH: `which pydanticai-api-template`
+2. Check Python path and installation: `python -m pydanticai_api_template.cli --help`
 3. Debug with `docker compose exec pydanticai-api-template-dev which pydanticai-api-template`
+4. Get a shell in the container for deeper debugging: `docker compose exec pydanticai-api-template-dev zsh`
 
 ### VS Code Dev Container Issues
 
@@ -188,12 +189,12 @@ For CI/CD integration:
 
 1. Use the production Docker container as the environment
 2. Run validation using `pydanticai-api-template validate`
-3. Run tests using your test framework of choice
+3. Run tests using your test framework of choice (e.g., `pytest`)
 4. Use health checks to verify deployment
 
 Example GitHub Actions workflow fragment:
 ```yaml
-- uses: actions/checkout@v3
+- uses: actions/checkout@v4
 - name: Build container
   run: docker build -t pydanticai-api-template .
 - name: Validate
@@ -211,5 +212,5 @@ Before committing significant changes:
 - [ ] Update Docker configurations if needed
 - [ ] Verify dev container works with VS Code
 - [ ] Test all Make commands
-- [ ] Update documentation in README.md
+- [ ] Update documentation in README.md and MAINTENANCE.md
 - [ ] Run pre-commit hooks: `pre-commit run --all-files` 
