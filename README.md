@@ -125,14 +125,14 @@ Update documentation when making these changes:
 
 | Change Type | Documentation to Update |
 |------------|--------------------------|
-| API endpoints | API.md, example in README if major |
-| Pydantic models | MODELS.md |
+| API endpoints | [API.md](./docs/API.md), example in README if major |
+| Pydantic models | [MODELS.md](./docs/MODELS.md) |
 | Project structure | README.md (project structure section) |
-| Architecture | ARCHITECTURE.md, README.md if major |
-| Dev workflow | DEVELOPER.md |
-| Configuration | docs/MAINTENANCE.md |
-| CLI commands | DEVELOPER.md, README.md if major |
-| Testing approach | TESTING.md |
+| Architecture | [ARCHITECTURE.md](./docs/ARCHITECTURE.md), README.md if major |
+| Dev workflow | [DEVELOPER.md](./docs/DEVELOPER.md) |
+| Configuration | [MAINTENANCE.md](./docs/MAINTENANCE.md) |
+| CLI commands | [DEVELOPER.md](./docs/DEVELOPER.md), README.md if major |
+| Testing approach | [TESTING.md](./docs/TESTING.md) |
 
 For all significant changes:
 1. Update relevant documentation files
