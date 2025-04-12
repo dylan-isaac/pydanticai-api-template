@@ -25,9 +25,17 @@
             "type": "shell",
             "command": "make lint",
             "group": "test",
-            "problemMatcher": [
-                "$ruff"
-            ],
+            "problemMatcher": {
+                "owner": "ruff",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(.+):(\\d+):(\\d+): (.+)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            },
             "detail": "Runs Ruff linter and formatter checks using Make."
         },
         {
