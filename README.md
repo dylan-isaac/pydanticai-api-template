@@ -18,6 +18,7 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
 3. **Start Development**:
    - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux) to start the server
    - Visit http://localhost:8000/docs to see API documentation
+   - For the MCP server, run `pydanticai-api-template run-mcp` and connect to http://localhost:3001
 
 ## Project Documentation
 
@@ -30,10 +31,37 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
 
 - **PydanticAI**: Structured interactions with LLMs using Pydantic models
 - **FastAPI**: High-performance API framework with automatic docs
+- **MCP Server**: Model Context Protocol server for AI agent access
 - **UV**: Fast dependency management and virtual environments
 - **Docker**: Containerization for consistent deployment
 - **Dev Containers**: VS Code / Cursor integration for zero-configuration setup
 - **Modern Tooling**: Ruff, MyPy, Typer CLI, and more
+
+## MCP Server
+
+This project includes an MCP (Model Context Protocol) server that allows AI agents to interact with the API. To start the MCP server:
+
+```bash
+pydanticai-api-template run-mcp
+```
+
+The MCP server will be available at http://localhost:3001, and provides the following tools:
+- `chat`: Send a message to the AI assistant and receive a response
+
+You can connect to the MCP server from any MCP client, for example:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.mcp import MCPServerHTTP
+
+server = MCPServerHTTP(url='http://localhost:3001/sse')
+agent = Agent('openai:gpt-4o', mcp_servers=[server])
+
+async def main():
+    async with agent.run_mcp_servers():
+        result = await agent.run('Your message here')
+    print(result.data)
+```
 
 ## Environment Variables
 

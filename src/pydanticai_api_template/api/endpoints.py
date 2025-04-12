@@ -1,7 +1,7 @@
 import logging
 import os
 import sys  # Import sys to configure logging output stream
-from typing import Dict
+from typing import Dict, Optional
 
 # Load environment variables from .env file BEFORE other imports
 # This ensures they are available when other modules might need them
@@ -62,7 +62,7 @@ app.add_middleware(
 # --- PydanticAI Agent ---
 try:
     # Use a more robust initialization
-    ai_agent = (
+    ai_agent: Optional[Agent] = (
         Agent("openai:gpt-4o", result_type=ChatResponse) if OPENAI_API_KEY else None
     )
     if ai_agent:
@@ -111,11 +111,17 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
         )
         # Explicitly assert that ai_agent is not None to satisfy type checker
         assert ai_agent is not None
+
         # Use the initialized agent
         agent_run_result = await ai_agent.run(chat_message.message)
 
-        chat_response: ChatResponse = agent_run_result.data
-        # Simplified logging to try and clear linter state
+        # Check if result is already a ChatResponse or needs conversion
+        if isinstance(agent_run_result.data, ChatResponse):
+            chat_response = agent_run_result.data
+        else:
+            # Convert string or dict response to ChatResponse
+            reply = str(agent_run_result.data)
+            chat_response = ChatResponse(reply=reply)
         logger.info("Agent returned reply.")
         return chat_response
     except Exception as e:

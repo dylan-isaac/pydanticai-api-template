@@ -474,5 +474,45 @@ def check() -> None:
     typer.echo("\n✨ Status check complete")
 
 
+@app.command()
+def run_mcp(
+    host: str = typer.Option(
+        "0.0.0.0", "--host", "-h", help="Host address to bind the MCP server to."
+    ),
+    port: int = typer.Option(
+        3001, "--port", "-p", help="Port number to bind the MCP server to."
+    ),
+    reload: bool = typer.Option(
+        True, "--reload", help="Enable auto-reload on code changes."
+    ),
+    log_level: str = typer.Option(
+        "info",
+        "--log-level",
+        help="Logging level (e.g., debug, info, warning, error, critical).",
+    ),
+) -> None:
+    """Run the MCP server for AI agent access."""
+    # Set environment variables for the MCP server
+    os.environ["MCP_HOST"] = host
+    os.environ["MCP_PORT"] = str(port)
+
+    # Import the create_app function from the mcp_server module
+    try:
+        from pydanticai_api_template.mcp_server import create_app
+
+        typer.echo(f"Starting MCP server on {host}:{port}...")
+        uvicorn.run(
+            create_app(),
+            host=host,
+            port=port,
+            reload=reload,
+            log_level=log_level.lower(),
+        )
+    except ImportError as e:
+        typer.echo(f"Error importing MCP server: {e}", err=True)
+        typer.echo("Please make sure pydantic-ai[mcp] and mcp packages are installed.")
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

@@ -85,3 +85,58 @@ The architecture is designed for extensibility:
 2. **Additional Endpoints**: Can be easily added to endpoints.py
 3. **New Models**: Can be defined in models.py to support new functionality
 4. **CLI Commands**: Can be added to cli.py to support new operations
+
+## MCP Server Architecture
+
+The project includes an MCP (Model Context Protocol) server that exposes AI functionalities over a standardized protocol.
+
+### Components
+
+```
+                  ┌──────────────────┐
+                  │   MCP Client     │
+                  │  (Any Protocol-  │
+                  │ Compatible Agent)│
+                  └────────┬─────────┘
+                           │
+                           │ HTTP SSE
+                           │ Connection
+                           ▼
+┌───────────────────────────────────────────────┐
+│                 MCP Server                     │
+│                                               │
+│  ┌───────────────┐      ┌───────────────────┐ │
+│  │  FastMCP      │◄────►│ AI Agent Tools    │ │
+│  │  Server       │      │                   │ │
+│  └───────┬───────┘      └─────────┬─────────┘ │
+│          │                        │           │
+│          │                        │           │
+│          ▼                        ▼           │
+│  ┌───────────────┐      ┌───────────────────┐ │
+│  │  FastAPI      │      │ PydanticAI Agent  │ │
+│  │  Integration  │      │                   │ │
+│  └───────────────┘      └───────────────────┘ │
+└───────────────────────────────────────────────┘
+```
+
+### Key Components
+
+1. **MCP Server** (`mcp_server.py`):
+   - Implements the Model Context Protocol server using FastMCP
+   - Provides AI tools that can be called by any MCP-compatible client
+   - Integrates with the FastAPI application for unified deployment
+
+2. **AI Agent Tools**:
+   - `chat`: Exposes the chat functionality to MCP clients
+   - Extensible: New tools can be added using the `@server.tool()` decorator
+
+3. **Transport Protocol**:
+   - Uses HTTP Server-Sent Events (SSE) for network communication
+   - Allows multiple clients to connect to the server remotely
+
+### Advantages
+
+- **Standardized Protocol**: Allows any MCP-compatible agent to access your API's functionalities
+- **Decoupled Architecture**: MCP clients don't need to know API implementation details
+- **Unified Development**: Same AI agents used in both REST API and MCP server
+- **Extensibility**: Easy to add new tools without changing client code

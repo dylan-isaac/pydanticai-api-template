@@ -83,3 +83,63 @@ No rate limiting is implemented in the template by default. In a production envi
 ## Extending the API
 
 To add new endpoints, see the [Developer Guide](./DEVELOPER.md) for instructions.
+
+## MCP Server
+
+The project includes an MCP (Model Context Protocol) server that allows AI agents to interact with our API.
+
+### MCP Endpoint
+
+- **URL**: `http://localhost:3001/sse`
+- **Transport**: HTTP Server-Sent Events (SSE)
+
+### Available Tools
+
+| Tool Name | Description | Parameters |
+|-----------|-------------|------------|
+| `chat` | Chat with the AI assistant | `message`: The message to send to the assistant |
+
+### Example Usage
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.mcp import MCPServerHTTP
+
+# Connect to the MCP server
+server = MCPServerHTTP(url='http://localhost:3001/sse')
+agent = Agent('openai:gpt-4o', mcp_servers=[server])
+
+async def main():
+    async with agent.run_mcp_servers():
+        result = await agent.run('Your message here')
+    print(result.data)
+```
+
+### Adding Custom Tools
+
+To add custom tools to the MCP server, edit the `/app/src/pydanticai_api_template/mcp_server.py` file and add new tool functions using the `@server.tool()` decorator:
+
+```python
+@server.tool()
+async def your_tool_name(param1: str, param2: int) -> str:
+    """Your tool description
+
+    More detailed description here.
+    """
+    # Tool implementation
+    return "Result"
+```
+
+### Running the MCP Server
+
+To start the MCP server:
+
+```bash
+pydanticai-api-template run-mcp
+```
+
+By default, the server runs on `0.0.0.0:3001`. You can customize the host and port:
+
+```bash
+pydanticai-api-template run-mcp --host 127.0.0.1 --port 4000
+```
