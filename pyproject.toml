@@ -7,8 +7,11 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "pydantic>=2.11.3",
-    "pydantic-ai[openai]>=0.0.55",
-    "typer[all]>=0.9.0",
+    "pydantic-ai>=0.0.55",
+    "openai>=1.0.0",
+    "typer>=0.9.0",
+    "rich>=13.5.0",
+    "shellingham>=1.5.0",
     "uvicorn>=0.27.1",
 ]
 
@@ -33,10 +36,12 @@ artifacts = ["src/**/*.py"]
 packages = ["src/pydanticai_api_template"]
 
 [tool.ruff]
-select = ["E", "F", "I"]
-ignore = ["E402"]
 line-length = 88
 target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E402"]
 
 [tool.ruff.format]
 quote-style = "double"

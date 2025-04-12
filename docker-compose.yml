@@ -37,7 +37,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5s # Give the service time to start before checking
-    command: pydanticai-api-template run --reload # Updated command to match new CLI entry point
 
   # Production-like service (without hot reload or dev tools)
   pydanticai-api-template:

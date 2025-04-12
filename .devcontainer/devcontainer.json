@@ -51,6 +51,6 @@
             ]
         }
     },
-    "postCreateCommand": "echo \"Dev container created! Use Cmd+Shift+B to start the server or run 'pydanticai-api-template run --reload' in the terminal.\"",
+    "postCreateCommand": "chmod +x scripts/welcome.sh && scripts/welcome.sh && python scripts/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B or run \"start\" in the terminal to start the server.'",
     "remoteUser": "root"
 }

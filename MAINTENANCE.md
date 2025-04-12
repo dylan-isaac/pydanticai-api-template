@@ -2,6 +2,61 @@
 
 This document explains how the project's configuration files are structured, how they relate to each other, and how to maintain them when making changes.
 
+## Dev Container Architecture
+
+The development environment uses VS Code's Dev Containers to provide a consistent, isolated environment.
+
+```
+┌─────────────────────────────────┐
+│         Host Machine            │
+│                                 │
+│ ┌─────────┐     ┌─────────────┐ │
+│ │ VS Code │     │ Git Config  │ │
+│ │ Cursor  │     │ Credentials │ │
+│ └────┬────┘     └──────┬──────┘ │
+└──────┼────────────────┼─────────┘
+       │                │
+       ▼                ▼
+┌──────────────────────────────────────────────┐
+│              Docker Container                │
+│                                              │
+│ ┌──────────┐ ┌────────┐ ┌─────────────────┐ │
+│ │ Python   │ │ Source │ │ Dev Tools       │ │
+│ │ FastAPI  │ │ Code   │ │ • Zsh + Oh My   │ │
+│ │ PydanticAI│ │ (mount)│ │ • Modern CLIs  │ │
+│ └──────────┘ └────────┘ │ • Ruff/MyPy     │ │
+│                         └─────────────────┘ │
+│ ┌──────────────────────────────────────────┐│
+│ │ VS Code Server                           ││
+│ │ • Extensions                             ││
+│ │ • Tasks, Debugging                       ││
+│ │ • Terminal                               ││
+│ └──────────────────────────────────────────┘│
+└──────────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **Configuration Flow**:
+   - `.devcontainer/devcontainer.json` defines the container configuration
+   - It references `docker-compose.dev.yml` for container creation
+   - VS Code Server runs inside the container to provide IDE features
+
+2. **Volume Mounting**:
+   - Source code from the host is mounted into the container
+   - Host's Git configuration is mounted for seamless Git operations
+   - Container-specific directories (.venv, __pycache__) stay in the container for performance
+
+3. **Development Workflow**:
+   - The container starts without automatically launching the application
+   - When the container starts, a welcome message shows available commands
+   - Developers manually start the server with `start` command or VS Code tasks (Cmd+Shift+B)
+   - VS Code tasks provide easy access to common operations
+   - Extensions handle linting, formatting, and debugging inside the container
+   - Changes to the code on the host are immediately visible in the container
+
+This architecture allows developers to work with local files while having consistent tooling and dependencies across all development setups. The separation between container startup and application startup ensures better stability and easier troubleshooting.
+
 ## Configuration File Hierarchy
 
 The project uses several configuration files that work together to create a seamless developer experience:
@@ -11,6 +66,16 @@ The project uses several configuration files that work together to create a seam
 3. **Docker** files (Dockerfile, Dockerfile.dev, docker-compose.yml)
 4. **VS Code** configurations (.devcontainer/devcontainer.json, .vscode/tasks.json)
 5. **Pre-commit** configuration (.pre-commit-config.yaml)
+
+## Environment Variables and .env Files
+
+The project supports loading environment variables from `.env` files placed in the project root. This allows developers to:
+
+1. Keep sensitive data like API keys out of version control
+2. Configure the application locally without modifying container settings
+3. Override default settings when needed
+
+The `.env` file is automatically loaded by the application at startup. Note that the environment status check tool directly checks the environment variables, so it may show warnings even when your app is working correctly with the .env file.
 
 ## Git Configuration in Dev Containers
 
@@ -168,6 +233,14 @@ If the CLI doesn't work in containers:
 3. Debug with `docker compose exec pydanticai-api-template-dev which pydanticai-api-template`
 4. Get a shell in the container for deeper debugging: `docker compose exec pydanticai-api-template-dev zsh`
 
+### Application Startup Issues
+
+If the server doesn't start when expected:
+1. Make sure you're running `start` or pressing Cmd+Shift+B to manually start the server
+2. Check for errors in the terminal output
+3. Verify that port 8000 is not in use by another application
+4. Try running the server with debug output: `pydanticai-api-template run --reload --log-level debug`
+
 ### VS Code Dev Container Issues
 
 If VS Code dev containers don't work:
@@ -195,12 +268,6 @@ For CI/CD integration:
 Example GitHub Actions workflow fragment:
 ```yaml
 - uses: actions/checkout@v4
-- name: Build container
-  run: docker build -t pydanticai-api-template .
-- name: Validate
-  run: docker run pydanticai-api-template pydanticai-api-template validate
-- name: Run tests
-  run: docker run pydanticai-api-template pytest
 ```
 
 ## Final Checklist for Updates
@@ -213,4 +280,4 @@ Before committing significant changes:
 - [ ] Verify dev container works with VS Code
 - [ ] Test all Make commands
 - [ ] Update documentation in README.md and MAINTENANCE.md
-- [ ] Run pre-commit hooks: `pre-commit run --all-files` 
+- [ ] Run pre-commit hooks: `pre-commit run --all-files`

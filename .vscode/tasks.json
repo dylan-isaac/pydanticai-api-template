@@ -2,14 +2,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Dev Server",
+            "label": "Start Development Server",
             "type": "shell",
             "command": "make",
             "args": [
                 "run"
             ],
             "problemMatcher": [],
-            "detail": "Runs: make run",
+            "detail": "Start the FastAPI development server with hot reload",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -74,6 +74,67 @@
             ],
             "problemMatcher": [],
             "detail": "Runs: make cleanup"
+        },
+        {
+            "label": "Run Dev Server (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template run --reload",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs the FastAPI server with hot reload using the CLI.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "Lint (pydanticai-api-template)",
+            "type": "shell",
+            "command": "make lint",
+            "group": "test",
+            "problemMatcher": [
+                "$ruff"
+            ],
+            "detail": "Runs Ruff linter and formatter checks using Make."
+        },
+        {
+            "label": "Test (pydanticai-api-template)",
+            "type": "shell",
+            "command": "make test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs pytest using Make."
+        },
+        {
+            "label": "Validate (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template validate",
+            "problemMatcher": [],
+            "detail": "Runs the CLI validation command."
+        },
+        {
+            "label": "Cleanup (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template cleanup",
+            "problemMatcher": [],
+            "detail": "Runs the CLI cleanup command."
+        },
+        {
+            "label": "Sync Configs (pydanticai-api-template)",
+            "type": "shell",
+            "command": "make sync-configs",
+            "problemMatcher": [],
+            "detail": "Runs the configuration synchronization script."
         }
     ]
 }

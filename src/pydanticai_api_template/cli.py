@@ -16,12 +16,22 @@ app = typer.Typer(help=f"{PROJECT_NAME} CLI")
 
 @app.command()
 def run(
-    host: str = typer.Option("0.0.0.0", "--host", "-h", help="Host address to bind the server to."),
-    port: int = typer.Option(8000, "--port", "-p", help="Port number to bind the server to."),
-    reload: bool = typer.Option(True, "--reload", help="Enable auto-reload on code changes."),
-    workers: int = typer.Option(1, "--workers", "-w", help="Number of worker processes."),
+    host: str = typer.Option(
+        "0.0.0.0", "--host", "-h", help="Host address to bind the server to."
+    ),
+    port: int = typer.Option(
+        8000, "--port", "-p", help="Port number to bind the server to."
+    ),
+    reload: bool = typer.Option(
+        True, "--reload", help="Enable auto-reload on code changes."
+    ),
+    workers: int = typer.Option(
+        1, "--workers", "-w", help="Number of worker processes."
+    ),
     log_level: str = typer.Option(
-        "info", "--log-level", help="Logging level (e.g., debug, info, warning, error, critical)."
+        "info",
+        "--log-level",
+        help="Logging level (e.g., debug, info, warning, error, critical).",
     ),
 ) -> None:
     """Run the FastAPI application server."""
@@ -29,12 +39,12 @@ def run(
     app_path = "pydanticai_api_template.api.endpoints:app"
     typer.echo(f"Starting Uvicorn server for {app_path}...")
     uvicorn.run(
-        app_path, # Use the updated path
+        app_path,  # Use the updated path
         host=host,
         port=port,
         reload=reload,
         workers=workers,
-        log_level=log_level.lower(), # Ensure log level is lowercase
+        log_level=log_level.lower(),  # Ensure log level is lowercase
     )
 
 
@@ -52,11 +62,13 @@ def version() -> None:
             with open(init_path, "r") as f:
                 for line in f:
                     if line.startswith("__version__"):
-                        pkg_version = line.split("=")[1].strip().strip('"\'')
-                        typer.echo(f"{PROJECT_NAME} version: {pkg_version} (from __init__.py)")
+                        pkg_version = line.split("=")[1].strip().strip("\"'")
+                        typer.echo(
+                            f"{PROJECT_NAME} version: {pkg_version} (from __init__.py)"
+                        )
                         return
         except Exception:
-            pass # Ignore errors trying to read __init__.py
+            pass  # Ignore errors trying to read __init__.py
         typer.echo(f"{PROJECT_NAME} version: unknown (package not installed?) ")
 
 
@@ -64,8 +76,11 @@ def version() -> None:
 def install_completion(
     shell: Optional[str] = typer.Argument(
         None,
-        help="The shell to install completion for. If not provided, detects the current shell.",
-        show_default=False, # Don't show default value in help
+        help=(
+            "The shell to install completion for. "
+            "If not provided, detects the current shell."
+        ),
+        show_default=False,  # Don't show default value in help
     ),
 ) -> None:
     """Install shell completion for the CLI.
@@ -78,11 +93,11 @@ def install_completion(
     if shell is None:
         shell = typer.prompt(
             "Which shell do you want to install completion for? (bash, zsh, fish)",
-            default=os.path.basename(os.getenv("SHELL", "bash")) # Sensible default
+            default=os.path.basename(os.getenv("SHELL", "bash")),  # Sensible default
         )
 
     shell = shell.lower()
-    cli_name = PROJECT_NAME # Use the defined project name
+    cli_name = PROJECT_NAME  # Use the defined project name
     env_var_name = f"_{cli_name.upper().replace('-', '_')}_COMPLETE"
 
     completion_script = ""
@@ -124,12 +139,14 @@ def install_completion(
             typer.echo(f"ℹ️ Completion script already exists in {config_file_path}")
 
         typer.echo(
-            "\nPlease restart your shell or source the config file (e.g., 'source ~/.zshrc') for changes to take effect."
+            "\nPlease restart your shell or source the config file "
+            "(e.g., 'source ~/.zshrc') for changes to take effect."
         )
 
     except OSError as e:
         typer.echo(
-            f"❌ Error accessing shell configuration file {config_file_path}: {e}", err=True
+            f"❌ Error accessing shell configuration file {config_file_path}: {e}",
+            err=True,
         )
         typer.echo("You may need to add the script manually:")
         typer.echo(f"  {completion_script}")
@@ -140,7 +157,9 @@ def install_completion(
 def validate() -> None:
     """Validate application configuration and environment."""
     typer.echo("🔍 Validating environment...")
-    python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    python_version = (
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
     typer.echo(f"✅ Python version: {python_version}")
 
     # Check key dependencies
@@ -150,7 +169,10 @@ def validate() -> None:
             version = importlib.metadata.version(dep)
             typer.echo(f"✅ {dep} version: {version}")
         except importlib.metadata.PackageNotFoundError:
-            typer.echo(f"⚠️ {dep} package not found (might be OK if not needed for current task)")
+            typer.echo(
+                f"⚠️ {dep} package not found "
+                "(might be OK if not needed for current task)"
+            )
 
     # Check OpenAI Key (optional)
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -180,23 +202,287 @@ def cleanup() -> None:
 
     try:
         # Dynamically import and run the main function from the cleanup script
-        spec = importlib.util.spec_from_file_location("cleanup_script", str(cleanup_script_path))
+        spec = importlib.util.spec_from_file_location(
+            "cleanup_script", str(cleanup_script_path)
+        )
         if spec and spec.loader:
             cleanup_module = importlib.util.module_from_spec(spec)
-            sys.modules["cleanup_script"] = cleanup_module # Add to sys.modules temporarily
+            sys.modules["cleanup_script"] = (
+                cleanup_module  # Add to sys.modules temporarily
+            )
             spec.loader.exec_module(cleanup_module)
-            if hasattr(cleanup_module, "main"): # Check if main function exists
-                cleanup_module.main() # Execute the main function
+            if hasattr(cleanup_module, "main"):  # Check if main function exists
+                cleanup_module.main()  # Execute the main function
                 typer.echo("✅ Cleanup complete!")
             else:
-                 typer.echo(f"❌ 'main' function not found in {cleanup_script_path}", err=True)
-                 raise typer.Exit(code=1)
+                typer.echo(
+                    f"❌ 'main' function not found in {cleanup_script_path}", err=True
+                )
+                raise typer.Exit(code=1)
         else:
-            typer.echo(f"❌ Could not load cleanup script from {cleanup_script_path}", err=True)
+            typer.echo(
+                f"❌ Could not load cleanup script from {cleanup_script_path}", err=True
+            )
             raise typer.Exit(code=1)
     except Exception as e:
         typer.echo(f"❌ An error occurred during cleanup: {e}", err=True)
         raise typer.Exit(code=1)
+
+
+@app.command()
+def lint() -> None:
+    """Run code quality checks using Ruff."""
+    import shutil
+    import subprocess
+
+    typer.echo("🔍 Running code quality checks...")
+
+    # Check if we're inside a dev container
+    in_container = Path("/.dockerenv").exists()
+
+    # Check if 'make' is available
+    if shutil.which("make"):
+        try:
+            # Use Make command which handles dependency installation if needed
+            result = subprocess.run(
+                ["make", "lint"], check=True, capture_output=True, text=True
+            )
+            typer.echo(result.stdout)
+            typer.echo("✅ Linting complete!")
+        except subprocess.CalledProcessError as e:
+            if in_container:
+                # If in container and make failed, try direct commands
+                # with --system flag
+                typer.echo("Make command failed, trying direct commands...")
+                try:
+                    # Run Ruff check
+                    typer.echo("Running Ruff check...")
+                    subprocess.run(["ruff", "check", "."], check=True)
+
+                    # Run Ruff format check
+                    typer.echo("Running Ruff format check...")
+                    subprocess.run(["ruff", "format", "--check", "."], check=True)
+
+                    typer.echo("✅ Linting complete!")
+                    return
+                except subprocess.CalledProcessError:
+                    pass
+            # If we get here, both approaches failed
+            typer.echo(f"❌ Linting failed:\n{e.stdout}\n{e.stderr}", err=True)
+            raise typer.Exit(code=1)
+    else:
+        # Fallback to direct commands if Make is not available
+        try:
+            # Install dev dependencies if not in container (container should have them)
+            if not in_container:
+                typer.echo("Installing development dependencies...")
+                subprocess.run(
+                    ["uv", "pip", "install", "-e", ".[dev]"],
+                    check=True,
+                    capture_output=True,
+                )
+            else:
+                # In container, use --system flag to avoid venv issues
+                typer.echo("Installing development dependencies with system flag...")
+                subprocess.run(
+                    ["uv", "pip", "install", "--system", "-e", ".[dev]"],
+                    check=True,
+                    capture_output=True,
+                )
+
+            # Run Ruff check
+            typer.echo("Running Ruff check...")
+            subprocess.run(["ruff", "check", "."], check=True)
+
+            # Run Ruff format check
+            typer.echo("Running Ruff format check...")
+            subprocess.run(["ruff", "format", "--check", "."], check=True)
+
+            typer.echo("✅ Linting complete!")
+        except subprocess.CalledProcessError:
+            typer.echo("❌ Linting failed!", err=True)
+            raise typer.Exit(code=1)
+
+
+@app.command()
+def test() -> None:
+    """Run tests using pytest."""
+    import shutil
+    import subprocess
+
+    typer.echo("🧪 Running tests...")
+
+    # Check if we're inside a dev container
+    in_container = Path("/.dockerenv").exists()
+
+    # Check if 'make' is available
+    if shutil.which("make"):
+        try:
+            # Use Make command which handles dependency installation if needed
+            result = subprocess.run(
+                ["make", "test"], check=True, capture_output=True, text=True
+            )
+            typer.echo(result.stdout)
+            typer.echo("✅ Tests complete!")
+        except subprocess.CalledProcessError as e:
+            if in_container:
+                # If in container and make failed, try direct command
+                typer.echo("Make command failed, trying direct command...")
+                try:
+                    subprocess.run(["pytest"], check=True)
+                    typer.echo("✅ Tests complete!")
+                    return
+                except subprocess.CalledProcessError:
+                    pass
+            # If we get here, both approaches failed
+            typer.echo(f"❌ Tests failed:\n{e.stdout}\n{e.stderr}", err=True)
+            raise typer.Exit(code=1)
+    else:
+        # Fallback to direct commands if Make is not available
+        try:
+            # Install test dependencies if not in container (container should have them)
+            if not in_container:
+                typer.echo("Installing test dependencies...")
+                subprocess.run(
+                    ["uv", "pip", "install", "-e", ".[dev,test]"],
+                    check=True,
+                    capture_output=True,
+                )
+            else:
+                # In container, use --system flag to avoid venv issues
+                typer.echo("Installing test dependencies with system flag...")
+                subprocess.run(
+                    ["uv", "pip", "install", "--system", "-e", ".[dev,test]"],
+                    check=True,
+                    capture_output=True,
+                )
+
+            # Run pytest
+            typer.echo("Running pytest...")
+            subprocess.run(["pytest"], check=True)
+
+            typer.echo("✅ Tests complete!")
+        except subprocess.CalledProcessError:
+            typer.echo("❌ Tests failed!", err=True)
+            raise typer.Exit(code=1)
+
+
+@app.command()
+def sync() -> None:
+    """Synchronize configuration files."""
+    import shutil
+    import subprocess
+
+    typer.echo("🔄 Synchronizing configuration files...")
+
+    # Check if we're inside a dev container
+    in_container = Path("/.dockerenv").exists()
+
+    # Check if 'make' is available
+    if shutil.which("make"):
+        try:
+            # Use Make command to run the sync script
+            result = subprocess.run(
+                ["make", "sync-configs"], check=True, capture_output=True, text=True
+            )
+            typer.echo(result.stdout)
+            typer.echo("✅ Configuration sync complete!")
+        except subprocess.CalledProcessError as e:
+            if in_container:
+                # If in container and make failed, try direct command
+                typer.echo("Make command failed, trying direct command...")
+                try:
+                    sync_script = (
+                        Path(__file__).parent.parent.parent
+                        / "scripts"
+                        / "update_configs.py"
+                    )
+
+                    if not sync_script.exists():
+                        typer.echo(
+                            f"❌ Sync script not found at: {sync_script}", err=True
+                        )
+                        raise typer.Exit(code=1)
+
+                    typer.echo(f"Running sync script: {sync_script}")
+                    subprocess.run(["python", str(sync_script)], check=True)
+
+                    typer.echo("✅ Configuration sync complete!")
+                    return
+                except subprocess.CalledProcessError:
+                    pass
+            # If we get here, both approaches failed
+            typer.echo(
+                f"❌ Configuration sync failed:\n{e.stdout}\n{e.stderr}", err=True
+            )
+            raise typer.Exit(code=1)
+    else:
+        # Fallback to direct command if Make is not available
+        try:
+            # For direct execution, we need to make sure dependencies are installed
+            if in_container:
+                # In container, use --system flag to avoid venv issues
+                typer.echo("Installing required dependencies with system flag...")
+                try:
+                    subprocess.run(
+                        ["uv", "pip", "install", "--system", "pyyaml", "tomli"],
+                        check=True,
+                        capture_output=True,
+                    )
+                except subprocess.CalledProcessError as e:
+                    typer.echo(f"Failed to install dependencies: {e}", err=True)
+
+            sync_script = (
+                Path(__file__).parent.parent.parent / "scripts" / "update_configs.py"
+            )
+
+            if not sync_script.exists():
+                typer.echo(f"❌ Sync script not found at: {sync_script}", err=True)
+                raise typer.Exit(code=1)
+
+            typer.echo(f"Running sync script: {sync_script}")
+            subprocess.run(["python", str(sync_script)], check=True)
+
+            typer.echo("✅ Configuration sync complete!")
+        except subprocess.CalledProcessError as e:
+            typer.echo(f"❌ Configuration sync failed: {e}", err=True)
+            raise typer.Exit(code=1)
+
+
+@app.command()
+def check() -> None:
+    """Perform a quick status check of the development environment."""
+    import shutil
+    import socket
+
+    typer.echo("🔍 PydanticAI API Template Status Check")
+
+    # Check Python and dependencies (reuse validate command)
+    validate()
+
+    # Check if server port is available
+    port = 8000
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("localhost", port))
+        typer.echo(f"✅ Port {port} is available")
+    except socket.error:
+        typer.echo(f"⚠️ Port {port} is already in use. Is the server running?")
+    finally:
+        s.close()
+
+    # Check Docker status if in container
+    if os.path.exists("/.dockerenv"):
+        typer.echo("✅ Running inside Docker container")
+
+    # Check required CLI tools
+    for cmd in ["curl", "make", "git"]:
+        if shutil.which(cmd):
+            typer.echo(f"✅ {cmd} is installed")
+        else:
+            typer.echo(f"❌ {cmd} is not installed")
+
+    typer.echo("\n✨ Status check complete")
 
 
 if __name__ == "__main__":

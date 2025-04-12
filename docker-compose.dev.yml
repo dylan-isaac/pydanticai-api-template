@@ -31,10 +31,11 @@ services:
     tty: true # Keep the container running interactively
     stdin_open: true # Keep stdin open for interactive sessions
     healthcheck:
-      # Basic health check: verifies the FastAPI docs endpoint is reachable
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      # Basic health check: verifies the container is responsive, not the app
+      test: ["CMD", "echo", "Container is healthy"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 5s # Give the service time to start before checking
-    command: pydanticai-api-template run --reload # Updated command to match new CLI entry point 
+      start_period: 5s
+    # Keep container running without starting the app
+    command: ["zsh", "-c", "echo '🚀 Dev Container ready! Start the server with: start or press Cmd+Shift+B'; exec zsh -i"]
