@@ -10,6 +10,7 @@ import uvicorn
 
 # Get the project name from pyproject.toml or define it
 PROJECT_NAME = "pydanticai-api-template"
+CLI_NAME = "pat"  # New CLI command name
 
 app = typer.Typer(help=f"{PROJECT_NAME} CLI")
 
@@ -76,7 +77,7 @@ def install_completion(
 
     Tries to detect the shell if not provided.
     Supported shells: bash, zsh, fish
-    Example: pydanticai-api-template install-completion zsh
+    Example: pat install-completion zsh
     """
     # Improved shell detection and handling from axe-ai
     if shell is None:
@@ -86,7 +87,7 @@ def install_completion(
         )
 
     shell = shell.lower()
-    cli_name = PROJECT_NAME  # Use the defined project name
+    cli_name = CLI_NAME  # Use the defined CLI name
     env_var_name = f"_{cli_name.upper().replace('-', '_')}_COMPLETE"
 
     completion_script = ""

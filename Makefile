@@ -6,13 +6,13 @@ install:
 	uv sync && uv pip install -e .
 
 run:
-	pydanticai-api-template run --reload
+	pat run --reload
 
 shell-completion:
-	pydanticai-api-template install-completion
+	pat install-completion
 
 validate:
-	pydanticai-api-template validate
+	pat validate
 
 # Code quality commands - note: dependencies are already installed in the container
 # If running locally outside the container, these will install dependencies first

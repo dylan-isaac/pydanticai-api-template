@@ -64,9 +64,9 @@ RUN mkdir -p /etc/profile.d && \
 # Create development environment initialization script with useful aliases
 RUN echo '# Development environment initialization\n\
 # Project-specific aliases\n\
-alias start="pydanticai-api-template run --reload"\n\
-alias check="pydanticai-api-template check"\n\
-alias validate="pydanticai-api-template validate"\n\
+alias start="pat run --reload & pat run-mcp"\n\
+alias check="pat check"\n\
+alias validate="pat validate"\n\
 alias lint="make lint"\n\
 alias test="make test"\n\
 alias sync="make sync-configs"\n\
@@ -75,7 +75,7 @@ alias docs="xdg-open http://localhost:8000/docs 2>/dev/null || open http://local
 # Helper to show available aliases\n\
 function help() {\n\
   echo "Available commands:"\n\
-  echo "  start    - Start development server"\n\
+  echo "  start    - Start both REST API and MCP servers"\n\
   echo "  check    - Run environment status check"\n\
   echo "  validate - Validate environment configuration"\n\
   echo "  lint     - Run code quality checks"\n\

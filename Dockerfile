@@ -43,4 +43,4 @@ EXPOSE 8000
 
 # Command to run the application using the CLI entry point defined in pyproject.toml
 # Ensures it runs as the non-root user
-CMD ["pydanticai-api-template", "run", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--log-level", "info"] # Use CLI script name 
+CMD ["pat", "run", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--log-level", "info"] # Use CLI command

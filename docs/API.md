@@ -166,11 +166,11 @@ async def your_tool_name(param1: str, param2: int) -> str:
 To start the MCP server:
 
 ```bash
-pydanticai-api-template run-mcp
+pat run-mcp
 ```
 
 By default, the server runs on `0.0.0.0:3001`. You can customize the host and port:
 
 ```bash
-pydanticai-api-template run-mcp --host 127.0.0.1 --port 4000
+pat run-mcp --host 127.0.0.1 --port 4000
 ```

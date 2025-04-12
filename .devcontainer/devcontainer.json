@@ -6,7 +6,8 @@
     "service": "pydanticai-api-template-dev",
     "workspaceFolder": "/app",
     "forwardPorts": [
-        8000
+        8000,
+        3001
     ],
     "runServices": [
         "pydanticai-api-template-dev"
@@ -55,5 +56,5 @@
             ]
         }
     },
-    "postCreateCommand": "chmod +x scripts/welcome.sh && scripts/welcome.sh && python scripts/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B or run \"start\" in the terminal to start the server.'"
+    "postCreateCommand": "chmod +x scripts/welcome.sh && scripts/welcome.sh && python scripts/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B to start both REST API and MCP servers, or type \"start\" in the terminal.'"
 }

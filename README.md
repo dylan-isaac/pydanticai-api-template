@@ -18,7 +18,7 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
 3. **Start Development**:
    - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux)
    - Visit http://localhost:8000/docs for API documentation
-   - For the MCP server: `pydanticai-api-template run-mcp` (accessible at http://localhost:3001)
+   - For the MCP server: `pat run-mcp` (accessible at http://localhost:3001)
 
 ## Documentation Map
 

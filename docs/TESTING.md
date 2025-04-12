@@ -10,7 +10,7 @@ To run the automated tests:
 
 ```bash
 # Run all tests
-pydanticai-api-template test
+pat test
 
 # Run specific tests with pytest directly
 python -m pytest tests/test_mcp_server.py -v
@@ -54,7 +54,7 @@ The MCP server has unit tests in `tests/test_mcp_server.py` that test:
 Start the MCP server:
 
 ```bash
-pydanticai-api-template run-mcp
+pat run-mcp
 ```
 
 The server will start on http://localhost:3001 by default.
@@ -291,7 +291,7 @@ mypy src/pydanticai_api_template/api/models.py
    - Check that the .env file is in the correct location (project root)
 
 3. **Port already in use**:
-   - If port 3001 is already in use, change the port: `pydanticai-api-template run-mcp --port 3002`
+   - If port 3001 is already in use, change the port: `pat run-mcp --port 3002`
 
 4. **Type checking errors**:
    - Check the function signatures and return types
@@ -303,7 +303,7 @@ mypy src/pydanticai_api_template/api/models.py
 To see detailed logs from the MCP server:
 
 ```bash
-pydanticai-api-template run-mcp --log-level debug
+pat run-mcp --log-level debug
 ```
 
 This will show more detailed information about the server operation and any errors.
@@ -378,16 +378,16 @@ To run promptfoo tests using the CLI:
 
 ```bash
 # Run all prompt tests
-pydanticai-api-template prompt-test
+pat prompt-test
 
 # Run tests with a specific config file
-pydanticai-api-template prompt-test --config custom-config.yaml
+pat prompt-test --config custom-config.yaml
 
 # Open the web UI after running tests
-pydanticai-api-template prompt-test --view
+pat prompt-test --view
 
 # Show detailed test information
-pydanticai-api-template prompt-test --verbose
+pat prompt-test --verbose
 ```
 
 ### Prompt Test Configuration

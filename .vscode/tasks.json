@@ -14,7 +14,7 @@
         {
             "label": "Run MCP Server",
             "type": "shell",
-            "command": "pydanticai-api-template run-mcp",
+            "command": "pat run-mcp",
             "problemMatcher": [],
             "detail": "Runs the MCP (Model Context Protocol) server.",
             "presentation": {
@@ -26,7 +26,7 @@
         {
             "label": "Run All Servers",
             "dependsOn": [
-                "Run Dev Server (pydanticai-api-template)",
+                "Run Dev Server (API)",
                 "Run MCP Server"
             ],
             "group": {
@@ -35,6 +35,61 @@
             },
             "problemMatcher": [],
             "detail": "Launches both the REST API and MCP servers."
+        },
+        {
+            "label": "Run Dev Server (API)",
+            "type": "shell",
+            "command": "pat run --reload",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Runs the FastAPI server with hot reload using the CLI.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            }
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "make lint",
+            "group": "test",
+            "problemMatcher": [
+                "$ruff"
+            ],
+            "detail": "Runs Ruff linter and formatter checks using Make."
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "make test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs pytest using Make."
+        },
+        {
+            "label": "Validate",
+            "type": "shell",
+            "command": "pat validate",
+            "problemMatcher": [],
+            "detail": "Runs the CLI validation command."
+        },
+        {
+            "label": "Cleanup",
+            "type": "shell",
+            "command": "pat cleanup",
+            "problemMatcher": [],
+            "detail": "Runs the CLI cleanup command."
+        },
+        {
+            "label": "Sync Configs",
+            "type": "shell",
+            "command": "make sync-configs",
+            "problemMatcher": [],
+            "detail": "Runs the configuration synchronization script."
         },
         {
             "label": "Run Dev Server (pydanticai-api-template)",

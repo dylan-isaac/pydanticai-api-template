@@ -65,4 +65,4 @@ services:
       retries: 3
       start_period: 5s
     # The production Dockerfile's CMD will be used by default
-    # command: pydanticai-api-template run --host 0.0.0.0 # Command is defined in Dockerfile
+    # command: pat run --host 0.0.0.0 # Command is defined in Dockerfile

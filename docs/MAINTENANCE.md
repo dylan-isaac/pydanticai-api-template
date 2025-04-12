@@ -221,9 +221,9 @@ pyproject.toml           # Primary source of truth for dependencies
     ├── .pre-commit-config.yaml  # Should align with dev dependencies
     │   └── (updated by sync tool)
     │
-    ├── Makefile         # Commands should match available CLI commands
+    ├── Makefile         # Commands should match available CLI commands (pat)
     │
-    └── .vscode/tasks.json  # Tasks should align with CLI commands
+    └── .vscode/tasks.json  # Tasks should align with CLI commands (pat)
         └── (updated by sync tool)
 ```
 
@@ -243,9 +243,9 @@ When adding new development tools:
 ### Container-related Issues
 
 If the CLI doesn't work in containers:
-1. Verify the installation path in the Dockerfile or check if it's on PATH: `which pydanticai-api-template`
+1. Verify the installation path in the Dockerfile or check if it's on PATH: `which pat`
 2. Check Python path and installation: `python -m pydanticai_api_template.cli --help`
-3. Debug with `docker compose exec pydanticai-api-template-dev which pydanticai-api-template`
+3. Debug with `docker compose exec pydanticai-api-template-dev which pat`
 4. Get a shell in the container for deeper debugging: `docker compose exec pydanticai-api-template-dev zsh`
 
 ### Application Startup Issues
@@ -254,7 +254,7 @@ If the server doesn't start when expected:
 1. Make sure you're running `start` or pressing Cmd+Shift+B to manually start the server
 2. Check for errors in the terminal output
 3. Verify that port 8000 is not in use by another application
-4. Try running the server with debug output: `pydanticai-api-template run --reload --log-level debug`
+4. Try running the server with debug output: `pat run --reload --log-level debug`
 
 ### VS Code Dev Container Issues
 
@@ -276,7 +276,7 @@ If Make commands fail:
 For CI/CD integration:
 
 1. Use the production Docker container as the environment
-2. Run validation using `pydanticai-api-template validate`
+2. Run validation using `pat validate`
 3. Run tests using your test framework of choice (e.g., `pytest`)
 4. Use health checks to verify deployment
 

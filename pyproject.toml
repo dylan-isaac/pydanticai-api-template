@@ -38,7 +38,7 @@ test = [
 ]
 
 [project.scripts]
-pydanticai-api-template = "pydanticai_api_template.cli:app"
+pat = "pydanticai_api_template.cli:app"
 
 [tool.hatch.build]
 artifacts = ["src/**/*.py", "src/**/py.typed"]
