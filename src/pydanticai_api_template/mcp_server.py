@@ -149,7 +149,9 @@ async def story(message: str) -> dict:
         if not story_agent:
             span.set_status("error", "AI service not available")
             return {
-                "error": "AI service is not available. Please check server configuration."
+                "error": (
+                    "AI service is not available. Please check server configuration."
+                )
             }
 
         try:

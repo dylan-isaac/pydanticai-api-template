@@ -308,21 +308,165 @@ pydanticai-api-template run-mcp --log-level debug
 
 This will show more detailed information about the server operation and any errors.
 
-## Continuous Integration
+## CI/CD Integration
 
-If you're setting up CI/CD pipelines, add the following steps to test the MCP server:
+When integrating tests with CI/CD pipelines, you can automate the verification of your API, MCP server, and prompts.
+
+### Standard Testing
+
+For basic API and MCP server testing:
 
 ```yaml
 # Example GitHub Actions step
-- name: Test MCP Server
-  run: |
-    python -m pytest tests/test_mcp_server.py -v
+- name: Run Tests
+  run: python -m pytest
   env:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-# Add type checking
-- name: Run Type Checker
-  run: |
-    pip install mypy
-    mypy src tests
+# Type checking
+- name: Type Check
+  run: mypy src tests
 ```
+
+### Prompt Testing in CI
+
+Add prompt testing to your CI pipeline:
+
+```yaml
+# For GitHub Actions
+- name: Setup Node.js and Python
+  uses: actions/setup-node@v3 # For promptfoo
+  with:
+    node-version: '18'
+- name: Install promptfoo
+  run: npm install -g promptfoo@0.1.0
+- name: Run prompt tests
+  run: python -m pydanticai_api_template.cli prompt-test
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+```
+
+```yaml
+# For GitLab CI
+prompt-testing:
+  stage: test
+  image: node:18
+  before_script:
+    - apt-get update && apt-get install -y python3 python3-pip
+    - npm install -g promptfoo@0.1.0
+    - pip3 install -e ".[dev,test]"
+  script:
+    - python -m pydanticai_api_template.cli prompt-test
+  variables:
+    OPENAI_API_KEY: $OPENAI_API_KEY
+```
+
+### Best Practices
+
+- **Version pinning**: Specify exact versions in CI configs
+- **Cost management**: Consider scheduled rather than per-commit runs for LLM tests
+- **Selective testing**: For large prompt sets, test only changed prompts on PRs
+- **Artifacts**: Save test results as artifacts for documentation
+
+## Testing Prompts with Promptfoo
+
+The template includes support for testing prompts using the [Promptfoo](https://github.com/promptfoo/promptfoo) tool. This allows you to define test cases for your prompts and ensure they produce the expected outputs with different inputs.
+
+### Running Prompt Tests
+
+To run promptfoo tests using the CLI:
+
+```bash
+# Run all prompt tests
+pydanticai-api-template prompt-test
+
+# Run tests with a specific config file
+pydanticai-api-template prompt-test --config custom-config.yaml
+
+# Open the web UI after running tests
+pydanticai-api-template prompt-test --view
+
+# Show detailed test information
+pydanticai-api-template prompt-test --verbose
+```
+
+### Prompt Test Configuration
+
+Prompt tests are defined in the `promptfoo/config.yaml` file. Here's how to structure it:
+
+```yaml
+# Define your prompts
+prompts:
+  - id: chat
+    label: Chat Prompt
+    raw: |
+      You are a helpful assistant. Please respond to the following message:
+
+      {{input}}
+
+  - id: story
+    label: Story Prompt
+    raw: |
+      Generate a story idea with a title and premise based on:
+
+      {{input}}
+
+# Define your AI providers
+providers:
+  - id: openai:gpt-4o
+    config:
+      headers:
+        Authorization: "Bearer ${OPENAI_API_KEY}"
+
+# Define test cases
+testCases:
+  - description: Basic greeting
+    vars:
+      input: "Hello, how are you today?"
+    assert:
+      - type: llm-rubric
+        value: "The response should be a polite greeting."
+      - type: javascript
+        value: "output.length > 10"
+
+  - description: Story about space
+    vars:
+      input: "Write a story about space exploration"
+    assert:
+      - type: llm-rubric
+        value: "The response should include a creative story idea with a title and premise related to space exploration."
+      - type: javascript
+        value: "output.includes('space') || output.includes('exploration')"
+```
+
+### Writing Effective Prompt Tests
+
+1. **Define clear assertions**: Use a combination of `llm-rubric` for qualitative evaluation and `javascript` for objective criteria.
+
+2. **Test with diverse inputs**: Include edge cases and different types of requests.
+
+3. **Check for specific content**: Verify that responses contain required information.
+
+4. **Keep tests focused**: Each test should check a specific aspect of the prompt's behavior.
+
+### Testing Checklist for Prompts
+
+- [ ] Tests for different prompt variations
+- [ ] Tests for edge cases (very short or unusual inputs)
+- [ ] Tests for content that should be included in responses
+- [ ] Tests for response length and format
+- [ ] Tests for adherence to specified instructions
+
+### Troubleshooting Prompt Tests
+
+1. **Missing Node.js or npm**:
+   - The prompt-test command requires Node.js and npm to be installed
+   - In the development container, these are pre-installed
+
+2. **API key issues**:
+   - Make sure your .env file contains the required API keys
+   - The prompt-test command automatically loads environment variables from .env
+
+3. **Configuration file not found**:
+   - Verify the path to your promptfoo configuration file
+   - The default location is `promptfoo/config.yaml` in the project root

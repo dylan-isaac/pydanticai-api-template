@@ -42,6 +42,7 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Type Safety**: End-to-end type checking with mypy and Pydantic
 - **Docker**: Containerization for consistent development and deployment
 - **Modern Tooling**: Ruff, MyPy, UV package manager, and more
+- **Prompt Testing**: Automated testing for LLM prompts with CI/CD integration
 
 ## Project Structure
 
@@ -49,6 +50,7 @@ This README provides a high-level overview. For detailed information, refer to:
 ├── .devcontainer    # Dev container configuration
 ├── .vscode          # VS Code settings and tasks
 ├── docs/            # Detailed documentation
+├── promptfoo/       # Prompt testing configuration
 ├── src/             # Source code
 │   └── pydanticai_api_template/
 │       ├── api/     # FastAPI routes and endpoints

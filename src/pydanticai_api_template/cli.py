@@ -526,18 +526,20 @@ def prompt_test(
     view: bool = typer.Option(
         False, "--view", "-v", help="Open the web UI after running tests."
     ),
+    verbose: bool = typer.Option(
+        False, "--verbose", help="Show detailed logs during test execution."
+    ),
 ) -> None:
     """Test prompts using promptfoo."""
     import shutil
     import subprocess
     from pathlib import Path
 
-    # Check if promptfoo is installed
-    promptfoo_path = shutil.which("promptfoo")
-    if not promptfoo_path:
-        # Should be pre-installed in the dev container
+    # Check if npm is available
+    npm_exec = shutil.which("npm")
+    if not npm_exec:
         typer.echo(
-            "❌ promptfoo command not found. Please rebuild the dev container.",
+            "❌ npm command not found. Please install Node.js and npm.",
             err=True,
         )
         raise typer.Exit(code=1)
@@ -560,15 +562,89 @@ def prompt_test(
 
     setup_logfire(service_name="promptfoo-testing")
 
+    # If verbose, display the test cases being run
+    if verbose:
+        try:
+            # Try to import yaml in a way that mypy won't complain about
+            try:
+                import yaml  # type: ignore
+
+                yaml_available = True
+            except ImportError:
+                yaml_available = False
+
+            if yaml_available:
+                with open(config_file, "r") as f:
+                    config = yaml.safe_load(f)
+                    typer.echo("\n📋 Test Configuration:")
+                    typer.echo(f"  Prompts: {len(config.get('prompts', []))} defined")
+                    typer.echo(
+                        f"  Providers: {len(config.get('providers', []))} defined"
+                    )
+
+                    test_cases = config.get("testCases", [])
+                    typer.echo(f"  Test Cases: {len(test_cases)} defined")
+                    for i, test in enumerate(test_cases):
+                        typer.echo(
+                            f"    {i + 1}. {test.get('description', 'Unnamed test')}"
+                        )
+                        input_text = test.get("vars", {}).get("input", "None")
+                        # Truncate long inputs for display
+                        truncated_input = (
+                            input_text[:50] + "..."
+                            if len(input_text) > 50
+                            else input_text
+                        )
+                        typer.echo(f"       Input: {truncated_input}")
+                        typer.echo(f"       Assertions: {len(test.get('assert', []))}")
+                    typer.echo("")
+            else:
+                typer.echo(
+                    "⚠️ PyYAML not installed. Skipping verbose test case display."
+                )
+        except Exception as e:
+            typer.echo(f"⚠️ Error reading test configuration: {e}")
+
     try:
-        # Run promptfoo eval
-        subprocess.run(["promptfoo", "eval", "--config", str(config_file)], check=True)
+        # Use npm directly for running promptfoo commands
+        typer.echo("Running promptfoo using npm...")
+
+        # Create environment with PATH that doesn't include Python's bin directory
+        # to avoid confusion with any pip-installed promptfoo
+        env = os.environ.copy()
+        node_path = os.path.dirname(npm_exec)
+        if "PATH" in env:
+            paths = env["PATH"].split(os.pathsep)
+            # Filter out paths that might contain pip-installed binaries
+            filtered_paths = [
+                p for p in paths if not (p.endswith("/bin") and "python" in p)
+            ]
+            # Ensure node path is first
+            if node_path not in filtered_paths:
+                filtered_paths.insert(0, node_path)
+            env["PATH"] = os.pathsep.join(filtered_paths)
+
+        # Add verbose flag if requested
+        extra_args = ["--verbose"] if verbose else []
+
+        # Run promptfoo eval using npm exec
+        eval_cmd = [
+            "npm",
+            "exec",
+            "--",
+            "promptfoo",
+            "eval",
+            "--config",
+            str(config_file),
+        ] + extra_args
+        subprocess.run(eval_cmd, check=True, env=env)
         typer.echo("✅ Prompt tests complete!")
 
         # Open web UI if requested
         if view:
             typer.echo("🌐 Opening promptfoo web UI...")
-            subprocess.run(["promptfoo", "view"], check=True)
+            view_cmd = ["npm", "exec", "--", "promptfoo", "view"]
+            subprocess.run(view_cmd, check=True, env=env)
     except subprocess.CalledProcessError as e:
         typer.echo(f"❌ Prompt tests failed: {e}", err=True)
         raise typer.Exit(code=1)

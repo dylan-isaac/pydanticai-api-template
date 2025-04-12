@@ -113,3 +113,34 @@ def test_shutdown_logfire_enabled(mock_logfire: MagicMock) -> None:
     # Verify shutdown was called
     mock_logfire.info.assert_called_once_with("Shutting down LogFire")
     mock_logfire.shutdown.assert_called_once()
+
+
+@patch("pydanticai_api_template.utils.observability.logfire")
+@patch(
+    "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
+)
+def test_setup_logfire_promptfoo(
+    mock_configure: MagicMock, mock_logfire: MagicMock
+) -> None:
+    """Test setup_logfire when called from prompt_test command."""
+    # Enable LogFire
+    os.environ["LOGFIRE_ENABLED"] = "true"
+    os.environ["LOGFIRE_API_KEY"] = "test-api-key"
+    os.environ["LOGFIRE_PROJECT_ID"] = "test-project-id"
+
+    # Call the function with promptfoo-testing service name
+    setup_logfire(service_name="promptfoo-testing")
+
+    # Verify configuration with correct service name
+    mock_logfire.configure.assert_called_once_with(
+        api_key="test-api-key",
+        project_id="test-project-id",
+        service_name="promptfoo-testing",
+        environment=os.getenv("ENVIRONMENT", "development"),
+    )
+
+    # Verify instrumentation
+    mock_logfire.instrument_httpx.assert_called_once()
+    mock_logfire.instrument_fastapi.assert_called_once()
+    mock_logfire.instrument_asyncio.assert_called_once()
+    mock_configure.assert_called_once()

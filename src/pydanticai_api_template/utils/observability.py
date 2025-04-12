@@ -9,7 +9,20 @@ import os
 from typing import Optional
 
 import logfire
-from logfire.pydantic_ai import configure_pydantic_ai_instrumentation
+
+# Try to import configure_pydantic_ai_instrumentation,
+# but don't fail if it's not available
+try:
+    from logfire.pydantic_ai import configure_pydantic_ai_instrumentation
+
+    HAS_PYDANTIC_AI_INTEGRATION = True
+except ImportError:
+    # Create a no-op function as fallback
+    def configure_pydantic_ai_instrumentation() -> None:
+        """No-op function when logfire.pydantic_ai is not available."""
+        pass
+
+    HAS_PYDANTIC_AI_INTEGRATION = False
 
 
 def is_logfire_enabled() -> bool:
@@ -51,8 +64,9 @@ def setup_logfire(
     logfire.instrument_fastapi()  # FastAPI monitoring
     logfire.instrument_asyncio()  # AsyncIO monitoring
 
-    # Configure PydanticAI instrumentation
-    configure_pydantic_ai_instrumentation()
+    # Configure PydanticAI instrumentation if available
+    if HAS_PYDANTIC_AI_INTEGRATION:
+        configure_pydantic_ai_instrumentation()
 
     logfire.info(
         "LogFire observability configured successfully",

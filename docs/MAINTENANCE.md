@@ -195,6 +195,15 @@ When updating major dependencies like Python, FastAPI, or UV:
 6.  **Thorough Testing**: Run all tests (`make test`) and manually test key features, especially those related to the updated dependency.
 7.  **Update Documentation**: Note the new versions in `README.md` or relevant places if significant.
 
+### Maintaining External Tool Versions
+
+When using external tools like promptfoo (Node.js), maintain version consistency across:
+- `pyproject.toml`: `promptfoo==0.1.0` in dev dependencies
+- `Dockerfile.dev`: `npm install -g promptfoo@0.1.0`
+- CI/CD configurations in your workflow files
+
+When upgrading, update all occurrences simultaneously to prevent version conflicts.
+
 ## Dependency Graph
 
 Here's how the configuration files depend on each other:

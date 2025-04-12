@@ -147,7 +147,9 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
             span.set_status("error", "AI service not available")
             raise HTTPException(
                 status_code=503,  # Service Unavailable
-                detail="AI service is not available. Please check server configuration.",
+                detail=(
+                    "AI service is not available. Please check server configuration."
+                ),
             )
 
         try:
@@ -184,7 +186,9 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
             # We don't want to expose internal errors to clients
             raise HTTPException(
                 status_code=500,
-                detail="An internal server error occurred while processing your request.",
+                detail=(
+                    "An internal server error occurred while processing your request."
+                ),
             )
 
 
@@ -213,7 +217,9 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
             span.set_status("error", "AI service not available")
             raise HTTPException(
                 status_code=503,  # Service Unavailable
-                detail="AI service is not available. Please check server configuration.",
+                detail=(
+                    "AI service is not available. Please check server configuration."
+                ),
             )
 
         try:
@@ -240,7 +246,8 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
             if isinstance(response_data, StoryIdea):
                 story_idea = response_data
             else:
-                # This should not happen with proper configuration, but handle just in case
+                # This should not happen with proper configuration,
+                # but handle just in case
                 raise ValueError("Agent did not return a StoryIdea object")
 
             span.set_attributes(
@@ -260,5 +267,7 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
             # We don't want to expose internal errors to clients
             raise HTTPException(
                 status_code=500,
-                detail="An internal server error occurred while processing your request.",
+                detail=(
+                    "An internal server error occurred while processing your request."
+                ),
             )
