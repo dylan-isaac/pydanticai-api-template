@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Use tomli for TOML parsing (part of standard library in 3.11+, but included in deps for <3.11)
+# Use tomli for TOML parsing (standard lib in 3.11+, included for <3.11)
 try:
     import tomllib
 except ImportError:
@@ -33,9 +33,12 @@ except ImportError:
 
 # Use PyYAML for YAML parsing
 try:
-    import yaml
+    import yaml  # type: ignore
 except ImportError:
-    print("Error: 'PyYAML' is required for this script. Please install it ('uv pip install pyyaml').")
+    print(
+        "Error: 'PyYAML' is required for this script. "
+        "Please install it ('uv pip install pyyaml')."
+    )
     sys.exit(1)
 
 # --- Configuration ---
@@ -58,17 +61,27 @@ DEFAULT_TASKS_STRUCTURE = {"version": "2.0.0", "tasks": []}
 # Define tasks based on assumed CLI commands (adjust if your CLI changes)
 # We'll dynamically get the CLI script name from pyproject.toml
 CLI_COMMANDS_FOR_TASKS = [
-    {"label": "Run Dev Server", "command": "run", "args": ["--reload"], "group": "build", "isDefault": True},
+    {
+        "label": "Run Dev Server",
+        "command": "run",
+        "args": ["--reload"],
+        "group": "build",
+        "isDefault": True,
+    },
     {"label": "Lint", "command": "lint", "args": []},
     {"label": "Test", "command": "test", "args": []},
     {"label": "Validate Environment", "command": "validate", "args": []},
-    {"label": "Sync Configs", "command": "sync-configs", "args": []}, # Assumes a make target
-    {"label": "Install Completion", "command": "install-completion", "args": []}, # Example task
-    {"label": "Cleanup", "command": "cleanup", "args": []}, # Example task
+    # Assumes a make target:
+    {"label": "Sync Configs", "command": "sync-configs", "args": []},
+    # Example task:
+    {"label": "Install Completion", "command": "install-completion", "args": []},
+    # Example task:
+    {"label": "Cleanup", "command": "cleanup", "args": []},
 ]
 
 
 # --- Helper Functions ---
+
 
 def read_pyproject() -> Tuple[Dict[str, Any], Optional[str]]:
     """Read pyproject.toml and extract relevant data."""
@@ -94,36 +107,40 @@ def read_pyproject() -> Tuple[Dict[str, Any], Optional[str]]:
         print(f"Error reading or parsing {PYPROJECT_PATH}: {e}", file=sys.stderr)
         sys.exit(1)
 
+
 def extract_dev_dependencies(pyproject_data: Dict[str, Any]) -> Dict[str, str]:
     """Extract development dependency names and versions."""
     dev_deps: Dict[str, str] = {}
     optional_deps = pyproject_data.get("project", {}).get("optional-dependencies", {})
     dev_list = optional_deps.get("dev", [])
 
-    # Also check top-level [tool.poetry.dev-dependencies] or similar if needed
-    # Example for Poetry:
-    # poetry_dev_deps = pyproject_data.get("tool", {}).get("poetry", {}).get("dev-dependencies", {})
-    # if poetry_dev_deps:
-    #     dev_deps.update(poetry_dev_deps)
-
     for dep_str in dev_list:
         # Regex to capture package name and version specifier
         # Handles >=, ==, ~, ^ etc. and extracts the base version number
-        match = re.match(r"^([a-zA-Z0-9_-]+)\s*([>=<^~!]+)?\s*([0-9]+\.[0-9]+(?:\.[0-9]+)?(?:[a-zA-Z0-9.-]*)?)", dep_str)
+        pattern = (
+            r"^([a-zA-Z0-9_-]+)"  # Package name
+            r"\s*([>=<^~!]+)?"  # Optional version constraint operator
+            r"\s*([0-9]+\.[0-9]+(?:\.[0-9]+)?(?:[a-zA-Z0-9.-]*)?)"  # Version
+        )
+        match = re.match(pattern, dep_str)
         if match:
             name, _, version = match.groups()
             dev_deps[name] = version
         else:
-            # Handle cases without version specifiers if necessary, or just log a warning
+            # Handle cases without version specifiers, or just log a warning
             name_match = re.match(r"^([a-zA-Z0-9_-]+)", dep_str)
             if name_match:
-                 print(f"Warning: Could not parse version for dev dependency '{dep_str}'. Adding without version.")
-                 dev_deps[name_match.group(1)] = "" # Or some default/marker
+                print(
+                    f"Warning: Could not parse version for dev dependency '{dep_str}'. "
+                    f"Adding without version."
+                )
+                dev_deps[name_match.group(1)] = ""  # Or some default/marker
             else:
                 print(f"Warning: Could not parse dev dependency string '{dep_str}'")
 
     print(f"Found {len(dev_deps)} development dependencies.")
     return dev_deps
+
 
 def update_precommit_config(dev_deps: Dict[str, str]) -> None:
     """Update .pre-commit-config.yaml with versions from dev dependencies."""
@@ -158,20 +175,27 @@ def update_precommit_config(dev_deps: Dict[str, str]) -> None:
         if mapped_dep_name and mapped_dep_name in dev_deps:
             target_version = dev_deps[mapped_dep_name]
             if target_version:
-                # pre-commit often uses tags like vX.Y.Z
                 # Attempt to format the version similarly, assuming semantic versioning
                 # Basic check: add 'v' if it's missing and looks like X.Y.Z
-                if not target_version.startswith("v") and re.match(r"^[0-9]+\.[0-9]+(?:\.[0-9]+)?$", target_version):
+                is_semver = re.match(r"^[0-9]+\.[0-9]+(?:\.[0-9]+)?$", target_version)
+                if not target_version.startswith("v") and is_semver:
                     target_rev = f"v{target_version}"
                 else:
-                    target_rev = target_version # Use the version as-is if it has 'v' or other format
+                    # Use the version as-is if it has 'v' or other format
+                    target_rev = target_version
 
                 if current_rev != target_rev:
-                    print(f"  Updating repo '{repo_url}' rev from '{current_rev}' to '{target_rev}' (based on '{mapped_dep_name}' dependency)")
+                    print(
+                        f"  Updating repo '{repo_url}' rev from '{current_rev}' "
+                        f"to '{target_rev}' (based on '{mapped_dep_name}' dependency)"
+                    )
                     repo["rev"] = target_rev
                     updated = True
             else:
-                print(f"Warning: No version found for dependency '{mapped_dep_name}' to update repo '{repo_url}'")
+                print(
+                    f"Warning: No version found for dependency '{mapped_dep_name}' "
+                    f"to update repo '{repo_url}'"
+                )
 
     if updated:
         try:
@@ -179,26 +203,37 @@ def update_precommit_config(dev_deps: Dict[str, str]) -> None:
                 yaml.dump(precommit_config, f, sort_keys=False, indent=2)
             print("Successfully updated .pre-commit-config.yaml.")
         except Exception as e:
-            print(f"Error writing updated {PRECOMMIT_CONFIG_PATH}: {e}", file=sys.stderr)
+            print(
+                f"Error writing updated {PRECOMMIT_CONFIG_PATH}: {e}", file=sys.stderr
+            )
     else:
-        print("No version updates needed for pre-commit hooks based on tracked dependencies.")
+        print(
+            "No version updates needed for pre-commit hooks "
+            "based on tracked dependencies."
+        )
 
-def generate_vscode_task(label: str, cli_script_name: str, command: str, args: List[str], group: Optional[str] = None, is_default: bool = False) -> Dict[str, Any]:
+
+def generate_vscode_task(
+    label: str,
+    cli_script_name: str,
+    command: str,
+    args: List[str],
+    group: Optional[str] = None,
+    is_default: bool = False,
+) -> Dict[str, Any]:
     """Generate a VS Code task dictionary using Make as the executor."""
     task: Dict[str, Any] = {
         "label": label,
         "type": "shell",
-        # Use Make to run the command - ensures environment setup (like venv) is handled if Make is configured
+        # Use Make to run the command - ensures environment setup (like venv)
+        # is handled if Make is configured
         "command": "make",
-        "args": [command], # Pass the Make target (which should map to the CLI command)
+        "args": [command],  # Pass the Make target (maps to CLI command)
         "problemMatcher": [],
-        "detail": f"Runs: make {command}"
+        "detail": f"Runs: make {command}",
     }
     if group:
-        task["group"] = {
-            "kind": group,
-            "isDefault": is_default
-        }
+        task["group"] = {"kind": group, "isDefault": is_default}
     # Add presentation options if desired
     # task["presentation"] = {
     #     "echo": True,
@@ -210,10 +245,12 @@ def generate_vscode_task(label: str, cli_script_name: str, command: str, args: L
     # }
     return task
 
+
 def update_vscode_tasks(pyproject: Dict[str, Any]) -> None:
     """Update VS Code tasks based on available CLI commands."""
     tasks_path = Path(".vscode/tasks.json")
-    project_name = pyproject.get("project", {}).get("name", "pydanticai-api-template") # Use project name
+    # Use project name from pyproject.toml
+    project_name = pyproject.get("project", {}).get("name", "pydanticai-api-template")
 
     # Define base structure if file doesn't exist
     if not tasks_path.exists():
@@ -228,13 +265,21 @@ def update_vscode_tasks(pyproject: Dict[str, Any]) -> None:
         except (json.JSONDecodeError, FileNotFoundError):
             tasks = {"version": "2.0.0", "tasks": []}
 
+    assert isinstance(tasks, dict), (
+        f"Expected 'tasks' to be a dict, but got {type(tasks)}"
+    )
+
+    # Ensure tasks["tasks"] exists and is a list
+    if "tasks" not in tasks or not isinstance(tasks["tasks"], list):
+        tasks["tasks"] = []  # Initialize or reset if invalid type
+
     # Define tasks based on CLI commands - Use project_name variable
     # Ensure commands defined in cli.py exist
-    cli_tasks = [
+    cli_tasks: List[Dict[str, Any]] = [
         {
-            "label": f"Run Dev Server ({project_name})", # Use project_name
+            "label": f"Run Dev Server ({project_name})",  # Use project_name
             "type": "shell",
-            "command": f"{project_name} run --reload", # Use project_name
+            "command": f"{project_name} run --reload",  # Use project_name
             "group": {"kind": "build", "isDefault": True},
             "problemMatcher": [],
             "detail": "Runs the FastAPI server with hot reload using the CLI.",
@@ -246,60 +291,66 @@ def update_vscode_tasks(pyproject: Dict[str, Any]) -> None:
             "runOptions": {"runOn": "folderOpen"},
         },
         {
-            "label": f"Lint ({project_name})", # Use project_name
+            "label": f"Lint ({project_name})",  # Use project_name
             "type": "shell",
-            "command": "make lint", # Keep using make lint for simplicity
+            "command": "make lint",  # Keep using make lint for simplicity
             "group": "test",
             "problemMatcher": ["$ruff"],
             "detail": "Runs Ruff linter and formatter checks using Make.",
         },
         {
-            "label": f"Test ({project_name})", # Use project_name
+            "label": f"Test ({project_name})",  # Use project_name
             "type": "shell",
-            "command": "make test", # Keep using make test for simplicity
+            "command": "make test",  # Keep using make test for simplicity
             "group": {"kind": "test", "isDefault": True},
             "problemMatcher": [],
             "detail": "Runs pytest using Make.",
         },
         {
-            "label": f"Validate ({project_name})", # Use project_name
+            "label": f"Validate ({project_name})",  # Use project_name
             "type": "shell",
-            "command": f"{project_name} validate", # Use project_name
+            "command": f"{project_name} validate",  # Use project_name
             "problemMatcher": [],
             "detail": "Runs the CLI validation command.",
         },
-         {
-            "label": f"Cleanup ({project_name})", # Use project_name
+        {
+            "label": f"Cleanup ({project_name})",  # Use project_name
             "type": "shell",
-            "command": f"{project_name} cleanup", # Use project_name
+            "command": f"{project_name} cleanup",  # Use project_name
             "problemMatcher": [],
             "detail": "Runs the CLI cleanup command.",
         },
         {
-            "label": f"Sync Configs ({project_name})", # Use project_name
+            "label": f"Sync Configs ({project_name})",  # Use project_name
             "type": "shell",
-            "command": "make sync-configs", # Keep using make sync-configs
+            "command": "make sync-configs",  # Keep using make sync-configs
             "problemMatcher": [],
             "detail": "Runs the configuration synchronization script.",
         },
     ]
 
-    # Update tasks: Remove old tasks with the same label, then add new ones
+    # Remove existing CLI tasks before adding updated ones
     existing_labels = {task["label"] for task in cli_tasks}
+    # Now safely access tasks["tasks"] because we ensured it's a list
+    current_tasks = tasks["tasks"]
     tasks["tasks"] = [
-        task for task in tasks.get("tasks", []) if task.get("label") not in existing_labels
+        task
+        for task in current_tasks  # Use the validated list
+        # Ensure task is a dict before getting label
+        if isinstance(task, dict) and task.get("label") not in existing_labels
     ]
     tasks["tasks"].extend(cli_tasks)
 
     # Write updated tasks using json.dump for .json file
     with open(tasks_path, "w") as f:
         json.dump(tasks, f, indent=4)
-        f.write("\n") # Add final newline for consistency
+        f.write("\n")  # Add final newline for consistency
 
     print(f"Updated VS Code tasks in {tasks_path}")
 
 
 # --- Main Execution ---
+
 
 def main() -> None:
     """Main function to update all configs."""

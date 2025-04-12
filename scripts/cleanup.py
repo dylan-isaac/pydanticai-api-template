@@ -49,10 +49,11 @@ def remove_invalid_dirs() -> None:
     for problem_dir in problem_dirs:
         problem_path = PROJECT_ROOT / problem_dir
         # Basic check to avoid deleting the entire root if pattern is just '*'
-        if str(problem_path.name) == problem_dir and problem_path.exists() and problem_path.is_dir():
+        is_problem_dir = str(problem_path.name) == problem_dir
+        if is_problem_dir and problem_path.exists() and problem_path.is_dir():
             print(f"Found potentially invalid directory: {problem_path}")
             print(f"Attempting removal of {problem_path}...")
-            # Try shell command first which might handle busy resources better on some systems
+            # Try shell command first; it might handle busy resources better
             run_shell_command(f'rm -rf "{problem_path}"', cwd=PROJECT_ROOT)
 
             # If it still exists, try the Python method
@@ -68,7 +69,7 @@ def remove_invalid_dirs() -> None:
             else:
                 print(f"Removed directory using shell: {problem_path}")
         elif problem_path.exists():
-            # It might exist but not be a directory, or the pattern might be more complex
+            # Path exists but isn't a dir, or the pattern is more complex.
             # Avoid accidentally deleting files matching these patterns for now.
             pass
 
@@ -118,7 +119,9 @@ def remove_egg_info() -> None:
         else:
             print(".egg-info directories are ignored and none were found.")
     else:
-        print(".egg-info directories are not specified in .gitignore, skipping removal.")
+        print(
+            ".egg-info directories are not specified in .gitignore, skipping removal."
+        )
 
 
 def main() -> None:
