@@ -276,6 +276,59 @@ Example GitHub Actions workflow fragment:
 - uses: actions/checkout@v4
 ```
 
+## Documentation Maintenance
+
+Documentation should evolve alongside code to maintain accuracy and usefulness. Follow these guidelines for documentation maintenance:
+
+### Documentation Structure
+
+The project's documentation is organized as follows:
+1. **README.md** - Project overview, quick start guide, and navigation hub
+2. **docs/** - Detailed technical documentation for specific topics
+   - ARCHITECTURE.md - System design and component relationships
+   - API.md - API endpoint specifications
+   - DEVELOPER.md - Development setup and workflows
+   - MODELS.md - Pydantic model details and validation
+   - TESTING.md - Testing strategies and examples
+   - MAINTENANCE.md - This file, covering configuration and maintenance
+
+### Documentation Update Guidelines
+
+When making changes to the project, update the appropriate documentation:
+
+| Change Type | Documentation to Update | Content to Include |
+|-------------|-------------------------|-------------------|
+| API endpoints | API.md | Endpoint paths, methods, parameters, responses, authentication requirements |
+| Pydantic models | MODELS.md | Model structure, validation rules, example usage |
+| Project structure | README.md | Updated project structure diagram |
+| Architecture | ARCHITECTURE.md | Component diagrams, flow explanations |
+| Dev workflow | DEVELOPER.md | Command examples, environment setup |
+| Configuration | MAINTENANCE.md | Config file relationships, environment variables |
+| CLI commands | DEVELOPER.md | Command syntax, parameters, examples |
+| Testing strategy | TESTING.md | Test patterns, fixtures, mocking approaches |
+
+### Documentation Principles
+
+For high-quality, maintainable documentation:
+
+1. **Be Concise**: Focus on clarity and brevity
+2. **Use Examples**: Include practical code examples for complex concepts
+3. **Maintain Accuracy**: Remove outdated information immediately
+4. **Consider Accessibility**: Use clear formatting, alt text for images
+5. **Standardize Formatting**: Use consistent Markdown styling
+6. **Link Appropriately**: Cross-reference related documentation
+7. **Update Comprehensively**: When changing one doc, check for impacts on others
+
+### AI Assistant Documentation Guidelines
+
+When using AI assistants to help with documentation:
+
+1. Direct the AI to update specific documentation files when making changes
+2. Request concise documentation that focuses on practical usage
+3. Ask for examples that demonstrate real use cases
+4. Ensure the AI maintains the existing documentation structure
+5. Have the AI update the README.md when adding new documentation files
+
 ## Final Checklist for Updates
 
 Before committing significant changes:
@@ -285,5 +338,5 @@ Before committing significant changes:
 - [ ] Update Docker configurations if needed
 - [ ] Verify dev container works with VS Code
 - [ ] Test all Make commands
-- [ ] Update documentation in README.md and MAINTENANCE.md
+- [ ] Update documentation in README.md and docs/MAINTENANCE.md
 - [ ] Run pre-commit hooks: `pre-commit run --all-files`

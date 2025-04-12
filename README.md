@@ -16,39 +16,70 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
    - Click "Reopen in Container" when prompted
 
 3. **Start Development**:
-   - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux) to start the server
-   - Visit http://localhost:8000/docs to see API documentation
-   - For the MCP server, run `pydanticai-api-template run-mcp` and connect to http://localhost:3001
+   - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux)
+   - Visit http://localhost:8000/docs for API documentation
+   - For the MCP server: `pydanticai-api-template run-mcp` (accessible at http://localhost:3001)
 
-## Project Documentation
+## Documentation Map
 
-- [Developer Guide](./docs/DEVELOPER.md) - Detailed setup and workflows
-- [Architecture](./docs/ARCHITECTURE.md) - System design and patterns
-- [Maintenance](./MAINTENANCE.md) - Configuration management
-- [API Reference](./docs/API.md) - API endpoint documentation
+This README provides a high-level overview. For detailed information, refer to:
 
-## Features
+| Documentation | Purpose |
+|--------------|---------|
+| [Documentation Overview](./docs/OVERVIEW.md) | Comprehensive guide to all documentation |
+| [Developer Guide](./docs/DEVELOPER.md) | Setup instructions and development workflows |
+| [Architecture](./docs/ARCHITECTURE.md) | System design, patterns, and component relationships |
+| [Models](./docs/MODELS.md) | Pydantic models, validation, and PydanticAI integration |
+| [API Reference](./docs/API.md) | API endpoints, parameters, and response formats |
+| [Testing Guide](./docs/TESTING.md) | Testing strategies and examples |
+| [Maintenance](./docs/MAINTENANCE.md) | Configuration management and project maintenance |
+
+## Key Features
 
 - **PydanticAI**: Structured interactions with LLMs using Pydantic models
 - **FastAPI**: High-performance API framework with automatic docs
 - **MCP Server**: Model Context Protocol server for AI agent access
-- **UV**: Fast dependency management and virtual environments
-- **Docker**: Containerization for consistent deployment
-- **Dev Containers**: VS Code / Cursor integration for zero-configuration setup
-- **Modern Tooling**: Ruff, MyPy, Typer CLI, and more
+- **Type Safety**: End-to-end type checking with mypy and Pydantic
+- **Docker**: Containerization for consistent development and deployment
+- **Modern Tooling**: Ruff, MyPy, UV package manager, and more
 
-## MCP Server
+## Project Structure
 
-This project includes an MCP (Model Context Protocol) server that allows AI agents to interact with the API. To start the MCP server:
-
-```bash
-pydanticai-api-template run-mcp
+```
+├── .devcontainer    # Dev container configuration
+├── .vscode          # VS Code settings and tasks
+├── docs/            # Detailed documentation
+├── src/             # Source code
+│   └── pydanticai_api_template/
+│       ├── api/     # FastAPI routes and endpoints
+│       ├── agents/  # PydanticAI agent definitions
+│       ├── models/  # Pydantic data models
+│       ├── mcp/     # MCP server implementation
+│       └── cli.py   # Command-line interface
+├── tests/           # Test suite
+├── pyproject.toml   # Project dependencies and config
+└── Makefile         # Common development commands
 ```
 
-The MCP server will be available at http://localhost:3001, and provides the following tools:
-- `chat`: Send a message to the AI assistant and receive a response
+## Basic Usage Examples
 
-You can connect to the MCP server from any MCP client, for example:
+### PydanticAI Structured Outputs
+
+```python
+from pydantic_ai import Agent
+from pydantic import BaseModel
+
+class StoryIdea(BaseModel):
+    title: str
+    premise: str
+
+story_agent = Agent("openai:gpt-4o", result_type=StoryIdea)
+result = await story_agent.run("Give me a sci-fi story idea")
+```
+
+### MCP Server Connection
+
+Connect any MCP-compatible client to access tools:
 
 ```python
 from pydantic_ai import Agent
@@ -56,27 +87,41 @@ from pydantic_ai.mcp import MCPServerHTTP
 
 server = MCPServerHTTP(url='http://localhost:3001/sse')
 agent = Agent('openai:gpt-4o', mcp_servers=[server])
-
-async def main():
-    async with agent.run_mcp_servers():
-        result = await agent.run('Your message here')
-    print(result.data)
 ```
 
-## Environment Variables
+## Environment Setup
 
-Create a `.env` file in the project root to store your API keys and other environment variables:
+Create a `.env` file in the project root with your API keys:
 
 ```
 OPENAI_API_KEY=your_api_key_here
 ```
 
-The application will load these variables automatically at runtime. Note that the status check command looks for environment variables directly, so it may show warnings even when your app is working correctly with the .env file.
-
 ## Status Check
 
-Run `check` or `pydanticai-api-template check` to verify your environment is properly configured.
+Run `check` to verify your environment configuration.
+
+## Documentation Maintenance Guide
+
+Update documentation when making these changes:
+
+| Change Type | Documentation to Update |
+|------------|--------------------------|
+| API endpoints | API.md, example in README if major |
+| Pydantic models | MODELS.md |
+| Project structure | README.md (project structure section) |
+| Architecture | ARCHITECTURE.md, README.md if major |
+| Dev workflow | DEVELOPER.md |
+| Configuration | docs/MAINTENANCE.md |
+| CLI commands | DEVELOPER.md, README.md if major |
+| Testing approach | TESTING.md |
+
+For all significant changes:
+1. Update relevant documentation files
+2. Ensure README links remain accurate
+3. If adding new documentation, update the Documentation Map table
+4. Keep examples concise but functional
 
 ## Alternative Setup Options
 
-While Dev Containers is the recommended approach, alternative setup options are documented in the [Developer Guide](./docs/DEVELOPER.md).
+See [Developer Guide](./docs/DEVELOPER.md) for non-containerized setup options.

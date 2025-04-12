@@ -121,4 +121,4 @@ Check:
 
 ### Other Issues
 
-See [MAINTENANCE.md](../MAINTENANCE.md) for more troubleshooting information.
+See [MAINTENANCE.md](./MAINTENANCE.md) for more troubleshooting information.
