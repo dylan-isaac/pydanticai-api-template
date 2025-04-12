@@ -92,9 +92,9 @@
             "detail": "Runs the configuration synchronization script."
         },
         {
-            "label": "Run Dev Server (pydanticai-api-template)",
+            "label": "Run Dev Server (pat)",
             "type": "shell",
-            "command": "pydanticai-api-template run --reload",
+            "command": "pat run --reload",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -105,13 +105,10 @@
                 "reveal": "always",
                 "panel": "dedicated",
                 "clear": true
-            },
-            "runOptions": {
-                "runOn": "folderOpen"
             }
         },
         {
-            "label": "Lint (pydanticai-api-template)",
+            "label": "Lint (pat)",
             "type": "shell",
             "command": "make lint",
             "group": "test",
@@ -121,7 +118,7 @@
             "detail": "Runs Ruff linter and formatter checks using Make."
         },
         {
-            "label": "Test (pydanticai-api-template)",
+            "label": "Test (pat)",
             "type": "shell",
             "command": "make test",
             "group": {
@@ -132,21 +129,21 @@
             "detail": "Runs pytest using Make."
         },
         {
-            "label": "Validate (pydanticai-api-template)",
+            "label": "Validate (pat)",
             "type": "shell",
-            "command": "pydanticai-api-template validate",
+            "command": "pat validate",
             "problemMatcher": [],
             "detail": "Runs the CLI validation command."
         },
         {
-            "label": "Cleanup (pydanticai-api-template)",
+            "label": "Cleanup (pat)",
             "type": "shell",
-            "command": "pydanticai-api-template cleanup",
+            "command": "pat cleanup",
             "problemMatcher": [],
             "detail": "Runs the CLI cleanup command."
         },
         {
-            "label": "Sync Configs (pydanticai-api-template)",
+            "label": "Sync Configs (pat)",
             "type": "shell",
             "command": "make sync-configs",
             "problemMatcher": [],

@@ -71,7 +71,7 @@ To run the tests:
 
 ```bash
 # Run all tests
-pydanticai-api-template test
+pat test
 
 # Run tests with coverage reporting
 pytest --cov=pydanticai_api_template tests/
@@ -98,10 +98,10 @@ To run prompt tests:
 
 ```bash
 # Run tests
-pydanticai-api-template prompt-test
+pat prompt-test
 
 # Run tests and open the web UI
-pydanticai-api-template prompt-test --view
+pat prompt-test --view
 ```
 
 ### CI/CD with GitHub Actions

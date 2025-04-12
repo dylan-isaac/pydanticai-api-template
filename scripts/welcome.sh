@@ -5,7 +5,7 @@ cat << 'EOF'
 🚀 PydanticAI API Template Development Environment
 
 Available commands:
-  • start     - Start the development server (pydanticai-api-template run --reload)
+  • start     - Start the development server (pat run --reload)
   • validate  - Check environment configuration
   • lint      - Run code quality checks
   • test      - Run test suite

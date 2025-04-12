@@ -9,7 +9,7 @@ This example demonstrates how to:
 Prerequisites:
 - pydantic-ai[mcp] installed
 - An OpenAI API key in your environment
-- The MCP server running (pydanticai-api-template run-mcp)
+- The MCP server running (pat run-mcp)
 """
 
 import asyncio
