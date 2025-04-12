@@ -15,8 +15,14 @@ COPY src /app/src/
 
 # Install uv and then install project dependencies using uv
 # This utilizes uv's speed and lock file for reproducibility
+# uv should be available on PATH after installation
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    uv pip install --system --no-cache --locked "."
+    # Ensure uv is available on PATH for the next command
+    export PATH="/root/.local/bin:$PATH" && \
+    # Make sure pyproject.toml exists before running sync
+    ls -la && \
+    echo "Installing dependencies from pyproject.toml..." && \
+    uv pip sync pyproject.toml --system --no-cache # Use sync for locked installs
 
 # Copy the rest of the application code
 # This is done after installing dependencies to leverage Docker layer caching

@@ -114,9 +114,10 @@ COPY . .
 
 # Install uv globally and then install project dependencies (including dev/test)
 # Using --system to install in the main Python environment within the container
-# Explicitly add uv to PATH for this RUN command after installation
+# uv should be available on PATH after installation
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    export PATH="/root/.cargo/bin:$PATH" && \
+    # Ensure uv is available on PATH for the next command
+    export PATH="/root/.local/bin:$PATH" && \
     echo "Installing project dependencies using uv..." && \
     uv pip install --system --no-cache --editable ".[dev,test]"
 

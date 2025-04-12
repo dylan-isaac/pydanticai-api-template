@@ -2,6 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Open Host Terminal (Outside Container)",
+            "type": "shell",
+            "command": "${command:workbench.action.terminal.openNativeConsole}",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never"
+            },
+            "detail": "Opens a terminal on the host system outside the dev container."
+        },
+        {
             "label": "Run Dev Server (pydanticai-api-template)",
             "type": "shell",
             "command": "pydanticai-api-template run --reload",
@@ -25,17 +35,9 @@
             "type": "shell",
             "command": "make lint",
             "group": "test",
-            "problemMatcher": {
-                "owner": "ruff",
-                "fileLocation": ["relative", "${workspaceFolder}"],
-                "pattern": {
-                    "regexp": "^(.+):(\\d+):(\\d+): (.+)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "message": 4
-                }
-            },
+            "problemMatcher": [
+                "$ruff"
+            ],
             "detail": "Runs Ruff linter and formatter checks using Make."
         },
         {

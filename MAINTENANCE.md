@@ -39,8 +39,9 @@ The development environment uses VS Code's Dev Containers to provide a consisten
 
 1. **Configuration Flow**:
    - `.devcontainer/devcontainer.json` defines the container configuration
-   - It references `docker-compose.dev.yml` for container creation
+   - It references `docker-compose.yml` (specifically the `pydanticai-api-template-dev` service) for container creation
    - VS Code Server runs inside the container to provide IDE features
+   - The container runs as a non-root user by default for better security.
 
 2. **Volume Mounting**:
    - Source code from the host is mounted into the container
@@ -49,6 +50,8 @@ The development environment uses VS Code's Dev Containers to provide a consisten
 
 3. **Development Workflow**:
    - The container starts without automatically launching the application
+   - The container uses a minimal `tail -f /dev/null` command to stay running
+   - Container health checks verify system health without requiring the API to be running
    - When the container starts, a welcome message shows available commands
    - Developers manually start the server with `start` command or VS Code tasks (Cmd+Shift+B)
    - VS Code tasks provide easy access to common operations
@@ -63,9 +66,12 @@ The project uses several configuration files that work together to create a seam
 
 1. **pyproject.toml** - Primary configuration file (dependencies, project metadata, tool configs)
 2. **Makefile** - Universal command interface
-3. **Docker** files (Dockerfile, Dockerfile.dev, docker-compose.yml)
-4. **VS Code** configurations (.devcontainer/devcontainer.json, .vscode/tasks.json)
-5. **Pre-commit** configuration (.pre-commit-config.yaml)
+3. **Docker** files (`Dockerfile`, `Dockerfile.dev`, `docker-compose.yml`)
+   - Docker Compose profiles control which services run by default:
+     - `pydanticai-api-template-dev` (dev profile) - Development environment
+     - `pydanticai-api-template` (prod profile) - Production-like environment
+4. **VS Code** configurations (`.devcontainer/devcontainer.json`, `.vscode/tasks.json`)
+5. **Pre-commit** configuration (`.pre-commit-config.yaml`)
 
 ## Environment Variables and .env Files
 
@@ -200,8 +206,8 @@ pyproject.toml           # Primary source of truth for dependencies
     │   └── CI/CD        # Production container used in CI/CD
     │
     ├── Dockerfile.dev   # Development container definition
-    │   ├── docker-compose.yml       # Uses dev container
-    │   └── .devcontainer/devcontainer.json  # Uses docker-compose
+    │   ├── docker-compose.yml       # Defines dev (`pydanticai-api-template-dev`) and prod services
+    │   └── .devcontainer/devcontainer.json  # Uses the dev service from docker-compose.yml
     │
     ├── .pre-commit-config.yaml  # Should align with dev dependencies
     │   └── (updated by sync tool)

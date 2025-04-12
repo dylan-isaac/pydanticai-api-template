@@ -11,6 +11,7 @@
         "PYTHONPATH",
         "PYTHONUNBUFFERED",
         "PYTHONWARNINGS",
+        "repomix",
         "venv"
     ]
 }

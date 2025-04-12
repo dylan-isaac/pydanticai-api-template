@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    profiles: ["dev"]
     ports:
       - "8000:8000"
     volumes:
@@ -31,18 +32,21 @@ services:
     tty: true # Keep the container running interactively
     stdin_open: true # Keep stdin open for interactive sessions
     healthcheck:
-      # Basic health check: verifies the FastAPI docs endpoint is reachable
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      # Basic health check: verifies the container is healthy without requiring the API to be running
+      test: ["CMD", "ps", "aux"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 5s # Give the service time to start before checking
+    # Simple command to keep container running without auto-starting the API
+    command: ["tail", "-f", "/dev/null"]
 
   # Production-like service (without hot reload or dev tools)
   pydanticai-api-template:
     build:
       context: .
       # Uses the production Dockerfile by default
+    profiles: ["prod"]
     ports:
       # Maps host port 8000 to container port 8000
       # Change the host port (e.g., 8001:8000) if 8000 is already in use on your host

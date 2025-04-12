@@ -55,21 +55,10 @@ def version() -> None:
         pkg_version = importlib.metadata.version(PROJECT_NAME)
         typer.echo(f"{PROJECT_NAME} version: {pkg_version}")
     except importlib.metadata.PackageNotFoundError:
-        # Fallback if package not installed (e.g., during dev without -e install)
-        try:
-            # Assuming __init__.py is in src/pydanticai_api_template/__init__.py
-            init_path = Path(__file__).parent / "__init__.py"
-            with open(init_path, "r") as f:
-                for line in f:
-                    if line.startswith("__version__"):
-                        pkg_version = line.split("=")[1].strip().strip("\"'")
-                        typer.echo(
-                            f"{PROJECT_NAME} version: {pkg_version} (from __init__.py)"
-                        )
-                        return
-        except Exception:
-            pass  # Ignore errors trying to read __init__.py
-        typer.echo(f"{PROJECT_NAME} version: unknown (package not installed?) ")
+        typer.echo(
+            f"{PROJECT_NAME} version: unknown "
+            "(package not installed or metadata missing?)"
+        )
 
 
 @app.command()
