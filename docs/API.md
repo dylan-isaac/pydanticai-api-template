@@ -48,6 +48,30 @@ Currently, no authentication is required for API endpoints in development. In pr
 - Requires `OPENAI_API_KEY` environment variable to be set
 - Uses the `gpt-4o` model by default
 
+### POST /story
+
+**Description**: Generates a story idea with a title and premise based on the user's input.
+
+**Request**:
+```json
+{
+  "message": "Give me a sci-fi story about time travel"
+}
+```
+
+**Response**:
+```json
+{
+  "title": "Echoes of Tomorrow",
+  "premise": "A physicist discovers that time isn't linear but layered, with each moment existing simultaneously. When she builds a device to view these layers, she witnesses a future catastrophe and must find a way to reach across time to prevent it."
+}
+```
+
+**Notes**:
+- Requires `OPENAI_API_KEY` environment variable to be set
+- Uses the `gpt-4o` model by default
+- Input can specify genre, themes, or characters to guide the story idea generation
+
 ## Error Responses
 
 The API uses standard HTTP status codes to indicate the success or failure of a request.
@@ -98,6 +122,7 @@ The project includes an MCP (Model Context Protocol) server that allows AI agent
 | Tool Name | Description | Parameters |
 |-----------|-------------|------------|
 | `chat` | Chat with the AI assistant | `message`: The message to send to the assistant |
+| `story` | Generate a story idea | `message`: The input to guide story generation (e.g., genre, theme) |
 
 ### Example Usage
 
@@ -111,8 +136,14 @@ agent = Agent('openai:gpt-4o', mcp_servers=[server])
 
 async def main():
     async with agent.run_mcp_servers():
-        result = await agent.run('Your message here')
-    print(result.data)
+        # Chat example
+        chat_result = await agent.run('Your message here')
+        print(chat_result.data)
+
+        # Story generation example
+        story_result = await agent.run_tool('story', message='Create a sci-fi story about time travel')
+        print(f"Title: {story_result['title']}")
+        print(f"Premise: {story_result['premise']}")
 ```
 
 ### Adding Custom Tools

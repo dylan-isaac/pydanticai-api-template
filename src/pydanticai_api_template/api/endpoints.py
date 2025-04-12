@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
 from pydantic_ai import Agent
 
 # Import models from the new location
-from .models import ChatMessage, ChatResponse
+from .models import ChatMessage, ChatResponse, StoryIdea
 
 # --- Logging Configuration ---
 # Consistent logging setup from axe-ai
@@ -65,6 +65,12 @@ try:
     ai_agent: Optional[Agent] = (
         Agent("openai:gpt-4o", result_type=ChatResponse) if OPENAI_API_KEY else None
     )
+
+    # Initialize a specialized agent for story ideas
+    story_agent: Optional[Agent] = (
+        Agent("openai:gpt-4o", result_type=StoryIdea) if OPENAI_API_KEY else None
+    )
+
     if ai_agent:
         logger.info("PydanticAI Agent initialized with openai:gpt-4o")
     else:
@@ -115,18 +121,77 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
         # Use the initialized agent
         agent_run_result = await ai_agent.run(chat_message.message)
 
+        # Get response data
+        response_data = agent_run_result.data
+
         # Check if result is already a ChatResponse or needs conversion
-        if isinstance(agent_run_result.data, ChatResponse):
-            chat_response = agent_run_result.data
+        if isinstance(response_data, ChatResponse):
+            chat_response = response_data
         else:
             # Convert string or dict response to ChatResponse
-            reply = str(agent_run_result.data)
+            reply = str(response_data)
             chat_response = ChatResponse(reply=reply)
         logger.info("Agent returned reply.")
         return chat_response
     except Exception as e:
         # Catch-all for any other exceptions that might occur
         logger.exception(f"Error in chat_with_agent: {e}")
+        # We don't want to expose internal errors to clients
+        raise HTTPException(
+            status_code=500,
+            detail="An internal server error occurred while processing your request.",
+        )
+
+
+@app.post("/story", response_model=StoryIdea)
+async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
+    """Endpoint to generate a story idea with title and premise."""
+    logger.info(
+        f"Received story idea request: '{chat_message.message[:50]}...'"
+    )  # Log truncated message
+
+    if not story_agent:
+        logger.error(
+            "Story idea request failed: PydanticAI Agent not initialized or "
+            "OpenAI key missing."
+        )
+        raise HTTPException(
+            status_code=503,  # Service Unavailable
+            detail="AI service is not available. Please check server configuration.",
+        )
+
+    try:
+        logger.debug(
+            f"Running PydanticAI story agent for message: "
+            f"{chat_message.message[:50]}..."
+        )
+        # Explicitly assert that story_agent is not None to satisfy type checker
+        assert story_agent is not None
+
+        # Enhance the prompt to get high-quality story ideas
+        enhanced_prompt = (
+            f"Generate a creative and original story idea based on this input: "
+            f"{chat_message.message}"
+        )
+
+        # Use the initialized agent
+        agent_run_result = await story_agent.run(enhanced_prompt)
+
+        # Get response data
+        response_data = agent_run_result.data
+
+        # Check if result is already a StoryIdea or needs conversion
+        if isinstance(response_data, StoryIdea):
+            story_idea = response_data
+        else:
+            # This should not happen with proper configuration, but handle just in case
+            raise ValueError("Agent did not return a StoryIdea object")
+
+        logger.info(f"Agent returned story idea: {story_idea.title}")
+        return story_idea
+    except Exception as e:
+        # Catch-all for any other exceptions that might occur
+        logger.exception(f"Error in generate_story_idea: {e}")
         # We don't want to expose internal errors to clients
         raise HTTPException(
             status_code=500,

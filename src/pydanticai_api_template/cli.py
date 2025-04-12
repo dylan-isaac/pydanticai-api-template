@@ -496,17 +496,18 @@ def run_mcp(
     os.environ["MCP_HOST"] = host
     os.environ["MCP_PORT"] = str(port)
 
-    # Import the create_app function from the mcp_server module
-    try:
-        from pydanticai_api_template.mcp_server import create_app
+    # Use an import string instead of directly calling create_app()
+    app_path = "pydanticai_api_template.mcp_server:create_app"
 
-        typer.echo(f"Starting MCP server on {host}:{port}...")
+    typer.echo(f"Starting MCP server on {host}:{port}...")
+    try:
         uvicorn.run(
-            create_app(),
+            app_path,
             host=host,
             port=port,
             reload=reload,
             log_level=log_level.lower(),
+            factory=True,  # Explicitly tell Uvicorn this is a factory function
         )
     except ImportError as e:
         typer.echo(f"Error importing MCP server: {e}", err=True)

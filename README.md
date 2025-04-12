@@ -77,6 +77,24 @@ story_agent = Agent("openai:gpt-4o", result_type=StoryIdea)
 result = await story_agent.run("Give me a sci-fi story idea")
 ```
 
+### Story API Endpoint
+
+You can generate story ideas using the `/story` endpoint:
+
+```bash
+curl -X POST "http://localhost:8000/story" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Give me a sci-fi story about time travel"}'
+```
+
+Response:
+```json
+{
+  "title": "Echoes of Tomorrow",
+  "premise": "A physicist discovers that time isn't linear but layered, with each moment existing simultaneously. When she builds a device to view these layers, she witnesses a future catastrophe and must find a way to reach across time to prevent it."
+}
+```
+
 ### MCP Server Connection
 
 Connect any MCP-compatible client to access tools:
