@@ -3,11 +3,14 @@ import logging
 import os
 from typing import Any, ClassVar, Optional, cast
 
+import logfire  # Add logfire import
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
+
+from pydanticai_api_template.utils.observability import setup_logfire
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize the OpenAI agent
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Initialize LogFire if enabled
+setup_logfire(service_name="pydanticai-mcp-server")
 
 
 # Define Pydantic models for MCP server
@@ -97,27 +103,34 @@ async def chat(message: str) -> str:
 
     Send a message to the AI assistant and receive a response.
     """
-    if not ai_agent:
-        return "AI service is not available. Please check server configuration."
+    with logfire.span("mcp_chat", message=message[:100]) as span:
+        if not ai_agent:
+            span.set_status("error", "AI service not available")
+            return "AI service is not available. Please check server configuration."
 
-    try:
-        # Create a properly typed request object
-        request = ChatRequest(message=message)
+        try:
+            # Create a properly typed request object
+            request = ChatRequest(message=message)
 
-        # Ensure the agent is properly typed for mypy
-        assert ai_agent is not None
+            # Ensure the agent is properly typed for mypy
+            assert ai_agent is not None
 
-        result: Any = await ai_agent.run(request.message)
+            result: Any = await ai_agent.run(request.message)
 
-        # Properly handle the response based on its type
-        # Access reply attribute directly rather than through fields
-        response_data = result.data
-        if hasattr(response_data, "reply"):
-            return str(response_data.reply)
-        return str(response_data)
-    except Exception as e:
-        logger.exception(f"Error in MCP chat tool: {e}")
-        return f"An error occurred while processing your request: {str(e)}"
+            # Properly handle the response based on its type
+            # Access reply attribute directly rather than through fields
+            response_data = result.data
+            if hasattr(response_data, "reply"):
+                reply = str(response_data.reply)
+                span.set_attributes({"response_length": len(reply)})
+                return reply
+            reply = str(response_data)
+            span.set_attributes({"response_length": len(reply)})
+            return reply
+        except Exception as e:
+            logger.exception(f"Error in MCP chat tool: {e}")
+            span.set_status("error", str(e))
+            return f"An error occurred while processing your request: {str(e)}"
 
 
 @server.tool()
@@ -132,32 +145,48 @@ async def story(message: str) -> dict:
     - "Create a fantasy story with dragons"
     - "Write a mystery set in Victorian London"
     """
-    if not story_agent:
-        return {
-            "error": "AI service is not available. Please check server configuration."
-        }
+    with logfire.span("mcp_story", message=message[:100]) as span:
+        if not story_agent:
+            span.set_status("error", "AI service not available")
+            return {
+                "error": "AI service is not available. Please check server configuration."
+            }
 
-    try:
-        # Enhance the prompt to get high-quality story ideas
-        enhanced_prompt = (
-            f"Generate a creative and original story idea based on this input: "
-            f"{message}"
-        )
+        try:
+            # Enhance the prompt to get high-quality story ideas
+            enhanced_prompt = (
+                f"Generate a creative and original story idea based on this input: "
+                f"{message}"
+            )
 
-        # Ensure the agent is properly typed for mypy
-        assert story_agent is not None
+            # Ensure the agent is properly typed for mypy
+            assert story_agent is not None
 
-        result = await story_agent.run(enhanced_prompt)
+            result = await story_agent.run(enhanced_prompt)
 
-        # Return the story idea as a dictionary
-        # Access attributes directly rather than through fields
-        response_data = result.data
-        if hasattr(response_data, "title") and hasattr(response_data, "premise"):
-            return {"title": response_data.title, "premise": response_data.premise}
-        return {"error": "Failed to generate a proper story idea"}
-    except Exception as e:
-        logger.exception(f"Error in MCP story tool: {e}")
-        return {"error": f"An error occurred while processing your request: {str(e)}"}
+            # Return the story idea as a dictionary
+            # Access attributes directly rather than through fields
+            response_data = result.data
+            if hasattr(response_data, "title") and hasattr(response_data, "premise"):
+                story_dict = {
+                    "title": response_data.title,
+                    "premise": response_data.premise,
+                }
+                span.set_attributes(
+                    {
+                        "story_title": story_dict["title"],
+                        "premise_length": len(story_dict["premise"]),
+                    }
+                )
+                return story_dict
+            span.set_status("error", "Failed to generate proper story idea")
+            return {"error": "Failed to generate a proper story idea"}
+        except Exception as e:
+            logger.exception(f"Error in MCP story tool: {e}")
+            span.set_status("error", str(e))
+            return {
+                "error": f"An error occurred while processing your request: {str(e)}"
+            }
 
 
 def create_app() -> FastAPI:

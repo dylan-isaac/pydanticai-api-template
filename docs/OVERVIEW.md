@@ -12,6 +12,7 @@ This document provides a comprehensive overview of the PydanticAI API Template d
 | [DEVELOPER.md](./DEVELOPER.md) | Development workflows and setup | Daily development tasks | Setup, Commands, Best practices |
 | [MODELS.md](./MODELS.md) | Pydantic model details | Working with data models | Model definitions, Validation patterns |
 | [TESTING.md](./TESTING.md) | Testing strategies | Writing or running tests | Testing patterns, Examples |
+| [OBSERVABILITY.md](./OBSERVABILITY.md) | Observability and testing infrastructure | Setting up monitoring, writing tests | LogFire integration, Testing setup |
 | [MAINTENANCE.md](./MAINTENANCE.md) | Project maintenance and configuration | Updating dependencies, configuration | Configuration files, Sync tools |
 
 ## Documentation Flow
@@ -30,7 +31,8 @@ The documentation is designed to follow a natural workflow:
 | Setting up the project | README.md, DEVELOPER.md | MAINTENANCE.md |
 | Adding a new API endpoint | API.md | MODELS.md, ARCHITECTURE.md |
 | Creating a new Pydantic model | MODELS.md | API.md |
-| Writing tests | TESTING.md | API.md, MODELS.md |
+| Writing tests | TESTING.md, OBSERVABILITY.md | API.md, MODELS.md |
+| Setting up monitoring | OBSERVABILITY.md | DEVELOPER.md |
 | Updating configuration | MAINTENANCE.md | DEVELOPER.md |
 | Understanding the system | ARCHITECTURE.md | MODELS.md, API.md |
 | Adding MCP server tools | ARCHITECTURE.md | API.md |
@@ -69,6 +71,7 @@ If you're new to this project, we recommend reading the documentation in this or
 4. MODELS.md - Learn about the data models
 5. API.md - Explore the API endpoints
 6. TESTING.md - Understand the testing approach
-7. MAINTENANCE.md - Learn about project maintenance
+7. OBSERVABILITY.md - Learn about monitoring and testing infrastructure
+8. MAINTENANCE.md - Learn about project maintenance
 
 This progression will take you from a high-level overview to detailed implementation knowledge.

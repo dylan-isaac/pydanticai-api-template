@@ -12,19 +12,6 @@
             "detail": "Opens a terminal on the host system outside the dev container."
         },
         {
-            "label": "Run Dev Server (pydanticai-api-template)",
-            "type": "shell",
-            "command": "pydanticai-api-template run --reload",
-            "group": "build",
-            "problemMatcher": [],
-            "detail": "Runs the FastAPI server with hot reload using the CLI.",
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated",
-                "clear": true
-            }
-        },
-        {
             "label": "Run MCP Server",
             "type": "shell",
             "command": "pydanticai-api-template run-mcp",
@@ -38,13 +25,35 @@
         },
         {
             "label": "Run All Servers",
-            "dependsOn": ["Run Dev Server (pydanticai-api-template)", "Run MCP Server"],
+            "dependsOn": [
+                "Run Dev Server (pydanticai-api-template)",
+                "Run MCP Server"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": [],
             "detail": "Launches both the REST API and MCP servers."
+        },
+        {
+            "label": "Run Dev Server (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template run --reload",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs the FastAPI server with hot reload using the CLI.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
         },
         {
             "label": "Lint (pydanticai-api-template)",

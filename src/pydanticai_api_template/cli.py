@@ -515,5 +515,64 @@ def run_mcp(
         raise typer.Exit(code=1)
 
 
+@app.command()
+def prompt_test(
+    config_path: str = typer.Option(
+        "promptfoo/config.yaml",
+        "--config",
+        "-c",
+        help="Path to the promptfoo config file.",
+    ),
+    view: bool = typer.Option(
+        False, "--view", "-v", help="Open the web UI after running tests."
+    ),
+) -> None:
+    """Test prompts using promptfoo."""
+    import shutil
+    import subprocess
+    from pathlib import Path
+
+    # Check if promptfoo is installed
+    promptfoo_path = shutil.which("promptfoo")
+    if not promptfoo_path:
+        # Should be pre-installed in the dev container
+        typer.echo(
+            "❌ promptfoo command not found. Please rebuild the dev container.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    # Check if config file exists
+    config_file = Path(config_path)
+    if not config_file.exists():
+        typer.echo(f"❌ Config file not found at: {config_file}", err=True)
+        raise typer.Exit(code=1)
+
+    typer.echo(f"🧪 Running prompt tests using config at {config_file}...")
+
+    # Use environment variables from .env file
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    # Setup logfire for prompt testing
+    from pydanticai_api_template.utils.observability import setup_logfire
+
+    setup_logfire(service_name="promptfoo-testing")
+
+    try:
+        # Run promptfoo eval
+        subprocess.run(["promptfoo", "eval", "--config", str(config_file)], check=True)
+        typer.echo("✅ Prompt tests complete!")
+
+        # Open web UI if requested
+        if view:
+            typer.echo("🌐 Opening promptfoo web UI...")
+            subprocess.run(["promptfoo", "view"], check=True)
+    except subprocess.CalledProcessError as e:
+        typer.echo(f"❌ Prompt tests failed: {e}", err=True)
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

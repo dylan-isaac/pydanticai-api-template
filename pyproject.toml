@@ -17,6 +17,7 @@ dependencies = [
     "mcp>=0.5.0",
     "python-dotenv>=1.1.0",
     "typing-extensions>=4.7.0",
+    "logfire>=0.16.0",
 ]
 
 [project.optional-dependencies]
@@ -27,12 +28,13 @@ dev = [
     "python-dotenv>=1.1.0",
     "tomli>=2.0.1",
     "pyyaml>=6.0.1",
+    "promptfoo>=0.1.0",
 ]
 test = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "httpx>=0.24.1",
-    "pytest-asyncio>=0.23.0"
+    "pytest-asyncio>=0.23.0",
 ]
 
 [project.scripts]
@@ -69,6 +71,7 @@ warn_no_return = true
 warn_return_any = true
 warn_unreachable = true
 plugins = ["pydantic.mypy"]
+mypy_path = ["src/pydanticai_api_template/types"]
 
 [[tool.mypy.overrides]]
 module = "pydantic.*"
@@ -78,6 +81,10 @@ disallow_untyped_defs = false
 [[tool.mypy.overrides]]
 module = "pydanticai_api_template.api.models"
 disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = "logfire.*"
+ignore_missing_imports = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

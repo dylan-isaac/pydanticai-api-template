@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zsh \
     ripgrep \
     make \
+    # Node.js and npm for promptfoo
+    nodejs \
+    npm \
     # Bat (may be named batcat on Debian/Ubuntu)
     bat \
     && \
@@ -42,6 +45,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     chsh -s $(which zsh) root && \
     # Clean up apt cache
     rm -rf /var/lib/apt/lists/*
+
+# Install promptfoo globally using npm
+RUN npm install -g promptfoo@0.1.0
 
 # Add user bin directory to PATH (for tools like zoxide installed via script)
 ENV PATH="/root/.local/bin:${PATH}"
