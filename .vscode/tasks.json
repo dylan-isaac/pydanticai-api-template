@@ -165,7 +165,7 @@
         {
             "label": "Run Dev Server (pydanticai-api-template)",
             "type": "shell",
-            "command": "pydanticai-api-template run --reload",
+            "command": "pat run --reload",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -205,14 +205,14 @@
         {
             "label": "Validate (pydanticai-api-template)",
             "type": "shell",
-            "command": "pydanticai-api-template validate",
+            "command": "pat validate",
             "problemMatcher": [],
             "detail": "Runs the CLI validation command."
         },
         {
             "label": "Cleanup (pydanticai-api-template)",
             "type": "shell",
-            "command": "pydanticai-api-template cleanup",
+            "command": "pat cleanup",
             "problemMatcher": [],
             "detail": "Runs the CLI cleanup command."
         },
