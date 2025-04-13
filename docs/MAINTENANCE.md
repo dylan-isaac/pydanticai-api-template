@@ -155,6 +155,35 @@ When modifying the CLI:
    - Makefile commands
    - README.md documentation
 
+### Maintaining the Wishlist
+
+The wishlist directory requires periodic maintenance to remain useful:
+
+1. **Regular Reviews:**
+   - Review wishlist items quarterly to ensure they remain relevant
+   - Archive or update items that are no longer aligned with project goals
+   - Prioritize items to guide implementation planning
+
+2. **Documentation Updates:**
+   - When a wishlist item is implemented, move relevant documentation to the appropriate docs
+   - Update the README.md to reflect newly implemented features
+   - Remove the wishlist item once fully implemented
+
+3. **Organization:**
+   - Group related wishlist items in subdirectories when the list grows
+   - Add a README.md to the wishlist directory to provide an overview of items
+   - Consider adding tags or priority indicators to help with planning
+
+4. **Version Control:**
+   - Include the wishlist directory in version control
+   - Track wishlist changes alongside code changes
+   - Use wishlist items as references in issue tracking systems
+
+5. **Accessibility:**
+   - Ensure wishlist items include accessibility considerations
+   - Document how proposed features impact different users
+   - Maintain consistent formatting for better screen reader compatibility
+
 ### Updating Docker Configuration
 
 When changing Docker setup:

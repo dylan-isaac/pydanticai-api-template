@@ -34,6 +34,7 @@ This README provides a high-level overview. For detailed information, refer to:
 | [Testing Guide](./docs/TESTING.md) | Testing strategies and examples |
 | [Maintenance](./docs/MAINTENANCE.md) | Configuration management and project maintenance |
 | [Observability](./docs/OBSERVABILITY.md) | Logging, tracing, and monitoring with Logfire |
+| [Wishlist](./wishlist/) | Future improvements and feature ideas |
 
 ## Key Features
 
@@ -61,6 +62,7 @@ This README provides a high-level overview. For detailed information, refer to:
 │       ├── mcp/     # MCP server implementation
 │       └── cli.py   # Command-line interface
 ├── tests/           # Test suite
+├── wishlist/        # Future improvements and feature ideas
 ├── pyproject.toml   # Project dependencies and config
 └── Makefile         # Common development commands
 ```
@@ -110,6 +112,19 @@ from pydantic_ai.mcp import MCPServerHTTP
 server = MCPServerHTTP(url='http://localhost:3001/sse')
 agent = Agent('openai:gpt-4o', mcp_servers=[server])
 ```
+
+## Wishlist
+
+The project includes a `wishlist/` directory for capturing future improvements and feature ideas. This serves as:
+
+1. **Feature Backlog**: A place to document desired enhancements while focusing on current priorities
+2. **AI-Driven Implementation**: Actionable items for AI to implement during coding sessions
+3. **Collaborative Planning**: A way to track ideas from the entire team for future sprints
+
+Current wishlist items:
+- Templateizing and CookieCutter integration for project scaffolding
+
+To contribute to the wishlist, add markdown files to the `wishlist/` directory with detailed descriptions of proposed features or improvements.
 
 ## Observability with Logfire
 
@@ -165,6 +180,7 @@ Update documentation when making these changes:
 | CLI commands | [DEVELOPER.md](./docs/DEVELOPER.md), README.md if major |
 | Testing approach | [TESTING.md](./docs/TESTING.md) |
 | Observability | [OBSERVABILITY.md](./docs/OBSERVABILITY.md) |
+| Wishlist items | README.md (wishlist section), add file to [wishlist/](./wishlist/) |
 
 For all significant changes:
 1. Update relevant documentation files

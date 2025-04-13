@@ -14,6 +14,7 @@ This document provides a comprehensive overview of the PydanticAI API Template d
 | [TESTING.md](./TESTING.md) | Testing strategies | Writing or running tests | Testing patterns, Examples |
 | [OBSERVABILITY.md](./OBSERVABILITY.md) | Observability and testing infrastructure | Setting up monitoring, writing tests | LogFire integration, Testing setup |
 | [MAINTENANCE.md](./MAINTENANCE.md) | Project maintenance and configuration | Updating dependencies, configuration | Configuration files, Sync tools |
+| [Wishlist](../wishlist/) | Future improvements and feature ideas | Planning future work, AI-assisted implementations | Feature requests, Implementation details |
 
 ## Documentation Flow
 
@@ -36,6 +37,7 @@ The documentation is designed to follow a natural workflow:
 | Updating configuration | MAINTENANCE.md | DEVELOPER.md |
 | Understanding the system | ARCHITECTURE.md | MODELS.md, API.md |
 | Adding MCP server tools | ARCHITECTURE.md | API.md |
+| Proposing future features | Wishlist | ARCHITECTURE.md, MODELS.md |
 
 ## Accessibility Considerations
 
@@ -73,5 +75,4 @@ If you're new to this project, we recommend reading the documentation in this or
 6. TESTING.md - Understand the testing approach
 7. OBSERVABILITY.md - Learn about monitoring and testing infrastructure
 8. MAINTENANCE.md - Learn about project maintenance
-
-This progression will take you from a high-level overview to detailed implementation knowledge.
+9. Wishlist - Discover planned improvements and potential contributions

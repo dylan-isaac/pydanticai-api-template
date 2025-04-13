@@ -57,6 +57,12 @@ Once the dev container is running:
    - Select "FastAPI: Debug Server" configuration
    - Press F5 to start debugging
 
+5. **Using the Wishlist:**
+   - Browse `wishlist/` directory to see planned improvements
+   - Add new markdown files to propose features or improvements
+   - Reference wishlist items when implementing features
+   - Use wishlist items as AI-assisted implementation targets
+
 ## Environment Variables
 
 Create a `.env` file in the project root to store your API keys and other configuration:
@@ -97,6 +103,32 @@ src/
 1. Update `pyproject.toml`
 2. Run `uv sync` to update the lock file
 3. Run `sync` to keep configurations in sync
+
+### Working with the Wishlist
+
+The Wishlist directory provides a structured way to plan and implement future improvements:
+
+1. **Viewing Wishlist Items:**
+   - Browse the `wishlist/` directory to see existing ideas
+   - Review items to understand planned enhancements
+
+2. **Adding New Wishlist Items:**
+   - Create a new markdown file in the `wishlist/` directory
+   - Use descriptive filenames (e.g., `feature-name.md`)
+   - Structure with clear headings and implementation details
+   - Include accessibility considerations where relevant
+
+3. **Implementing Wishlist Items:**
+   - Select items from the wishlist for implementation
+   - Use AI assistance to help implement complex features
+   - Reference the wishlist item in commit messages
+   - Move implemented features from wishlist to documentation
+
+4. **Best Practices:**
+   - Keep wishlist items focused and actionable
+   - Include enough detail for future implementation
+   - Consider dependencies and prerequisites
+   - Update or remove items as the project evolves
 
 ## Troubleshooting
 
