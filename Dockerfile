@@ -22,12 +22,16 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     # Make sure pyproject.toml exists before running sync
     ls -la && \
     echo "Installing dependencies from pyproject.toml..." && \
+    uv pip install "logfire[fastapi,httpx,asyncio,pydantic_ai]" && \
     uv pip sync pyproject.toml --system --no-cache # Use sync for locked installs
 
 # Copy the rest of the application code
 # This is done after installing dependencies to leverage Docker layer caching
 # No need to copy src again as it was copied above for install
 # COPY src /app/src/
+
+# Create a directory for the Logfire token
+RUN mkdir -p /app/.logfire && chown -R appuser:appuser /app/.logfire
 
 # Ensure the app directory is owned by the appuser
 # This includes the installed package in site-packages if installed globally
@@ -37,6 +41,10 @@ RUN chown -R appuser:appuser /app /usr/local/lib/python3.12/site-packages
 # Switch to the non-root user
 USER appuser
 WORKDIR /app
+
+# Set default environment variables for Logfire
+ENV LOGFIRE_ENABLED="true"
+ENV ENVIRONMENT="production"
 
 # Expose the port the app runs on
 EXPOSE 8000

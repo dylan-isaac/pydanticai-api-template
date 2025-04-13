@@ -5,15 +5,22 @@ cat << 'EOF'
 🚀 PydanticAI API Template Development Environment
 
 Available commands:
-  • start     - Start the development server (pat run --reload)
-  • validate  - Check environment configuration
-  • lint      - Run code quality checks
-  • test      - Run test suite
-  • sync      - Synchronize configuration files
+  • start        - Start the development server (pat run --reload)
+  • validate     - Check environment configuration
+  • lint         - Run code quality checks
+  • test         - Run test suite
+  • sync         - Synchronize configuration files
+  • auth-logfire - Authenticate with Logfire
+  • use-logfire  - Set current project to pydantic-ai-template in Logfire
 
 Quick start:
   1. Run 'start' or press Cmd+Shift+B to start the server
   2. Visit http://localhost:8000/docs for API documentation
+
+For Logfire observability:
+  1. Run 'auth-logfire' to authenticate with Logfire
+  2. Run 'use-logfire' to set the current project
+  3. Logs will automatically be sent when the app is running
 
 For more information, see the documentation in ./docs/
 EOF
@@ -29,6 +36,7 @@ if [ ! -f "$WELCOME_FLAG" ]; then
     echo "✨ First time in this container? Try these commands:"
     echo "   - 'check' to verify your environment"
     echo "   - 'help' to see all available aliases"
+    echo "   - 'auth-logfire' to set up observability"
     echo ""
     echo "⚠️  Server is NOT automatically started for better stability."
     echo "   - Run 'start' when you're ready to launch the server"

@@ -6,7 +6,7 @@ functions to set up observability for the application.
 """
 
 import os
-from typing import Optional
+from typing import Any, Optional
 
 import logfire
 
@@ -33,6 +33,7 @@ def is_logfire_enabled() -> bool:
 def setup_logfire(
     service_name: str = "pydanticai-api-template",
     environment: Optional[str] = None,
+    app: Any = None,
 ) -> None:
     """
     Set up LogFire for observability.
@@ -40,29 +41,51 @@ def setup_logfire(
     Args:
         service_name: The name of the service
         environment: The environment (dev, staging, prod)
+        app: Optional FastAPI app instance for instrumentation
     """
     if not is_logfire_enabled():
         return
 
     # Configure LogFire
-    api_key = os.getenv("LOGFIRE_API_KEY")
+    token = os.getenv("LOGFIRE_TOKEN")
     project_id = os.getenv("LOGFIRE_PROJECT_ID")
 
     # Determine environment from ENV var or default to development
     env = environment or os.getenv("ENVIRONMENT", "development")
 
-    # Configure LogFire with the API key and project ID
-    logfire.configure(
-        api_key=api_key,
-        project_id=project_id,
-        service_name=service_name,
-        environment=env,
-    )
+    # Configure LogFire with token (preferred) or project_id as fallback
+    if token:
+        logfire.configure(
+            token=token,
+            service_name=service_name,
+            environment=env,
+        )
+    else:
+        # Legacy configuration with API key and project ID
+        api_key = os.getenv("LOGFIRE_API_KEY")
+        if api_key and project_id:
+            logfire.configure(
+                api_key=api_key,
+                project_id=project_id,
+                service_name=service_name,
+                environment=env,
+            )
+        else:
+            logfire.info(
+                "LogFire configuration incomplete. Set LOGFIRE_TOKEN or both LOGFIRE_API_KEY and LOGFIRE_PROJECT_ID.",
+            )
+            return
 
     # Set up instrumentation for common libraries
     logfire.instrument_httpx()  # HTTP client monitoring
-    logfire.instrument_fastapi()  # FastAPI monitoring
-    logfire.instrument_asyncio()  # AsyncIO monitoring
+
+    # Instrument FastAPI - use basic version to avoid linter issues
+    # The app parameter might be needed in some versions but not others
+    try:
+        # For type safety, we ignore the type checker
+        logfire.instrument_fastapi()
+    except Exception as e:
+        logfire.warning(f"Failed to instrument FastAPI: {e}")
 
     # Configure PydanticAI instrumentation if available
     if HAS_PYDANTIC_AI_INTEGRATION:

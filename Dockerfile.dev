@@ -61,6 +61,9 @@ RUN mkdir -p /etc/profile.d && \
     echo '# Zoxide Initialization\neval "$(zoxide init zsh --no-aliases)"' > /etc/profile.d/zoxide.sh && \
     chmod +x /etc/profile.d/starship.sh /etc/profile.d/zoxide.sh
 
+# Create Logfire directory
+RUN mkdir -p /root/.logfire
+
 # Create development environment initialization script with useful aliases
 RUN echo '# Development environment initialization\n\
 # Project-specific aliases\n\
@@ -70,18 +73,22 @@ alias validate="pat validate"\n\
 alias lint="make lint"\n\
 alias test="make test"\n\
 alias sync="make sync-configs"\n\
+alias auth-logfire="logfire auth"\n\
+alias use-logfire="logfire projects use pydantic-ai-template"\n\
 alias docs="xdg-open http://localhost:8000/docs 2>/dev/null || open http://localhost:8000/docs 2>/dev/null || echo \"Open http://localhost:8000/docs in your browser\""\n\
 \n\
 # Helper to show available aliases\n\
 function help() {\n\
   echo "Available commands:"\n\
-  echo "  start    - Start both REST API and MCP servers"\n\
-  echo "  check    - Run environment status check"\n\
-  echo "  validate - Validate environment configuration"\n\
-  echo "  lint     - Run code quality checks"\n\
-  echo "  test     - Run test suite"\n\
-  echo "  sync     - Synchronize configuration files"\n\
-  echo "  docs     - Open API documentation in browser"\n\
+  echo "  start        - Start both REST API and MCP servers"\n\
+  echo "  check        - Run environment status check"\n\
+  echo "  validate     - Validate environment configuration"\n\
+  echo "  lint         - Run code quality checks"\n\
+  echo "  test         - Run test suite"\n\
+  echo "  sync         - Synchronize configuration files"\n\
+  echo "  auth-logfire - Authenticate with Logfire"\n\
+  echo "  use-logfire  - Set current project to pydantic-ai-template in Logfire"\n\
+  echo "  docs         - Open API documentation in browser"\n\
 }\n\
 ' > /etc/profile.d/dev-init.sh && \
     chmod +x /etc/profile.d/dev-init.sh
@@ -112,7 +119,8 @@ WORKDIR /app
 # Set up Python environment variables for development
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    ENVIRONMENT=development
 
 # Copy the entire project context first (needed for uv install)
 # .dockerignore should exclude unnecessary files
@@ -125,6 +133,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     # Ensure uv is available on PATH for the next command
     export PATH="/root/.local/bin:$PATH" && \
     echo "Installing project dependencies using uv..." && \
+    uv pip install --system --no-cache "logfire[fastapi,httpx,asyncio,pydantic_ai]" && \
     uv pip install --system --no-cache --editable ".[dev,test]"
 
 # Expose the port the app runs on

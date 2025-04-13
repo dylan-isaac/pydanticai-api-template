@@ -11,12 +11,36 @@ The project includes integration with [LogFire](https://logfire.pydantic.dev/doc
 Observability is configured through environment variables:
 
 ```
-LOGFIRE_API_KEY="your-api-key"
-LOGFIRE_PROJECT_ID="your-project-id"
+LOGFIRE_TOKEN="your-write-token"
+LOGFIRE_PROJECT_ID="pydantic-ai-template"
 LOGFIRE_ENABLED="true"
 ```
 
 These variables should be set in your `.env` file. For development or CI environments where you don't want to send telemetry, set `LOGFIRE_ENABLED="false"`.
+
+### Local Development Setup
+
+For local development, we recommend using the Logfire CLI to authenticate:
+
+```bash
+# Authenticate with Logfire
+logfire auth
+
+# Set the current project to pydantic-ai-template
+logfire projects use pydantic-ai-template
+```
+
+When using the development container, you can use these convenient aliases:
+- `auth-logfire` - Authenticate with Logfire
+- `use-logfire` - Set the current project to pydantic-ai-template
+
+### Production Setup
+
+For production environments, use a write token:
+
+1. Generate a write token through the Logfire dashboard (Settings → Write Tokens)
+2. Set the `LOGFIRE_TOKEN` environment variable in your production environment
+3. Ensure `LOGFIRE_ENABLED` is set to `true`
 
 ### Usage
 
@@ -51,11 +75,21 @@ with logfire.span("database_query") as span:
 
 ### Viewing Logs and Traces
 
-You can view your logs and traces in the LogFire dashboard. To access it:
+You can view your logs and traces in the LogFire dashboard:
 
-1. Sign up at [https://logfire.app/](https://logfire.app/)
-2. Create a project and get your API key
-3. Set up your environment variables as described above
+1. Go to [https://logfire-us.pydantic.dev](https://logfire-us.pydantic.dev)
+2. Navigate to your project
+3. Use the Live View to see real-time logs
+4. Create dashboards for recurring metrics
+
+### PydanticAI Integration
+
+PydanticAI integration is automatically set up when available. This provides visibility into:
+
+1. LLM calls and responses
+2. Prompt construction and token usage
+3. Model latency and performance metrics
+4. Validation errors and model failures
 
 ## Testing Infrastructure
 

@@ -6,6 +6,7 @@ T = TypeVar("T")
 SpanCallback = Callable[["Span"], T]
 
 def configure(
+    token: Optional[str] = None,
     api_key: Optional[str] = None,
     project_id: Optional[str] = None,
     service_name: Optional[str] = None,

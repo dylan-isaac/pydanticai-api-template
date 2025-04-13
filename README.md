@@ -33,6 +33,7 @@ This README provides a high-level overview. For detailed information, refer to:
 | [API Reference](./docs/API.md) | API endpoints, parameters, and response formats |
 | [Testing Guide](./docs/TESTING.md) | Testing strategies and examples |
 | [Maintenance](./docs/MAINTENANCE.md) | Configuration management and project maintenance |
+| [Observability](./docs/OBSERVABILITY.md) | Logging, tracing, and monitoring with Logfire |
 
 ## Key Features
 
@@ -43,6 +44,7 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Docker**: Containerization for consistent development and deployment
 - **Modern Tooling**: Ruff, MyPy, UV package manager, and more
 - **Prompt Testing**: Automated testing for LLM prompts with CI/CD integration
+- **Observability**: Complete visibility with Logfire integration
 
 ## Project Structure
 
@@ -109,6 +111,33 @@ server = MCPServerHTTP(url='http://localhost:3001/sse')
 agent = Agent('openai:gpt-4o', mcp_servers=[server])
 ```
 
+## Observability with Logfire
+
+This template comes with built-in observability powered by Logfire. Key features include:
+
+1. **Automatic Instrumentation** for FastAPI, PydanticAI, and HTTP requests
+2. **Live Debugging** with real-time trace visualization
+3. **LLM Call Monitoring** including prompts, tokens, and costs
+4. **Performance Metrics** to identify bottlenecks
+
+### Local Setup
+
+```bash
+# From inside the dev container
+auth-logfire     # Authenticate with Logfire
+use-logfire      # Set the current project
+```
+
+### Production Setup
+
+Set these environment variables:
+```
+LOGFIRE_TOKEN="your-write-token"
+LOGFIRE_ENABLED="true"
+```
+
+For detailed instructions, see [Observability](./docs/OBSERVABILITY.md).
+
 ## Environment Setup
 
 Create a `.env` file in the project root with your API keys:
@@ -135,6 +164,7 @@ Update documentation when making these changes:
 | Configuration | [MAINTENANCE.md](./docs/MAINTENANCE.md) |
 | CLI commands | [DEVELOPER.md](./docs/DEVELOPER.md), README.md if major |
 | Testing approach | [TESTING.md](./docs/TESTING.md) |
+| Observability | [OBSERVABILITY.md](./docs/OBSERVABILITY.md) |
 
 For all significant changes:
 1. Update relevant documentation files

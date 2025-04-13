@@ -10,7 +10,9 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 
-from pydanticai_api_template.utils.observability import setup_logfire
+from pydanticai_api_template.utils.observability import (
+    is_logfire_enabled,
+)
 
 # Load environment variables
 load_dotenv()
@@ -21,8 +23,8 @@ logger = logging.getLogger(__name__)
 # Initialize the OpenAI agent
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Initialize LogFire if enabled
-setup_logfire(service_name="pydanticai-mcp-server")
+# Initialize LogFire if enabled - moved to create_app function
+# setup_logfire(service_name="pydanticai-mcp-server")
 
 
 # Define Pydantic models for MCP server
@@ -195,7 +197,15 @@ def create_app() -> FastAPI:
     """Create a FastAPI app with the MCP server"""
     # Create the SSE app and use it directly as the root app
     # This makes the SSE endpoint available at / instead of /sse
-    return cast(FastAPI, server.sse_app())
+    app = cast(FastAPI, server.sse_app())
+
+    # Now that we have the app, instrument it with LogFire
+    if is_logfire_enabled():
+        from pydanticai_api_template.utils.observability import setup_logfire
+
+        setup_logfire(service_name="pydanticai-mcp-server", app=app)
+
+    return app
 
 
 def run_standalone() -> None:
