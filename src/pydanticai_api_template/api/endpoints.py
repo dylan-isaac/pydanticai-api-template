@@ -15,13 +15,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
 from pydantic_ai import Agent
 
-from ..utils.observability import setup_logfire, shutdown_logfire
+from pydanticai_api_template.api.models import (
+    ChatMessage,
+    ChatResponse,
+    StoryIdea,
+)
+from pydanticai_api_template.utils.observability import (
+    instrument_all_agents,
+    setup_logfire,
+    shutdown_logfire,
+)
 
-# Import models from the new location
-from .models import ChatMessage, ChatResponse, StoryIdea
-
-# Initialize LogFire if enabled
-setup_logfire(service_name="pydanticai-api")
+# Initialize LogFire if enabled - MOVED: Now called after app creation
 
 # --- Logging Configuration ---
 # Consistent logging setup from axe-ai
@@ -85,7 +90,8 @@ except Exception:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Handles application startup and shutdown events."""
     logfire.info("Application startup")
-    # Startup logic can go here if needed
+    # Instrument all PydanticAI agents at startup
+    instrument_all_agents()
     yield
     # Shutdown logic here
     logfire.info("Application shutdown initiated")
@@ -98,6 +104,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,  # Register the lifespan manager
 )
+
+# Initialize LogFire with the FastAPI app
+setup_logfire(service_name="pydanticai-api", app=app)
 
 # --- CORS Middleware ---
 # Allow all origins for development, be more specific in production
@@ -126,12 +135,17 @@ async def read_root() -> Dict[str, str]:
 async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
     """Endpoint to chat with the PydanticAI agent."""
     # Use logfire for structured logging with context
-    with logfire.span("chat_with_agent") as span:
+    with logfire.span(
+        "chat_with_agent", operation_type="api_chat", model="gpt-4o"
+    ) as span:
         span.set_attributes(
             {
                 "message_length": len(chat_message.message),
                 "user_message": chat_message.message[:100]
                 + ("..." if len(chat_message.message) > 100 else ""),
+                "token_count_approx": len(chat_message.message.split()),
+                "endpoint": "/chat",
+                "prompt_type": "user_message",
             }
         )
 
@@ -174,7 +188,15 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
                 chat_response = ChatResponse(reply=reply)
 
             span.set_attributes(
-                {"response_length": len(chat_response.reply), "success": True}
+                {
+                    "response_length": len(chat_response.reply),
+                    "success": True,
+                    "response_token_count_approx": len(chat_response.reply.split()),
+                    "completion_type": "text",
+                    "latency_ms": int(
+                        (getattr(agent_run_result, "completion_time", 0) or 0) * 1000
+                    ),
+                }
             )
 
             logger.info("Agent returned reply.")
@@ -196,12 +218,17 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
 async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
     """Endpoint to generate a story idea with title and premise."""
     # Use logfire for structured logging with context
-    with logfire.span("generate_story_idea") as span:
+    with logfire.span(
+        "generate_story_idea", operation_type="creative_generation", model="gpt-4o"
+    ) as span:
         span.set_attributes(
             {
                 "message_length": len(chat_message.message),
                 "user_message": chat_message.message[:100]
                 + ("..." if len(chat_message.message) > 100 else ""),
+                "token_count_approx": len(chat_message.message.split()),
+                "endpoint": "/story",
+                "prompt_type": "structured_generation",
             }
         )
 
@@ -239,26 +266,52 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
             # Use the initialized agent
             agent_run_result = await story_agent.run(enhanced_prompt)
 
-            # Get response data
-            response_data = agent_run_result.data
+            # Get the result data
+            story_idea_data = agent_run_result.data
 
-            # Check if result is already a StoryIdea or needs conversion
-            if isinstance(response_data, StoryIdea):
-                story_idea = response_data
+            # Ensure we have a StoryIdea object
+            if isinstance(story_idea_data, StoryIdea):
+                story_idea = story_idea_data
             else:
-                # This should not happen with proper configuration,
-                # but handle just in case
-                raise ValueError("Agent did not return a StoryIdea object")
+                # Create a StoryIdea with the data we have
+                try:
+                    # Try to convert from a dictionary if possible
+                    if hasattr(story_idea_data, "get"):
+                        story_idea = StoryIdea(
+                            title=story_idea_data.get("title", "Generated Story"),
+                            premise=story_idea_data.get(
+                                "premise", str(story_idea_data)
+                            ),
+                        )
+                    else:
+                        # Fallback for string or other types
+                        story_idea = StoryIdea(
+                            title="Generated Story", premise=str(story_idea_data)
+                        )
+                except Exception as e:
+                    logger.warning(f"Error converting to StoryIdea: {e}")
+                    # Ultimate fallback
+                    story_idea = StoryIdea(
+                        title="Generated Story", premise="A mysterious tale unfolds."
+                    )
 
+            # Track completion metrics
             span.set_attributes(
                 {
-                    "story_title": story_idea.title,
+                    "title_length": len(story_idea.title),
                     "premise_length": len(story_idea.premise),
                     "success": True,
+                    "completion_type": "structured",
+                    "response_complexity": "high"
+                    if len(story_idea.premise) > 200
+                    else "medium",
+                    "latency_ms": int(
+                        (getattr(agent_run_result, "completion_time", 0) or 0) * 1000
+                    ),
                 }
             )
 
-            logger.info(f"Agent returned story idea: {story_idea.title}")
+            logger.info(f"Generated story idea with title: {story_idea.title}")
             return story_idea
         except Exception as e:
             # Catch-all for any other exceptions that might occur

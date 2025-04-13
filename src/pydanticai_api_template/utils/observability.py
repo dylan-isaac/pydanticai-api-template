@@ -83,7 +83,10 @@ def setup_logfire(
     # The app parameter might be needed in some versions but not others
     try:
         # For type safety, we ignore the type checker
-        logfire.instrument_fastapi()
+        if app is not None:
+            logfire.instrument_fastapi(app)
+        else:
+            logfire.warning("No FastAPI app provided, skipping FastAPI instrumentation")
     except Exception as e:
         logfire.warning(f"Failed to instrument FastAPI: {e}")
 
@@ -96,6 +99,26 @@ def setup_logfire(
         service_name=service_name,
         environment=env,
     )
+
+
+def instrument_all_agents() -> None:
+    """
+    Instrument all PydanticAI agents to enable detailed AI operation monitoring.
+
+    This is a convenience function that calls Agent.instrument_all() if
+    PydanticAI is available.
+    """
+    if not is_logfire_enabled():
+        return
+
+    try:
+        from pydantic_ai import Agent
+
+        # Instrument all agents to avoid having to set instrument=True on each one
+        Agent.instrument_all()
+        logfire.info("Successfully instrumented all PydanticAI agents")
+    except (ImportError, AttributeError) as e:
+        logfire.warning(f"Failed to instrument PydanticAI agents: {e}")
 
 
 def shutdown_logfire() -> None:

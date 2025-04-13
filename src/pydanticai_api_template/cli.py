@@ -651,5 +651,41 @@ def prompt_test(
         raise typer.Exit(code=1)
 
 
+@app.command()
+def setup_logfire() -> None:
+    """Set up Logfire authentication and project configuration.
+
+    This runs the Logfire CLI commands to authenticate and set the current project.
+    """
+    import shutil
+    import subprocess
+
+    typer.echo("🔄 Setting up Logfire...")
+
+    # Check if logfire is available
+    logfire_exec = shutil.which("logfire")
+    if not logfire_exec:
+        typer.echo(
+            "❌ logfire command not found. Please ensure it's installed.", err=True
+        )
+        raise typer.Exit(code=1)
+
+    try:
+        # Run logfire auth
+        typer.echo("📝 Running logfire authentication...")
+        subprocess.run(["logfire", "auth"], check=True)
+
+        # Set project to pydantic-ai-template
+        typer.echo("🔧 Setting Logfire project to pydantic-ai-template...")
+        subprocess.run(
+            ["logfire", "projects", "use", "pydantic-ai-template"], check=True
+        )
+
+        typer.echo("✅ Logfire setup complete!")
+    except subprocess.CalledProcessError as e:
+        typer.echo(f"❌ Error setting up Logfire: {e}", err=True)
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

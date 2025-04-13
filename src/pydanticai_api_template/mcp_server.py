@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 
 from pydanticai_api_template.utils.observability import (
+    instrument_all_agents,
     is_logfire_enabled,
 )
 
@@ -25,6 +26,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Initialize LogFire if enabled - moved to create_app function
 # setup_logfire(service_name="pydanticai-mcp-server")
+
+# Instrument all PydanticAI agents if Logfire is enabled
+if is_logfire_enabled():
+    instrument_all_agents()
 
 
 # Define Pydantic models for MCP server
@@ -77,12 +82,16 @@ class StoryIdea(BaseModel):
 # Initialize AI agent
 try:
     ai_agent: Optional[Agent] = (
-        Agent("openai:gpt-4o", result_type=ChatResponse) if OPENAI_API_KEY else None
+        Agent("openai:gpt-4o", result_type=ChatResponse, instrument=True)
+        if OPENAI_API_KEY
+        else None
     )
 
     # Initialize story agent
     story_agent: Optional[Agent] = (
-        Agent("openai:gpt-4o", result_type=StoryIdea) if OPENAI_API_KEY else None
+        Agent("openai:gpt-4o", result_type=StoryIdea, instrument=True)
+        if OPENAI_API_KEY
+        else None
     )
 
     if ai_agent:
@@ -105,7 +114,9 @@ async def chat(message: str) -> str:
 
     Send a message to the AI assistant and receive a response.
     """
-    with logfire.span("mcp_chat", message=message[:100]) as span:
+    with logfire.span(
+        "mcp_chat", message=message[:100], operation_type="chat", model="gpt-4o"
+    ) as span:
         if not ai_agent:
             span.set_status("error", "AI service not available")
             return "AI service is not available. Please check server configuration."
@@ -117,6 +128,14 @@ async def chat(message: str) -> str:
             # Ensure the agent is properly typed for mypy
             assert ai_agent is not None
 
+            # Track token count for the prompt
+            span.set_attributes(
+                {
+                    "token_count_approx": len(message.split()),
+                    "prompt_type": "user_message",
+                }
+            )
+
             result: Any = await ai_agent.run(request.message)
 
             # Properly handle the response based on its type
@@ -124,10 +143,22 @@ async def chat(message: str) -> str:
             response_data = result.data
             if hasattr(response_data, "reply"):
                 reply = str(response_data.reply)
-                span.set_attributes({"response_length": len(reply)})
+                span.set_attributes(
+                    {
+                        "response_length": len(reply),
+                        "response_token_count_approx": len(reply.split()),
+                        "completion_type": "text",
+                    }
+                )
                 return reply
             reply = str(response_data)
-            span.set_attributes({"response_length": len(reply)})
+            span.set_attributes(
+                {
+                    "response_length": len(reply),
+                    "response_token_count_approx": len(reply.split()),
+                    "completion_type": "raw",
+                }
+            )
             return reply
         except Exception as e:
             logger.exception(f"Error in MCP chat tool: {e}")
@@ -147,7 +178,12 @@ async def story(message: str) -> dict:
     - "Create a fantasy story with dragons"
     - "Write a mystery set in Victorian London"
     """
-    with logfire.span("mcp_story", message=message[:100]) as span:
+    with logfire.span(
+        "mcp_story",
+        message=message[:100],
+        operation_type="story_generation",
+        model="gpt-4o",
+    ) as span:
         if not story_agent:
             span.set_status("error", "AI service not available")
             return {
@@ -161,6 +197,15 @@ async def story(message: str) -> dict:
             enhanced_prompt = (
                 f"Generate a creative and original story idea based on this input: "
                 f"{message}"
+            )
+
+            # Track token count for the prompt
+            span.set_attributes(
+                {
+                    "token_count_approx": len(enhanced_prompt.split()),
+                    "prompt_type": "structured_generation",
+                    "input_length": len(message),
+                }
             )
 
             # Ensure the agent is properly typed for mypy
@@ -180,6 +225,10 @@ async def story(message: str) -> dict:
                     {
                         "story_title": story_dict["title"],
                         "premise_length": len(story_dict["premise"]),
+                        "completion_type": "structured",
+                        "response_complexity": "high"
+                        if len(story_dict["premise"]) > 200
+                        else "medium",
                     }
                 )
                 return story_dict
@@ -196,7 +245,6 @@ async def story(message: str) -> dict:
 def create_app() -> FastAPI:
     """Create a FastAPI app with the MCP server"""
     # Create the SSE app and use it directly as the root app
-    # This makes the SSE endpoint available at / instead of /sse
     app = cast(FastAPI, server.sse_app())
 
     # Now that we have the app, instrument it with LogFire

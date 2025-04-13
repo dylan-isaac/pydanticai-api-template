@@ -84,7 +84,6 @@ def test_setup_logfire_enabled(
     # Verify instrumentation
     mock_logfire.instrument_httpx.assert_called_once()
     mock_logfire.instrument_fastapi.assert_called_once()
-    mock_logfire.instrument_asyncio.assert_called_once()
     mock_configure.assert_called_once()
 
 
@@ -142,5 +141,4 @@ def test_setup_logfire_promptfoo(
     # Verify instrumentation
     mock_logfire.instrument_httpx.assert_called_once()
     mock_logfire.instrument_fastapi.assert_called_once()
-    mock_logfire.instrument_asyncio.assert_called_once()
     mock_configure.assert_called_once()

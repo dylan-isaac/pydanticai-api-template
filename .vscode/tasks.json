@@ -12,6 +12,18 @@
             "detail": "Opens a terminal on the host system outside the dev container."
         },
         {
+            "label": "Setup Logfire",
+            "type": "shell",
+            "command": "pat setup-logfire",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": false
+            },
+            "detail": "Authenticates with Logfire and sets the current project."
+        },
+        {
             "label": "Run MCP Server",
             "type": "shell",
             "command": "pat run-mcp",
@@ -26,6 +38,7 @@
         {
             "label": "Run All Servers",
             "dependsOn": [
+                "Setup Logfire",
                 "Run Dev Server (API)",
                 "Run MCP Server"
             ],
@@ -34,7 +47,7 @@
                 "isDefault": true
             },
             "problemMatcher": [],
-            "detail": "Launches both the REST API and MCP servers."
+            "detail": "Launches both the REST API and MCP servers with Logfire setup."
         },
         {
             "label": "Run Dev Server (API)",
@@ -144,6 +157,67 @@
         },
         {
             "label": "Sync Configs (pat)",
+            "type": "shell",
+            "command": "make sync-configs",
+            "problemMatcher": [],
+            "detail": "Runs the configuration synchronization script."
+        },
+        {
+            "label": "Run Dev Server (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template run --reload",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs the FastAPI server with hot reload using the CLI.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "Lint (pydanticai-api-template)",
+            "type": "shell",
+            "command": "make lint",
+            "group": "test",
+            "problemMatcher": [
+                "$ruff"
+            ],
+            "detail": "Runs Ruff linter and formatter checks using Make."
+        },
+        {
+            "label": "Test (pydanticai-api-template)",
+            "type": "shell",
+            "command": "make test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs pytest using Make."
+        },
+        {
+            "label": "Validate (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template validate",
+            "problemMatcher": [],
+            "detail": "Runs the CLI validation command."
+        },
+        {
+            "label": "Cleanup (pydanticai-api-template)",
+            "type": "shell",
+            "command": "pydanticai-api-template cleanup",
+            "problemMatcher": [],
+            "detail": "Runs the CLI cleanup command."
+        },
+        {
+            "label": "Sync Configs (pydanticai-api-template)",
             "type": "shell",
             "command": "make sync-configs",
             "problemMatcher": [],
