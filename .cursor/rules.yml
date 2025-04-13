@@ -1,0 +1,125 @@
+---
+version: 1
+rules:
+  - name: Documentation-First Development
+    description: Ensures documentation is updated when relevant code changes
+    pattern:
+      - when: modified(.py)
+        files: src/pydanticai_api_template/**
+      - when: added(.py)
+        files: src/pydanticai_api_template/**
+    action:
+      type: remind
+      content: |
+        🔍 **Documentation Check**
+
+        You've modified code that may require documentation updates:
+
+        - API changes → Update [docs/API.md]
+        - Model changes → Update [docs/MODELS.md]
+        - Architecture changes → Update [docs/ARCHITECTURE.md]
+
+        Remember that well-documented code creates better AI coding assistance.
+
+  - name: Type Safety Guardian
+    description: Ensures type annotations are maintained throughout the codebase
+    pattern:
+      - when: modified(.py)
+        files: src/pydanticai_api_template/**
+        content:
+          added: "*: Any"
+          not_with: "ClassVar[dict[str, Any]]"
+    action:
+      type: remind
+      content: |
+        ⚠️ **Type Safety Alert**
+
+        You've introduced `Any` type annotations. This project prioritizes type safety.
+
+        Consider using more specific types:
+        - For collections: `List[T]`, `Dict[K, V]`, `Optional[T]`
+        - For unknown types: `TypeVar` or `Protocol`
+        - For Pydantic models: Explicit field types with validators
+
+        Type safety helps both humans and AI assistants understand your code better.
+
+  - name: MCP Tool Validator
+    description: Ensures MCP tools follow best practices
+    pattern:
+      - when: modified(mcp_server.py)
+        files: src/pydanticai_api_template/mcp_server.py
+        content:
+          added: "@server.tool()"
+    action:
+      type: remind
+      content: |
+        🔌 **MCP Tool Added**
+
+        Remember MCP tool best practices:
+
+        1. Always include descriptive docstrings (they're exposed to AI agents)
+        2. Use typed parameters and return values
+        3. Add observability with logfire.span
+        4. Handle exceptions gracefully
+        5. Update documentation in [docs/ARCHITECTURE.md]
+
+        MCP tools are your API's interface to AI agents - make them robust!
+
+  - name: Pydantic Model Standards
+    description: Ensures Pydantic models follow project standards
+    pattern:
+      - when: added(.py)
+        files: "**/*.py"
+        content:
+          added: "class * (BaseModel)"
+    action:
+      type: remind
+      content: |
+        📝 **New Pydantic Model**
+
+        Remember model best practices:
+
+        1. Add descriptive docstrings (they influence AI)
+        2. Use Field(...) with description and examples
+        3. Include validators for complex constraints
+        4. Add model_config for JSON schema examples
+        5. Consider adding the model to [docs/MODELS.md]
+
+        Well-structured models are crucial for PydanticAI's effectiveness.
+
+  - name: Test Coverage Guardian
+    description: Reminds to update tests when code changes
+    pattern:
+      - when: modified(.py)
+        files: src/pydanticai_api_template/**
+        not: tests/**
+    action:
+      type: remind
+      content: |
+        🧪 **Test Update Reminder**
+
+        You've changed code that may require test updates.
+
+        Consider:
+        - Adding unit tests for new functionality
+        - Updating existing tests to cover changes
+        - Adding prompt tests if you modified AI interactions
+
+        Remember the testing guidelines in [docs/TESTING.md].
+
+  - name: Accessibility Champion
+    description: Promotes accessibility in user-facing components
+    pattern:
+      - when: modified(.py)
+        files: src/pydanticai_api_template/api/**
+    action:
+      type: remind
+      content: |
+        ♿ **Accessibility Check**
+
+        You've modified API components. Consider:
+
+        1. Are error messages clear and helpful?
+        2. Is documentation accessible to all users?
+
+        Your custom instructions emphasize accessibility as an important value!

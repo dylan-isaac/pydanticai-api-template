@@ -34,6 +34,7 @@ This README provides a high-level overview. For detailed information, refer to:
 | [Testing Guide](./docs/TESTING.md) | Testing strategies and examples |
 | [Maintenance](./docs/MAINTENANCE.md) | Configuration management and project maintenance |
 | [Observability](./docs/OBSERVABILITY.md) | Logging, tracing, and monitoring with Logfire |
+| [Cursor Rules](./docs/CURSOR_RULES.md) | AI-assisted development with Cursor |
 | [Wishlist](./wishlist/) | Future improvements and feature ideas |
 
 ## Key Features
@@ -46,10 +47,29 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Modern Tooling**: Ruff, MyPy, UV package manager, and more
 - **Prompt Testing**: Automated testing for LLM prompts with CI/CD integration
 - **Observability**: Complete visibility with Logfire integration
+- **Cursor Rules**: Smart AI-assisted development with contextual reminders
+
+## AI-Assisted Development with Cursor
+
+This project includes custom [Cursor Rules](./docs/CURSOR_RULES.md) to enhance your development experience when using [Cursor](https://cursor.sh/), an AI-powered code editor:
+
+- **Documentation Reminders**: Get contextual reminders to update documentation when changing code
+- **Type Safety Enforcement**: Maintain type safety throughout the codebase
+- **Director Pattern Detection**: Identify opportunities for implementing autonomous AI workflows
+
+To get started with the Cursor Rules:
+
+1. Open the project in Cursor
+2. The rules will be automatically loaded from `.cursor/rules.yml`
+3. Start coding and benefit from smart, contextual assistance
+4. Use `@` symbol references (e.g., `@docs/MODELS.md`) to bring relevant context into chats
+
+For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
 
 ## Project Structure
 
 ```
+├── .cursor          # Cursor AI rules and configuration
 ├── .devcontainer    # Dev container configuration
 ├── .vscode          # VS Code settings and tasks
 ├── docs/            # Detailed documentation

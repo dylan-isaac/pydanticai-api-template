@@ -1,6 +1,73 @@
 # Documentation Overview
 
-This document provides a comprehensive overview of the PydanticAI API Template documentation system, explaining how each document relates to others and when to consult specific documentation files.
+This document provides a comprehensive guide to all documentation in the PydanticAI API Template project.
+
+## Core Documentation
+
+| Documentation | Purpose |
+|--------------|---------|
+| [README.md](../README.md) | High-level project overview and quick start |
+| [Developer Guide](./DEVELOPER.md) | Setup instructions and development workflows |
+| [Architecture](./ARCHITECTURE.md) | System design, patterns, and component relationships |
+| [Models](./MODELS.md) | Pydantic models, validation, and PydanticAI integration |
+| [API Reference](./API.md) | API endpoints, parameters, and response formats |
+| [Testing Guide](./TESTING.md) | Testing strategies and examples |
+| [Maintenance](./MAINTENANCE.md) | Configuration management and project maintenance |
+| [Observability](./OBSERVABILITY.md) | Logging, tracing, and monitoring with Logfire |
+| [Cursor Rules](./CURSOR_RULES.md) | AI-assisted development with Cursor |
+
+## Documentation Organization
+
+The documentation is organized to support different user roles:
+
+- **New Users**: Start with README.md for a project overview
+- **Developers**: Focus on DEVELOPER.md and API.md
+- **DevOps**: Refer to MAINTENANCE.md and OBSERVABILITY.md
+- **Architects**: Dive into ARCHITECTURE.md and MODELS.md
+- **QA Engineers**: Concentrate on TESTING.md
+
+## Using AI for Documentation Assistance
+
+This project is designed to work well with AI-assisted development tools like [Cursor](https://cursor.sh/). The documentation is structured to provide maximum benefit for AI context:
+
+1. **Referencing Documentation in Cursor**:
+   - Use the `@docs/FILENAME.md` syntax in Cursor to reference documentation
+   - Example: `@docs/MODELS.md` to bring model information into context
+
+2. **AI-Assisted Documentation Updates**:
+   - When implementing new features, ask Cursor to help update relevant docs
+   - Example: "Update API.md to document the new endpoint I just created"
+
+3. **Documentation-Driven Development**:
+   - Consider writing specification documentation before implementation
+   - Use AI to transform specifications into working code
+
+## Cursor Rules Integration
+
+To further enhance the development workflow, this project includes [Cursor Rules](./CURSOR_RULES.md) that:
+
+1. **Provide timely reminders** about documentation updates
+2. **Enforce code quality standards** like type safety
+3. **Suggest improvements** based on project patterns
+4. **Promote accessibility** in user-facing components
+
+See [Cursor Rules](./CURSOR_RULES.md) for detailed information on how to leverage these rules effectively.
+
+## Wishlist Documentation
+
+The `wishlist/` directory contains markdown files for future improvements and features. This serves as:
+
+1. A feature backlog for planning
+2. A source of implementation targets for AI-assisted development
+3. A collaborative planning tool for the team
+
+## Best Practices for Documentation
+
+1. **Keep Documentation Updated**: Documentation should be updated alongside code changes
+2. **Include Examples**: Concrete examples help users understand functionality
+3. **Cross-Reference**: Link between related documentation sections
+4. **Accessibility**: Ensure documentation is accessible to all users
+5. **AI-Friendly Structure**: Use clear headings, code blocks, and consistent terminology
 
 ## Documentation Map
 
