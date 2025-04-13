@@ -18,11 +18,19 @@ python -m pytest tests/test_mcp_server.py -v
 
 ### Test Coverage
 
-To generate test coverage reports:
+To generate test coverage reports locally:
 
 ```bash
 python -m pytest --cov=pydanticai_api_template tests/
 ```
+
+This will show coverage statistics in the terminal output. You can also generate an HTML report for more detailed information:
+
+```bash
+python -m pytest --cov=pydanticai_api_template tests/ --cov-report=html
+```
+
+The HTML report will be generated in the `htmlcov/` directory.
 
 ## Testing the MCP Server
 
