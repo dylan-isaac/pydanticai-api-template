@@ -84,7 +84,9 @@ def setup_logfire(
     try:
         # For type safety, we ignore the type checker
         if app is not None:
-            logfire.instrument_fastapi(app)
+            # Suppress linter warning - app parameter is required according to documentation
+            # but linter thinks it's not
+            logfire.instrument_fastapi(app)  # type: ignore
         else:
             logfire.warning("No FastAPI app provided, skipping FastAPI instrumentation")
     except Exception as e:
