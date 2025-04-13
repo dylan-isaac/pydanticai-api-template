@@ -29,13 +29,9 @@ jobs:
         run: |
           pip install uv
 
-      - name: Create Python virtual environment
+      - name: Install dependencies with system flag
         run: |
-          uv venv
-
-      - name: Install dependencies
-        run: |
-          uv pip install -e ".[dev,test]"
+          uv pip install --system -e ".[dev,test]"
 
       - name: Run linting
         run: |
@@ -48,11 +44,4 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=pydanticai_api_template tests/ --cov-report=xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          pytest --cov=pydanticai_api_template tests/
