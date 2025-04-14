@@ -21,7 +21,7 @@ def install_pre_commit_hook() -> bool:
 # Auto-sync configs when CLI files change
 if git diff --cached --name-only | grep -q "src/pydanticai_api_template/cli.py"; then
     echo "CLI file changed, syncing configs..."
-    python scripts/update_configs.py
+    python scripts/tasks/update_configs.py
     git add .vscode/tasks.json .pre-commit-config.yaml
 fi
 """

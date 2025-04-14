@@ -48,6 +48,8 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Prompt Testing**: Automated testing for LLM prompts with CI/CD integration
 - **Observability**: Complete visibility with Logfire integration
 - **Cursor Rules**: Smart AI-assisted development with contextual reminders
+- **Repomix Runner**: Easily bundle project files for providing context to AI assistants ([VS Code Extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner))
+- **Task Management**: Integrated AI-powered task management with [Claude Task Master](https://github.com/eyaltoledano/claude-task-master)
 
 ## AI-Assisted Development with Cursor
 
@@ -56,6 +58,7 @@ This project includes custom [Cursor Rules](./docs/CURSOR_RULES.md) to enhance y
 - **Documentation Reminders**: Get contextual reminders to update documentation when changing code
 - **Type Safety Enforcement**: Maintain type safety throughout the codebase
 - **Director Pattern Detection**: Identify opportunities for implementing autonomous AI workflows
+- **Repomix Integration**: Use the [Repomix Runner extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner) (automatically installed in the dev container) to easily bundle files or directories and copy them to the clipboard for pasting into AI chat prompts.
 
 To get started with the Cursor Rules:
 
@@ -65,6 +68,40 @@ To get started with the Cursor Rules:
 4. Use `@` symbol references (e.g., `@docs/MODELS.md`) to bring relevant context into chats
 
 For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
+
+## AI Task Management with Claude Task Master
+
+This template includes [Claude Task Master](https://github.com/eyaltoledano/claude-task-master), an AI-powered task management system integrated via MCP for seamless use within Cursor.
+
+**Key Features:**
+
+*   **PRD Parsing:** Automatically generate tasks from Product Requirements Documents.
+*   **Task Management:** Create, prioritize, track, and manage development tasks.
+*   **AI Assistance:** Get help implementing or expanding specific tasks directly in chat.
+*   **Structured Output:** Tasks are stored in a predictable format in the `.tasks/` directory.
+
+**Setup:**
+
+1.  **API Key:** Add your `ANTHROPIC_API_KEY` to your `.env` file in the project root:
+    ```
+    ANTHROPIC_API_KEY=your_claude_api_key_here
+    ```
+    If you don't provide it, Cursor will prompt you when the tool is first used. The specific Claude model (`claude-3-opus-20240229` by default) and other parameters can be adjusted in `.cursor/mcp.json`.
+2.  **Rebuild Container:** Ensure the tool is installed by rebuilding your dev container (`Cmd/Ctrl+Shift+P` -> `Dev Containers: Rebuild Container`).
+3.  **Enable MCP:** Make sure the `taskmaster-ai` server is enabled in Cursor's MCP settings.
+
+**Usage:**
+
+Once set up, you can interact with Task Master through Cursor chat:
+
+1.  **Initialize:** `"Can you please initialize taskmaster-ai into my project?"` (Creates the `.tasks/` directory)
+2.  **Parse PRD:** `"Can you parse my PRD at <path/to/prd.txt>?"`
+3.  **Get Next Task:** `"What's the next task I should work on?"`
+4.  **Implement Task:** `"Can you help me implement task <number> (e.g., task 3)?"`
+5.  **Expand Task:** `"Can you help me expand task <number> with more detail?"`
+6.  **List Tasks:** `"List all tasks."`
+
+Task Master will create and manage tasks as markdown files within a `.tasks/` directory in your project root. For more details, see the [Developer Guide](./docs/DEVELOPER.md).
 
 ## Project Structure
 
@@ -83,6 +120,7 @@ For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
 │       └── cli.py   # Command-line interface
 ├── tests/           # Test suite
 ├── wishlist/        # Future improvements and feature ideas
+├── .tasks/          # Claude Task Master generated tasks (created on init)
 ├── pyproject.toml   # Project dependencies and config
 └── Makefile         # Common development commands
 ```
@@ -178,36 +216,6 @@ For detailed instructions, see [Observability](./docs/OBSERVABILITY.md).
 Create a `.env` file in the project root with your API keys:
 
 ```
-OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_claude_api_key_here
 ```
-
-## Status Check
-
-Run `check` to verify your environment configuration.
-
-## Documentation Maintenance Guide
-
-Update documentation when making these changes:
-
-| Change Type | Documentation to Update |
-|------------|--------------------------|
-| API endpoints | [API.md](./docs/API.md), example in README if major |
-| Pydantic models | [MODELS.md](./docs/MODELS.md) |
-| Project structure | README.md (project structure section) |
-| Architecture | [ARCHITECTURE.md](./docs/ARCHITECTURE.md), README.md if major |
-| Dev workflow | [DEVELOPER.md](./docs/DEVELOPER.md) |
-| Configuration | [MAINTENANCE.md](./docs/MAINTENANCE.md) |
-| CLI commands | [DEVELOPER.md](./docs/DEVELOPER.md), README.md if major |
-| Testing approach | [TESTING.md](./docs/TESTING.md) |
-| Observability | [OBSERVABILITY.md](./docs/OBSERVABILITY.md) |
-| Wishlist items | README.md (wishlist section), add file to [wishlist/](./wishlist/) |
-
-For all significant changes:
-1. Update relevant documentation files
-2. Ensure README links remain accurate
-3. If adding new documentation, update the Documentation Map table
-4. Keep examples concise but functional
-
-## Alternative Setup Options
-
-See [Developer Guide](./docs/DEVELOPER.md) for non-containerized setup options.

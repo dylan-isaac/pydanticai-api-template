@@ -59,7 +59,7 @@ sync-configs:
 	if [ -f "/.dockerenv" ]; then \
 		uv pip install --system pyyaml tomli; \
 	fi
-	python scripts/update_configs.py
+	python scripts/tasks/update_configs.py
 
 # View logs for the development container
 logs:

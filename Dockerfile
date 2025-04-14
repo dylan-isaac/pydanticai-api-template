@@ -3,6 +3,9 @@ FROM python:3.12-slim
 # Install curl for health checks
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
+# Install Node.js and npm (needed for some potential build steps, but not repomix)
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory
 WORKDIR /app
 

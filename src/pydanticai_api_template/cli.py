@@ -184,7 +184,8 @@ def validate() -> None:
 def cleanup() -> None:
     """Clean up temporary files and directories (like __pycache__)."""
     typer.echo("🧹 Cleaning up temporary files...")
-    cleanup_script_path = Path(__file__).parent.parent.parent / "scripts" / "cleanup.py"
+    # Updated path to the cleanup script
+    cleanup_script_path = Path(__file__).parent / "utils" / "cleanup.py"
 
     if not cleanup_script_path.exists():
         typer.echo(f"❌ Cleanup script not found at: {cleanup_script_path}", err=True)
@@ -359,84 +360,42 @@ def test() -> None:
 
 @app.command()
 def sync() -> None:
-    """Synchronize configuration files."""
-    import shutil
-    import subprocess
-
+    """Synchronize project configuration files."""
     typer.echo("🔄 Synchronizing configuration files...")
+    # Updated path to the sync script
+    sync_script_path = (
+        Path(__file__).parent.parent.parent / "scripts" / "tasks" / "update_configs.py"
+    )
 
-    # Check if we're inside a dev container
-    in_container = Path("/.dockerenv").exists()
+    if not sync_script_path.exists():
+        typer.echo(f"❌ Sync script not found at: {sync_script_path}", err=True)
+        raise typer.Exit(code=1)
 
-    # Check if 'make' is available
-    if shutil.which("make"):
-        try:
-            # Use Make command to run the sync script
-            result = subprocess.run(
-                ["make", "sync-configs"], check=True, capture_output=True, text=True
-            )
-            typer.echo(result.stdout)
-            typer.echo("✅ Configuration sync complete!")
-        except subprocess.CalledProcessError as e:
-            if in_container:
-                # If in container and make failed, try direct command
-                typer.echo("Make command failed, trying direct command...")
-                try:
-                    sync_script = (
-                        Path(__file__).parent.parent.parent
-                        / "scripts"
-                        / "update_configs.py"
-                    )
-
-                    if not sync_script.exists():
-                        typer.echo(
-                            f"❌ Sync script not found at: {sync_script}", err=True
-                        )
-                        raise typer.Exit(code=1)
-
-                    typer.echo(f"Running sync script: {sync_script}")
-                    subprocess.run(["python", str(sync_script)], check=True)
-
-                    typer.echo("✅ Configuration sync complete!")
-                    return
-                except subprocess.CalledProcessError:
-                    pass
-            # If we get here, both approaches failed
-            typer.echo(
-                f"❌ Configuration sync failed:\n{e.stdout}\n{e.stderr}", err=True
-            )
-            raise typer.Exit(code=1)
-    else:
-        # Fallback to direct command if Make is not available
-        try:
-            # For direct execution, we need to make sure dependencies are installed
-            if in_container:
-                # In container, use --system flag to avoid venv issues
-                typer.echo("Installing required dependencies with system flag...")
-                try:
-                    subprocess.run(
-                        ["uv", "pip", "install", "--system", "pyyaml", "tomli"],
-                        check=True,
-                        capture_output=True,
-                    )
-                except subprocess.CalledProcessError as e:
-                    typer.echo(f"Failed to install dependencies: {e}", err=True)
-
-            sync_script = (
-                Path(__file__).parent.parent.parent / "scripts" / "update_configs.py"
-            )
-
-            if not sync_script.exists():
-                typer.echo(f"❌ Sync script not found at: {sync_script}", err=True)
+    try:
+        # Dynamically import and run the main function from the sync script
+        spec = importlib.util.spec_from_file_location(
+            "sync_script", str(sync_script_path)
+        )
+        if spec and spec.loader:
+            sync_module = importlib.util.module_from_spec(spec)
+            sys.modules["sync_script"] = sync_module  # Add to sys.modules temporarily
+            spec.loader.exec_module(sync_module)
+            if hasattr(sync_module, "main"):  # Check if main function exists
+                sync_module.main()  # Execute the main function
+                typer.echo("✅ Configuration synchronization complete!")
+            else:
+                typer.echo(
+                    f"❌ 'main' function not found in {sync_script_path}", err=True
+                )
                 raise typer.Exit(code=1)
-
-            typer.echo(f"Running sync script: {sync_script}")
-            subprocess.run(["python", str(sync_script)], check=True)
-
-            typer.echo("✅ Configuration sync complete!")
-        except subprocess.CalledProcessError as e:
-            typer.echo(f"❌ Configuration sync failed: {e}", err=True)
+        else:
+            typer.echo(
+                f"❌ Could not load sync script from {sync_script_path}", err=True
+            )
             raise typer.Exit(code=1)
+    except Exception as e:
+        typer.echo(f"❌ An error occurred during synchronization: {e}", err=True)
+        raise typer.Exit(code=1)
 
 
 @app.command()

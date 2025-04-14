@@ -68,7 +68,9 @@ Once the dev container is running:
 Create a `.env` file in the project root to store your API keys and other configuration:
 
 ```
-OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_claude_api_key_here
+# Add other environment variables as needed (e.g., LOGFIRE_TOKEN)
 ```
 
 The application will load these variables automatically at runtime. Note that the status check command looks for environment variables directly, so it may show warnings even when your app is working correctly with the .env file.
@@ -130,27 +132,100 @@ The Wishlist directory provides a structured way to plan and implement future im
    - Consider dependencies and prerequisites
    - Update or remove items as the project evolves
 
-## Troubleshooting
+## AI Development Tools
 
-### Server Won't Start
+This project includes tools to streamline AI-assisted development workflows.
 
-Check:
-- Port 8000 availability: `check` will verify
-- Logging: Look for error messages
-- Container status: Run `docker ps` on the host
+### Repomix Runner (VS Code Extension)
 
-### Dev Container Issues
+- **Purpose**: Easily bundle files or directories into a single text block for pasting into AI chat prompts, providing necessary context.
+- **Integration**: The [Repomix Runner VS Code extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner) is automatically installed when you open this project in the Dev Container.
+- **Usage**:
+    - Open the **REPOMIX** custom view in the VS Code sidebar.
+    - Select files or folders in the Explorer.
+    - Click "Run Repomix on selection" in the REPOMIX view.
+    - The bundled content will be copied to your clipboard, ready to be pasted into your AI assistant (like Cursor).
+    - You can also create and manage reusable bundles for commonly referenced parts of the codebase.
 
-- Try rebuilding: Command Palette → "Dev Containers: Rebuild Container"
-- Check Docker logs: `docker logs <container-id>`
-- Verify Docker Desktop is running
+### Repomix CLI Tool
 
-### Environment Variable Issues
+- **Purpose**: Generate a comprehensive text representation of your project or specific parts of it, suitable for providing context to Large Language Models (LLMs).
+- **Installation**: The `repomix` CLI tool is installed globally within the dev container via the `Dockerfile`.
+- **Basic Usage**:
+    - Open the integrated terminal in VS Code/Cursor (`Terminal > New Terminal`).
+    - Navigate to the project root directory (`cd /app` if not already there).
+    - Run the command:
+      ```bash
+      repomix
+      ```
+    - By default, this command reads `.gitignore` and `.repomixignore` (if present) to exclude files and generates an output file named `repomix_output.txt` in the current directory.
+    - This output file contains the bundled code and project structure, which you can then copy and paste into your AI assistant.
+- **Common Options**:
+    - **Specify output file**: `repomix -o custom_output.md`
+    - **Specify input directory/files**: `repomix src/ tests/` (bundles only `src/` and `tests/`)
+    - **Include specific patterns**: `repomix -p "src/**/*.py" -p "*.md"` (uses glob patterns)
+    - **Ignore additional patterns**: `repomix -i "**/__pycache__" -i "*.log"`
+    - **Copy to clipboard instead of file**: `repomix -c`
+    - **Use a specific configuration file**: `repomix --config path/to/repomix.config.json`
+    - **See all options**: `repomix --help`
+- **Sane Defaults & Configuration**: Repomix uses sensible defaults (like ignoring `node_modules`, `.git`, etc.). You can customize behavior further by creating a `repomix.config.json` file in the project root. See the official [Repomix documentation](https://github.com/yamadashy/repomix?tab=readme-ov-file#configuration) for details.
+- **When to Use**: Use the CLI when you need more control over the bundling process than the VS Code extension provides, such as specifying complex include/exclude patterns, using configuration files, or integrating repomix into scripts.
 
-- If the application works but status checks still show warnings about missing environment variables, this is expected behavior. The status check looks for variables directly in the environment while the app loads from the `.env` file.
-- Ensure your `.env` file is in the project root directory
-- Double-check that the variables match the expected format
+### Claude Task Master Integration
 
-### Other Issues
+This project includes [Claude Task Master](https://github.com/eyaltoledano/claude-task-master) for AI-driven task management, accessible via Cursor's MCP integration.
 
-See [MAINTENANCE.md](./MAINTENANCE.md) for more troubleshooting information.
+**Setup:**
+
+1.  **Install:** The tool (`task-master-ai`) is installed globally via `npm` in the `Dockerfile.dev`. No manual installation is needed within the container.
+2.  **Configure API Key:** Add your `ANTHROPIC_API_KEY` to the `.env` file. If missing, Cursor will prompt for it when the tool runs.
+3.  **Configure MCP Server:** The server is defined in `.cursor/mcp.json`. You can adjust environment variables there:
+    *   `MODEL`: Specify the Claude model (e.g., `claude-3-opus-20240229`, `claude-3-sonnet-20240229`). Opus is recommended for complex tasks, Sonnet for faster responses.
+    *   `MAX_TOKENS`: Max tokens for Claude's responses.
+    *   `DEFAULT_SUBTASKS`: How many subtasks to generate by default when parsing.
+    *   `DEFAULT_PRIORITY`: Default task priority (e.g., `low`, `medium`, `high`).
+4.  **Enable MCP:** Ensure the `taskmaster-ai` MCP server is enabled in your Cursor settings.
+5.  **Initialize Project:** Ask Cursor to `"initialize taskmaster-ai into my project"`. This creates the essential `.tasks/` directory.
+
+**`.tasks/` Directory Structure:**
+
+Task Master organizes tasks in the `.tasks/` directory:
+
+*   `.tasks/config.json`: Stores project-level settings (like the model used).
+*   `.tasks/metadata.json`: Tracks task status, priorities, etc.
+*   `.tasks/tasks/`: Contains individual task files (e.g., `task_001.md`).
+
+Each task file (`task_XXX.md`) uses Markdown format and typically includes:
+
+*   **Title:** A clear task description.
+*   **Description:** More detail about the task.
+*   **Priority:** (e.g., High, Medium, Low)
+*   **Status:** (e.g., TODO, IN_PROGRESS, DONE)
+*   **Subtasks:** A checklist of steps needed to complete the task.
+*   **Code Snippets/Context:** Relevant code or information provided by the AI.
+
+**Usage via Cursor Chat:**
+
+Interact with Task Master through natural language requests:
+
+*   **Initialization:**
+    *   `"Initialize taskmaster-ai for this project."`
+*   **PRD Parsing:**
+    *   `"Parse the requirements doc at docs/prd.md"`
+    *   `"Generate tasks from the PRD file <path>, creating 7 subtasks per main task."`
+*   **Task Retrieval:**
+    *   `"What's the next task?"`
+    *   `"Show me the highest priority task."`
+    *   `"List all tasks."` or `"List tasks with status TODO."`
+*   **Task Interaction:**
+    *   `"Help me implement task 5."` (Provides context and guidance)
+    *   `"Expand task 2 with more detailed subtasks."`
+    *   `"Mark task 4 as DONE."`
+    *   `"Set priority of task 1 to high."`
+
+Refer to the official [Task Master documentation](https://github.com/eyaltoledano/claude-task-master/tree/main/docs) for the full command reference and advanced usage.
+
+### Using the CLI
+
+The project includes a command-line interface powered by Typer.
+

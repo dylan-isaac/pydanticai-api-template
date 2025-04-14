@@ -41,20 +41,33 @@
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
-                "charliermarsh.ruff",
-                "ms-python.mypy-type-checker",
-                "njpwerner.autodocstring",
-                "streetsidesoftware.code-spell-checker",
+                "ms-python.debugpy",
                 "ms-azuretools.vscode-docker",
-                "eamodio.gitlens",
-                "github.vscode-pull-request-github",
+                "charliermarsh.ruff",
+                "njpwerner.autodocstring",
                 "tamasfe.even-better-toml",
+                "esbenp.prettier-vscode",
+                "streetsidesoftware.code-spell-checker",
+                "DavidAnson.vscode-markdownlint",
+                "eamodio.gitlens",
+                "donjayamanne.githistory",
+                "mhutchie.git-graph",
+                "christian-kohler.path-intellisense",
+                "Gruntfuggly.todo-tree",
+                "vscode-icons-team.vscode-icons",
+                "wayou.vscode-todo-highlight",
+                "mechatroner.rainbow-csv",
                 "redhat.vscode-yaml",
-                "editorconfig.editorconfig",
-                "ms-vsliveshare.vsliveshare",
-                "gruntfuggly.todo-tree"
+                "Orta.vscode-jest",
+                "ms-vscode-remote.remote-containers",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "Pydantic.pydantic-vscode",
+                "meqa.promptfoo",
+                "pydantic.logfire",
+                "DorianMassoulier.repomix-runner"
             ]
         }
     },
-    "postCreateCommand": "chmod +x scripts/welcome.sh && scripts/welcome.sh && python scripts/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B to start both REST API and MCP servers, or type \"start\" in the terminal.'"
+    "postCreateCommand": "chmod +x scripts/dev/welcome.sh && scripts/dev/welcome.sh && python scripts/dev/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B to start both REST API and MCP servers, or type \"start\" in the terminal.'"
 }
