@@ -6,7 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
-from httpx import AsyncClient
+from starlette.applications import Starlette
+from starlette.routing import Mount
 
 from pydanticai_api_template.mcp_server import chat, create_app
 
@@ -17,49 +18,52 @@ def app() -> FastAPI:
     return create_app()
 
 
-@pytest.fixture
-async def client(app: FastAPI) -> AsyncClient:
-    """Create an HTTP client for testing the FastAPI app."""
-    async with AsyncClient(base_url="http://test") as client:
-        return client
-
-
-def test_create_app() -> None:
-    """Test that the application is created successfully."""
-    app = create_app()
+def test_create_app(app: FastAPI) -> None:
+    """Test app creation, metadata, and correct SSE mounting."""
+    # Basic app metadata checks
     assert app.title == "PydanticAI MCP Server"
     assert app.description == "MCP server for PydanticAI API Template"
-    # Check that the SSE endpoint is mounted
-    assert any("/sse" in str(route) for route in app.routes)
+
+    # Verify that the SSE app is mounted correctly at the root
+    mount_route = None
+    for route in app.routes:
+        if isinstance(route, Mount) and route.path == "":
+            mount_route = route
+            break
+
+    assert mount_route is not None, "No Mount found at root path ('')"
+    assert isinstance(mount_route.app, (FastAPI, Starlette)), (
+        "Mounted app is not a FastAPI or Starlette instance"
+    )
+
+    # Verify the mounted app has the /sse route internally
+    sse_route_found = False
+    for sub_route in mount_route.app.routes:
+        route_path = getattr(sub_route, "path", str(sub_route))
+        if "/sse" in route_path:
+            sse_route_found = True
+            break
+
+    assert sse_route_found, "Internal route '/sse' not found in mounted SSE app"
 
 
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent")
 async def test_chat_success(
     mock_ai_agent: MagicMock,
-    client: AsyncClient,
 ) -> None:
     """Test successful chat interaction."""
-    # Create a mock object with a 'data' attribute
     mock_result = MagicMock()
     mock_result.data = "Mocked response"
-
-    # Make the mock's run method awaitable and return the mock_result
     mock_ai_agent.run = AsyncMock(return_value=mock_result)
-
-    # Call the chat tool
     response = await chat("Hello, how are you?")
-
-    # Assertions
     mock_ai_agent.run.assert_called_once_with("Hello, how are you?")
     assert response == "Mocked response"
 
 
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent", None)
-async def test_chat_no_agent(
-    client: AsyncClient,
-) -> None:
+async def test_chat_no_agent() -> None:
     """Test chat interaction when agent is not found."""
     response = await chat("Hello")
     assert "AI service is not available" in response
@@ -69,14 +73,9 @@ async def test_chat_no_agent(
 @patch("pydanticai_api_template.mcp_server.ai_agent")
 async def test_chat_exception(
     mock_ai_agent: MagicMock,
-    client: AsyncClient,
 ) -> None:
     """Test chat interaction when agent run raises an exception."""
     mock_ai_agent.run = AsyncMock(side_effect=Exception("Test exception"))
-
-    # Call the chat tool
     response = await chat("Hello")
-
-    # Assertions
     assert "An error occurred" in response
     assert "Test exception" in response

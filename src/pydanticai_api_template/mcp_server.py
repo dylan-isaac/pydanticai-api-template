@@ -261,9 +261,11 @@ def create_app() -> FastAPI:
     sse_app = server.sse_app()
 
     # Mount the SSE app directly at the root
-    # Since introspection showed the internal route is already /sse
+    # Since introspection showed the internal route is already /sse via the MCP service
     app.mount("/", sse_app, name="mcp_sse_root")
-    logger.info("Mounted sse_app at / based on discovered internal route /sse")
+    logger.info(
+        "Mounted sse_app at / based on discovered internal route /sse"
+    )  # Reverted log message
 
     # Instrument with LogFire
     if is_logfire_enabled():
