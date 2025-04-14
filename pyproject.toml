@@ -73,7 +73,6 @@ warn_no_return = true
 warn_return_any = true
 warn_unreachable = true
 plugins = ["pydantic.mypy"]
-mypy_path = ["src/pydanticai_api_template/types"]
 
 [[tool.mypy.overrides]]
 module = "pydantic.*"
