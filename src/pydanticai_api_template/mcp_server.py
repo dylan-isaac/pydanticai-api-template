@@ -257,11 +257,15 @@ def create_app() -> FastAPI:
         version="0.1.0",  # Add a version for completeness
     )
 
-    # Mount the SSE app from the server
+    # Get the SSE app/routes from FastMCP
     sse_app = server.sse_app()
-    app.mount("/sse", sse_app, name="mcp_sse")
 
-    # Now that we have the app, instrument it with LogFire
+    # Mount the SSE app directly at the root
+    # Since introspection showed the internal route is already /sse
+    app.mount("/", sse_app, name="mcp_sse_root")
+    logger.info("Mounted sse_app at / based on discovered internal route /sse")
+
+    # Instrument with LogFire
     if is_logfire_enabled():
         from pydanticai_api_template.utils.observability import setup_logfire
 
