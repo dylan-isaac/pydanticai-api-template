@@ -74,6 +74,16 @@ To get started with the Cursor Rules:
 
 For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
 
+### Managing Cursor Rules
+
+Due to potential editor interference when directly modifying files in the `.cursor/rules/` directory, a helper script is provided for a safer workflow:
+
+1. **Create/Edit Rules**: Make your changes to rule files (or create new ones) with the `.md` extension inside the staging directory `.cursor/rules_staging/` at the project root. Ensure each file starts with the correct YAML frontmatter (see `docs/CURSOR_RULES.md` for structure).
+2. **Run the Script**: Execute `make rules` or `./scripts/tasks/move_rules.sh` (make sure it's executable: `chmod +x scripts/tasks/move_rules.sh`).
+3. **Result**: The script will move all `.md` files from `.cursor/rules_staging/` to `.cursor/rules/`, rename them with the `.mdc` extension, and remove the (now empty) `.cursor/rules_staging/` directory.
+
+This ensures the files are correctly formatted and placed without potential conflicts during the editing process.
+
 ## Project Structure
 
 ```text

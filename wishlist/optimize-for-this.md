@@ -220,9 +220,9 @@ Unit tests can be annoying and LLMs aren’t perfect writing them either, but tr
 
 **Best practices for testing (the LLM should know this but just in case):**
 
-- Create the tests in a tests/ directory
-- Always “mock” calls to services like the DB and LLM so you aren’t interacting with anything “for real”.
-- For each function, test at least one successful scenario, one intentional failure (to ensure proper error handling), and one edge case.
+* Create the tests in a tests/ directory
+* Always “mock” calls to services like the DB and LLM so you aren’t interacting with anything “for real”.
+* For each function, test at least one successful scenario, one intentional failure (to ensure proper error handling), and one edge case.
 
 ---
 

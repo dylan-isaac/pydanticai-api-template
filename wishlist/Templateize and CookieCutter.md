@@ -7,15 +7,18 @@ Based on the project structure and its many moving parts (FastAPI, PydanticAI, d
 ## 1. Use a GitHub Template Repository for the Overall Shell
 
 **What It Provides:**
+
 - A consistent repository “shell” that includes the high-level directory structure, all the configuration files (like the Dockerfiles, dev container files, Makefile, documentation, etc.), and the baseline code for your API and MCP server.
 - Out-of-the-box support for a uniform developer experience (DX) across projects.
 
 **Benefits:**
+
 - **Quick Start:** Developers can click “Use this template” and immediately get an opinionated, ready-to-run environment.
 - **Centralized Upgrades:** Changes to common infrastructure (like dev container settings, linting/formatting configurations, Docker Compose settings, etc.) can be applied centrally.
 - **Consistent DX:** All teams or projects generated from this repository will share the same “shell” (including scripts and configuration files).
 
 **Workflow:**
+
 1. Enable the repository as a template on GitHub.
 2. Document in the README how to customize the project after cloning (e.g., changing the project name in `pyproject.toml`, updating environment variables, etc.).
 3. When creating a new project, use the GitHub template as the starting point.
@@ -25,20 +28,25 @@ Based on the project structure and its many moving parts (FastAPI, PydanticAI, d
 ## 2. Integrate a Cookiecutter Template for Code Scaffolding
 
 **What It Provides:**
+
 - A dynamic, parameterized scaffolding tool that asks for inputs (such as project name, author, target language(s), and dependency choices) and generates the inside of the project (especially the `src/` folder and related application code).
 - A way to inject variables into configuration files so that each new project has its own tailored settings without manual file editing.
 
 **Benefits:**
+
 - **Parameterization:** Customize not only the project’s metadata but also select which pieces of code or dependencies to scaffold (e.g., choosing whether to include Node.js support in addition to Python).
 - **Ease of Migration:** The templating logic can be updated over time. New versions of the Cookiecutter template can include migrations for the code inside `src/` or adjust configurations without affecting the overarching repository structure.
 
 **Workflow:**
+
 1. Create a `cookiecutter.json` file listing customizable variables (project name, description, preferred base images, etc.).
 2. Replace hard-coded values throughout your project files (like in `pyproject.toml`, environment files, and README) with template variables.
 3. When starting a new project, run:
+
    ```bash
    cookiecutter gh:yourusername/your-template-repo
    ```
+
 4. Answer the prompts, and a fully parameterized project is generated.
 
 ---
@@ -46,6 +54,7 @@ Based on the project structure and its many moving parts (FastAPI, PydanticAI, d
 ## 3. Achieve Composability and Upgradability
 
 **Composability Ideas:**
+
 - **Modular Dev Container Configuration:**
   Design the dev container setup so that it can ingest additional templates. For example, the `.devcontainer` folder (with its Dockerfile and docker-compose settings) can be written to allow for optional base images or additional service definitions (like Node.js, Python, or others).
 - **Plug-In Architecture for Dependencies:**
@@ -54,6 +63,7 @@ Based on the project structure and its many moving parts (FastAPI, PydanticAI, d
   Use versioning in your GitHub template repository. When you have updates (say, an improved Dockerfile or additional linting/formatting rules), create a new version of your template repository. For existing projects, you might consider using Git submodules or a dedicated CLI tool to help merge changes from the template into the codebase.
 
 **Upgradability Options:**
+
 - **CLI-Based Upgrade Script:**
   Create a command (e.g., `pat upgrade-template`) that checks for new versions of the template and optionally merges changes into an existing project.
 - **Submodule or Dependency Management:**
@@ -123,7 +133,7 @@ Cookiecutter works with Python 3.6 and above and uses [Jinja2](https://jinja.pal
 2. **Copy your entire project into this new directory.**
    Your new folder structure might look like this:
 
-   ```
+   ```text
    cookiecutter-pydanticai-api-template/
    ├── cookiecutter.json
    ├── {{ cookiecutter.project_slug }}/
@@ -176,7 +186,7 @@ At the root of your template folder (the same level as the folder that will be r
 
 Now you need to go through your codebase files and replace hard-coded values with Jinja2 template variables.
 
-### Examples:
+### Examples
 
 - **Project Name:**
   In your `pyproject.toml` file, replace instances of your project name with `{{ cookiecutter.project_name }}`. For example:
@@ -192,7 +202,7 @@ Now you need to go through your codebase files and replace hard-coded values wit
 - **Directory Name:**
   Rename your root code folder (for example, the folder that currently might be named `pydanticai_api_template`) to:
 
-  ```
+  ```text
   {{ cookiecutter.project_slug }}
   ```
 
@@ -218,7 +228,7 @@ Now you need to go through your codebase files and replace hard-coded values wit
 - **Environment Files:**
   If your template should include a sample `.env` file, you can create one (say, `.env.example`) and populate it with:
 
-  ```
+  ```text
   OPENAI_API_KEY={{ cookiecutter.openai_api_key }}
   PYTHON_VERSION={{ cookiecutter.python_version }}
   ```

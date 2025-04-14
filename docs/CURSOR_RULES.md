@@ -63,6 +63,7 @@ When asking Cursor to modify PydanticAI code, structure your prompts as:
 3. **Detail**: Provide specifics of what should change
 
 Example:
+
 ```text
 UPDATE src/pydanticai_api_template/api/models.py:
 ADD field publication_date to StoryIdea model
@@ -108,3 +109,90 @@ To create additional Cursor rules:
 - [Cursor Documentation](https://docs.cursor.com/)
 - [Cursor's Model Context Protocol](https://docs.cursor.com/context/model-context-protocol)
 - [Cursor Rules Reference](https://docs.cursor.com/context/rules-for-ai)
+
+## Rule File Structure and Management
+
+Each rule is defined in its own `.mdc` file within the `.cursor/rules/` directory.
+
+### File Format
+
+Rule files (`.mdc`) use Markdown with YAML frontmatter:
+
+```yaml
+---
+description: "A brief explanation of when this rule applies (used by AI)"
+globs: # List of glob patterns for files/folders
+  - "src/pydanticai_api_template/**.py"
+  - "!tests/**" # Optional negation
+alwaysApply: false # Set to true for rules that always apply
+---
+# Rule Title (Optional)
+
+Markdown content explaining the rule, best practices, links to relevant docs (@docs/...), etc.
+
+This content is provided to the AI when the rule is triggered.
+```
+
+### Managing Rule Files (Recommended Workflow)
+
+Directly editing `.mdc` files within the `.cursor/rules` directory while Cursor is active can sometimes lead to unexpected behavior or saving issues. To avoid this, use the provided helper script:
+
+1. **Create/Edit in Staging**: Create or edit your rule files within the `.cursor/rules_staging/` directory using the `.md` extension (e.g., `.cursor/rules_staging/my-new-rule.md`). Ensure the YAML frontmatter is correct.
+2. **Run the Script**: Open your terminal in the project root and run:
+
+   ```bash
+   # Make executable (only need to do this once)
+   chmod +x scripts/tasks/move_rules.sh
+
+   # Execute the script (or use 'make rules')
+   ./scripts/tasks/move_rules.sh
+   ```
+
+3. **Verification**: The script moves the `.md` files to `.cursor/rules/`, renames them to `.mdc`, and removes the `.cursor/rules_staging` directory. The rules should now be active in Cursor.
+
+This workflow ensures files are processed correctly without potential editor conflicts. The `.cursor/rules_staging` directory is ignored by Git.
+
+## Example Rules Breakdown
+
+Let's look at how a rule file (`.cursor/rules/tdd-guidance.mdc`) works:
+
+```yaml
+key: "tdd-guidance" # Unique identifier
+trigger: # Conditions for showing the rule
+  glob: "**/tests/**.py" # Show for files in the tests directory
+```
+
+This rule triggers when you open a Python file within the `tests/` directory.
+
+### Rule Content Example
+
+```markdown
+## Test-Driven Development (TDD) Guidance
+
+Remember our TDD workflow:
+1. Write a failing test (`tests/`).
+2. Implement the minimal code in `src/` to make it pass.
+3. Refactor and add documentation (`README.md`, `docs/`).
+```
+
+## Rule Management Script (`make rules`)
+
+The script `./scripts/tasks/move_rules.sh` handles moving rules from staging to the active directory:
+
+1. Creates `.cursor/rules/` if it doesn't exist.
+2. Moves files from `.cursor/rules_staging/*.md` to `.cursor/rules/`.
+3. Renames them to `.mdc`.
+
+   ```bash
+   #!/bin/bash
+   set -e # Exit on error
+
+   SOURCE_DIR=".cursor/rules_staging"
+   TARGET_DIR=".cursor/rules"
+
+   # ... script content ...
+   ```
+
+4. Removes the staging directory if empty.
+
+This workflow prevents editor conflicts when modifying rules directly in `.cursor/rules/`.

@@ -73,6 +73,7 @@ The application uses a hierarchical configuration approach:
 3. Default values in code (lowest priority)
 
 Key configuration options include:
+
 - OPENAI_API_KEY: For LLM integration
 - HOST/PORT: For server binding
 - LOG_LEVEL: For log verbosity control
@@ -140,3 +141,10 @@ The project includes an MCP (Model Context Protocol) server that exposes AI func
 - **Decoupled Architecture**: MCP clients don't need to know API implementation details
 - **Unified Development**: Same AI agents used in both REST API and MCP server
 - **Extensibility**: Easy to add new tools without changing client code
+
+- **Environment Variables:**
+  - `LOGFIRE_TOKEN`: Required for production observability.
+  - `OPENAI_API_KEY`: For LLM interactions.
+  - `ANTHROPIC_API_KEY`: For Claude model access.
+
+## Maintenance

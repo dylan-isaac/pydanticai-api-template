@@ -1,4 +1,4 @@
-.PHONY: install run shell-completion validate lint test clean docker-build docker-up docker-down docker-shell sync-configs logs setup
+.PHONY: install run shell-completion validate lint test clean docker-build docker-up docker-down docker-shell sync-configs logs setup install-completion rules
 
 # Local development commands (primarily for direct host machine use)
 # Note: When using Dev Containers, dependencies are already installed
@@ -59,3 +59,17 @@ setup: install docker-build shell-completion validate
 	@echo "Setup complete! 🚀"
 	@echo "Run 'make dev' to start local development (outside container)"
 	@echo "Run 'make docker-up' to start in Docker (or use Dev Containers)"
+
+install-completion:
+	@echo "Installing shell completion..."
+	@python -m $(PROJECT_NAME).cli install-completion
+
+rules:
+	@echo "Processing temporary rule files..."
+	@if [ -f scripts/tasks/move_rules.sh ]; then \
+		chmod +x scripts/tasks/move_rules.sh && ./scripts/tasks/move_rules.sh; \
+	else \
+		echo "Error: scripts/tasks/move_rules.sh not found."; exit 1; \
+	fi
+
+# Add more tasks as needed
