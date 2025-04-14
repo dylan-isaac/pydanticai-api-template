@@ -65,22 +65,20 @@ def test_setup_logfire_disabled(
 def test_setup_logfire_enabled(
     mock_configure: MagicMock, mock_logfire: MagicMock
 ) -> None:
-    """Test setup_logfire when LogFire is enabled."""
-    # Enable LogFire
+    """Test setup_logfire when LogFire is enabled via LOGFIRE_TOKEN."""
+    # Enable LogFire and set token
     os.environ["LOGFIRE_ENABLED"] = "true"
-    os.environ["LOGFIRE_API_KEY"] = "test-api-key"
-    os.environ["LOGFIRE_PROJECT_ID"] = "test-project-id"
-    # Unset token to test API key/project ID branch
-    if "LOGFIRE_TOKEN" in os.environ:
-        del os.environ["LOGFIRE_TOKEN"]
+    os.environ["LOGFIRE_TOKEN"] = "test-token"
+    # Ensure API key/project ID are not set (or remove if they are)
+    os.environ.pop("LOGFIRE_API_KEY", None)
+    os.environ.pop("LOGFIRE_PROJECT_ID", None)
 
     # Call the function
     setup_logfire(service_name="test-service", environment="test")
 
-    # Verify configuration
+    # Verify configuration using token
     mock_logfire.configure.assert_called_once_with(
-        api_key="test-api-key",
-        project_id="test-project-id",
+        token="test-token",
         service_name="test-service",
         environment="test",
     )
@@ -127,22 +125,20 @@ def test_shutdown_logfire_enabled(mock_logfire: MagicMock) -> None:
 def test_setup_logfire_promptfoo(
     mock_configure: MagicMock, mock_logfire: MagicMock
 ) -> None:
-    """Test setup_logfire when called from prompt_test command."""
-    # Enable LogFire
+    """Test setup_logfire when called from prompt_test command via LOGFIRE_TOKEN."""
+    # Enable LogFire and set token
     os.environ["LOGFIRE_ENABLED"] = "true"
-    os.environ["LOGFIRE_API_KEY"] = "test-api-key"
-    os.environ["LOGFIRE_PROJECT_ID"] = "test-project-id"
-    # Unset token to test API key/project ID branch
-    if "LOGFIRE_TOKEN" in os.environ:
-        del os.environ["LOGFIRE_TOKEN"]
+    os.environ["LOGFIRE_TOKEN"] = "test-token-promptfoo"
+    # Ensure API key/project ID are not set (or remove if they are)
+    os.environ.pop("LOGFIRE_API_KEY", None)
+    os.environ.pop("LOGFIRE_PROJECT_ID", None)
 
     # Call the function with promptfoo-testing service name
     setup_logfire(service_name="promptfoo-testing")
 
-    # Verify configuration with correct service name
+    # Verify configuration with correct service name using token
     mock_logfire.configure.assert_called_once_with(
-        api_key="test-api-key",
-        project_id="test-project-id",
+        token="test-token-promptfoo",
         service_name="promptfoo-testing",
         environment=os.getenv("ENVIRONMENT", "development"),
     )

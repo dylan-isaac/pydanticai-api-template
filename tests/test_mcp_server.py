@@ -2,7 +2,7 @@
 Tests for the MCP server functionality.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
@@ -36,17 +36,22 @@ def test_create_app() -> None:
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent")
 async def test_chat_success(
+    mock_ai_agent: MagicMock,
     client: AsyncClient,
-    mock_agent_run: MagicMock,
 ) -> None:
     """Test successful chat interaction."""
-    mock_agent_run.return_value = "Mocked response"
+    # Create a mock object with a 'data' attribute
+    mock_result = MagicMock()
+    mock_result.data = "Mocked response"
+
+    # Make the mock's run method awaitable and return the mock_result
+    mock_ai_agent.run = AsyncMock(return_value=mock_result)
 
     # Call the chat tool
     response = await chat("Hello, how are you?")
 
     # Assertions
-    mock_agent_run.assert_called_once_with("Hello, how are you?")
+    mock_ai_agent.run.assert_called_once_with("Hello, how are you?")
     assert response == "Mocked response"
 
 
@@ -54,11 +59,8 @@ async def test_chat_success(
 @patch("pydanticai_api_template.mcp_server.ai_agent", None)
 async def test_chat_no_agent(
     client: AsyncClient,
-    mock_get_agent: MagicMock,
 ) -> None:
     """Test chat interaction when agent is not found."""
-    mock_get_agent.return_value = None
-
     response = await chat("Hello")
     assert "AI service is not available" in response
 
@@ -66,11 +68,11 @@ async def test_chat_no_agent(
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent")
 async def test_chat_exception(
+    mock_ai_agent: MagicMock,
     client: AsyncClient,
-    mock_agent_run: MagicMock,
 ) -> None:
     """Test chat interaction when agent run raises an exception."""
-    mock_agent_run.side_effect = Exception("Test exception")
+    mock_ai_agent.run = AsyncMock(side_effect=Exception("Test exception"))
 
     # Call the chat tool
     response = await chat("Hello")
