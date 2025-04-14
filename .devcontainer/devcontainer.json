@@ -34,7 +34,7 @@
                 ],
                 "terminal.integrated.fontFamily": "MesloLGM Nerd Font Mono",
                 "terminal.integrated.fontSize": 14,
-                "files.eol": "\\n",
+                "files.eol": "\n",
                 "files.trimTrailingWhitespace": true,
                 "files.insertFinalNewline": true
             },
