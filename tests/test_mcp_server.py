@@ -2,13 +2,13 @@
 Tests for the MCP server functionality.
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
-from pydanticai_api_template.mcp_server import ChatResponse, chat, create_app
+from pydanticai_api_template.mcp_server import chat, create_app
 
 
 @pytest.fixture
@@ -18,9 +18,10 @@ def app() -> FastAPI:
 
 
 @pytest.fixture
-def client(app: FastAPI) -> TestClient:
-    """Create a test client for the app."""
-    return TestClient(app)
+async def client(app: FastAPI) -> AsyncClient:
+    """Create an HTTP client for testing the FastAPI app."""
+    async with AsyncClient(base_url="http://test") as client:
+        return client
 
 
 def test_create_app() -> None:
@@ -34,37 +35,42 @@ def test_create_app() -> None:
 
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent")
-async def test_chat_success(mock_agent: MagicMock) -> None:
-    """Test the chat tool with a successful response."""
-    # Setup mock
-    mock_result = MagicMock()
-    mock_data = MagicMock(spec=ChatResponse)
-    mock_data.reply = "This is a test response"
-    mock_result.data = mock_data
-    mock_agent.run = AsyncMock(return_value=mock_result)
+async def test_chat_success(
+    client: AsyncClient,
+    mock_agent_run: MagicMock,
+) -> None:
+    """Test successful chat interaction."""
+    mock_agent_run.return_value = "Mocked response"
 
     # Call the chat tool
     response = await chat("Hello, how are you?")
 
     # Assertions
-    mock_agent.run.assert_called_once_with("Hello, how are you?")
-    assert response == "This is a test response"
+    mock_agent_run.assert_called_once_with("Hello, how are you?")
+    assert response == "Mocked response"
 
 
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent", None)
-async def test_chat_no_agent() -> None:
-    """Test the chat tool when no agent is available."""
+async def test_chat_no_agent(
+    client: AsyncClient,
+    mock_get_agent: MagicMock,
+) -> None:
+    """Test chat interaction when agent is not found."""
+    mock_get_agent.return_value = None
+
     response = await chat("Hello")
     assert "AI service is not available" in response
 
 
 @pytest.mark.asyncio
 @patch("pydanticai_api_template.mcp_server.ai_agent")
-async def test_chat_exception(mock_agent: MagicMock) -> None:
-    """Test the chat tool when an exception occurs."""
-    # Setup mock to raise an exception
-    mock_agent.run = AsyncMock(side_effect=Exception("Test exception"))
+async def test_chat_exception(
+    client: AsyncClient,
+    mock_agent_run: MagicMock,
+) -> None:
+    """Test chat interaction when agent run raises an exception."""
+    mock_agent_run.side_effect = Exception("Test exception")
 
     # Call the chat tool
     response = await chat("Hello")

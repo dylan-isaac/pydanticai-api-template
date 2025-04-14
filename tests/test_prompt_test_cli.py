@@ -15,7 +15,7 @@ from pydanticai_api_template.cli import app
 runner = CliRunner()
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def mock_config_file(tmp_path: Path) -> str:
     """Create a temporary config file for testing."""
     config_dir = tmp_path / "promptfoo"

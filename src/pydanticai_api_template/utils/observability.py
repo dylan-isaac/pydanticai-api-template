@@ -48,8 +48,6 @@ def setup_logfire(
 
     # Configure LogFire
     token = os.getenv("LOGFIRE_TOKEN")
-    api_key = os.getenv("LOGFIRE_API_KEY")
-    project_id = os.getenv("LOGFIRE_PROJECT_ID")
 
     # Determine environment from ENV var or default to development
     env = environment or os.getenv("ENVIRONMENT", "development")
@@ -61,18 +59,11 @@ def setup_logfire(
             service_name=service_name,
             environment=env,
         )
-    elif api_key and project_id:
-        logfire.configure(
-            api_key=api_key,
-            project_id=project_id,
-            service_name=service_name,
-            environment=env,
-        )
     else:
-        # If neither token nor API_KEY+PROJECT_ID are set, log info and return
+        # If token is not set, log info and return
         logfire.info(
-            "LogFire configuration incomplete. Set LOGFIRE_TOKEN or both "
-            "LOGFIRE_API_KEY and LOGFIRE_PROJECT_ID environment variables."
+            "LogFire configuration incomplete. "
+            "Set LOGFIRE_TOKEN environment variable or use 'logfire auth'."
         )
         return
 

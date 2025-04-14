@@ -21,8 +21,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 os.environ.setdefault("OPENAI_API_KEY", "test_key_for_mocks")
 
 
-@pytest.fixture(autouse=True)
-def env_setup() -> Iterator[None]:
+@pytest.fixture(scope="function")
+def env_setup(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     """
     Set up environment variables for tests and restore them after.
 

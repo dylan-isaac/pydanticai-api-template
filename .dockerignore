@@ -81,4 +81,4 @@ docker-compose.yml
 
 # DO NOT IGNORE the src directory - required for package installation
 !src/
-!src/**/*.py 
+!src/**/*.py

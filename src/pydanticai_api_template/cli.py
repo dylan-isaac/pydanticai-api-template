@@ -16,7 +16,7 @@ CLI_NAME = "pat"  # New CLI command name
 app = typer.Typer(help=f"{PROJECT_NAME} CLI")
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def run(
     host: str = typer.Option(
         "0.0.0.0", "--host", "-h", help="Host address to bind the server to."
@@ -50,7 +50,7 @@ def run(
     )
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def version() -> None:
     """Show the application version."""
     try:
@@ -63,7 +63,7 @@ def version() -> None:
         )
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def install_completion(
     shell: Optional[str] = typer.Argument(
         None,
@@ -144,7 +144,7 @@ def install_completion(
         raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def validate() -> None:
     """Validate application configuration and environment."""
     typer.echo("🔍 Validating environment...")
@@ -178,10 +178,10 @@ def validate() -> None:
     else:
         typer.echo("ℹ️ Not running inside a known Docker container environment")
 
-    typer.echo("\nValidation complete. Basic checks passed. ��")
+    typer.echo("\nValidation complete. Basic checks passed.")
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def cleanup() -> None:
     """Clean up temporary files and directories (like __pycache__)."""
     typer.echo("🧹 Cleaning up temporary files...")
@@ -221,7 +221,7 @@ def cleanup() -> None:
         raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def lint() -> None:
     """Run code quality checks using Ruff."""
     import shutil
@@ -296,7 +296,7 @@ def lint() -> None:
             raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def test() -> None:
     """Run tests using pytest."""
     import shutil
@@ -359,7 +359,7 @@ def test() -> None:
             raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def sync() -> None:
     """Synchronize project configuration files."""
     typer.echo("🔄 Synchronizing configuration files...")
@@ -399,7 +399,7 @@ def sync() -> None:
         raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def check() -> None:
     """Perform a quick status check of the development environment."""
     import shutil
@@ -435,7 +435,7 @@ def check() -> None:
     typer.echo("\n✨ Status check complete")
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def run_mcp(
     host: str = typer.Option(
         "0.0.0.0", "--host", "-h", help="Host address to bind the MCP server to."
@@ -476,7 +476,7 @@ def run_mcp(
         raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def prompt_test(
     config_path: str = typer.Option(
         "promptfoo/config.yaml",
@@ -601,7 +601,7 @@ def prompt_test(
         raise typer.Exit(code=1)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def setup_logfire() -> None:
     """Set up Logfire authentication and project configuration.
 

@@ -6,6 +6,7 @@
         "healthcheck",
         "logfire",
         "mypy",
+        "MYPYPATH",
         "noninteractive",
         "promptfoo",
         "pycache",
@@ -18,6 +19,7 @@
         "PYTHONUNBUFFERED",
         "PYTHONWARNINGS",
         "repomix",
+        "uvicorn",
         "venv"
     ]
 }

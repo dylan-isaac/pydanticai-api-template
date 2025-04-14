@@ -33,7 +33,7 @@ except ImportError:
 
 # Use PyYAML for YAML parsing
 try:
-    import yaml  # type: ignore
+    import yaml
 except ImportError:
     print(
         "Error: 'PyYAML' is required for this script. "
@@ -78,6 +78,11 @@ CLI_COMMANDS_FOR_TASKS = [
     # Example task:
     {"label": "Cleanup", "command": "cleanup", "args": []},
 ]
+
+CONFIG_FILE = "pyproject.toml"
+PROJECT_NAME = "pydanticai_api_template"
+# Ignore type checking on non-literal assignment
+IGNORE_TYPES = ["mcp"]
 
 
 # --- Helper Functions ---

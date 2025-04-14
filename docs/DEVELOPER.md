@@ -174,4 +174,3 @@ This project includes tools to streamline AI-assisted development workflows.
 ### Using the CLI
 
 The project includes a command-line interface powered by Typer.
-
