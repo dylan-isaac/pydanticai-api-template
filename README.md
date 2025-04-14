@@ -10,6 +10,24 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
    - [Docker](https://www.docker.com/products/docker-desktop/)
    - A [Nerd Font](https://www.nerdfonts.com/) for optimal terminal experience (optional)
 
+### Terminal Icons and Nerd Fonts
+
+The development environment uses modern CLI tools like `eza` with icons enabled (`--icons`). For these icons to display correctly in the integrated terminal (VS Code / Cursor):
+
+1.  **Install a Nerd Font on your host machine** (not in the container).
+    *   The `.devcontainer/devcontainer.json` is configured to use **"MesloLGM Nerd Font Mono"** by default.
+    *   You can download this specific font or another Nerd Font variant (like Meslo, Fira Code, Hack) from the [Nerd Fonts website](https://www.nerdfonts.com/font-downloads). Make sure to get a "Nerd Font" version (often suffixed with `NF` or `Nerd Font`).
+    *   Install the downloaded font on your **host** operating system (e.g., through Font Book on macOS).
+
+2.  **Verify VS Code/Cursor Configuration**:
+    *   The Dev Container setting `terminal.integrated.fontFamily` in `.devcontainer/devcontainer.json` is set to `"MesloLGM Nerd Font Mono"`.
+    *   If you installed a *different* Nerd Font on your host, **update this setting** in `.devcontainer/devcontainer.json` to match the *exact name* of the font you installed *before* rebuilding the container. You can find the exact name in your OS's font manager (e.g., Font Book on macOS).
+
+3.  **Configure External Terminals (If Applicable)**:
+    *   If you use a terminal *outside* of VS Code/Cursor to interact with the container, ensure that terminal is also configured to use the Nerd Font you installed on your host.
+
+**Note:** If you see boxes (`□`) or missing icons in the terminal after rebuilding the container, it likely means the font name specified in `.devcontainer/devcontainer.json` doesn't exactly match a Nerd Font installed and recognized on your host system. Double-check the font name in your OS font manager and the `devcontainer.json` setting.
+
 2. **Open in Dev Container**:
    - Clone this repository
    - Open in VS Code/Cursor
@@ -24,18 +42,18 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
 
 This README provides a high-level overview. For detailed information, refer to:
 
-| Documentation | Purpose |
-|--------------|---------|
-| [Documentation Overview](./docs/OVERVIEW.md) | Comprehensive guide to all documentation |
-| [Developer Guide](./docs/DEVELOPER.md) | Setup instructions and development workflows |
-| [Architecture](./docs/ARCHITECTURE.md) | System design, patterns, and component relationships |
-| [Models](./docs/MODELS.md) | Pydantic models, validation, and PydanticAI integration |
-| [API Reference](./docs/API.md) | API endpoints, parameters, and response formats |
-| [Testing Guide](./docs/TESTING.md) | Testing strategies and examples |
-| [Maintenance](./docs/MAINTENANCE.md) | Configuration management and project maintenance |
-| [Observability](./docs/OBSERVABILITY.md) | Logging, tracing, and monitoring with Logfire |
-| [Cursor Rules](./docs/CURSOR_RULES.md) | AI-assisted development with Cursor |
-| [Wishlist](./wishlist/) | Future improvements and feature ideas |
+| Documentation                                | Purpose                                                 |
+| -------------------------------------------- | ------------------------------------------------------- |
+| [Documentation Overview](./docs/OVERVIEW.md) | Comprehensive guide to all documentation                |
+| [Developer Guide](./docs/DEVELOPER.md)       | Setup instructions and development workflows            |
+| [Architecture](./docs/ARCHITECTURE.md)       | System design, patterns, and component relationships    |
+| [Models](./docs/MODELS.md)                   | Pydantic models, validation, and PydanticAI integration |
+| [API Reference](./docs/API.md)               | API endpoints, parameters, and response formats         |
+| [Testing Guide](./docs/TESTING.md)           | Testing strategies and examples                         |
+| [Maintenance](./docs/MAINTENANCE.md)         | Configuration management and project maintenance        |
+| [Observability](./docs/OBSERVABILITY.md)     | Logging, tracing, and monitoring with Logfire           |
+| [Cursor Rules](./docs/CURSOR_RULES.md)       | AI-assisted development with Cursor                     |
+| [Wishlist](./wishlist/)                      | Future improvements and feature ideas                   |
 
 ## Key Features
 

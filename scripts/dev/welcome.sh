@@ -4,6 +4,10 @@
 cat << 'EOF'
 🚀 PydanticAI API Template Development Environment
 
+# NOTE: For icons (e.g., from 'ls', 'lt') to display correctly,
+# install a Nerd Font (like MesloLGS NF) on your HOST machine
+# and configure your terminal emulator to use it.
+
 Available commands:
   • start        - Start the development server (pat run --reload)
   • validate     - Check environment configuration
