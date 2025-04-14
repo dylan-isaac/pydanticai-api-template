@@ -1,7 +1,7 @@
 import argparse
 import logging
 import os
-from typing import Any, ClassVar, Optional, cast
+from typing import Any, ClassVar, Optional
 
 import logfire  # Add logfire import
 from dotenv import load_dotenv
@@ -250,8 +250,16 @@ async def story(message: str) -> dict:
 
 def create_app() -> FastAPI:
     """Create a FastAPI app with the MCP server"""
-    # Create the SSE app and use it directly as the root app
-    app = cast(FastAPI, server.sse_app())
+    # Initialize FastAPI app first
+    app = FastAPI(
+        title="PydanticAI MCP Server",
+        description="MCP server for PydanticAI API Template",
+        version="0.1.0",  # Add a version for completeness
+    )
+
+    # Mount the SSE app from the server
+    sse_app = server.sse_app()
+    app.mount("/sse", sse_app, name="mcp_sse")
 
     # Now that we have the app, instrument it with LogFire
     if is_logfire_enabled():

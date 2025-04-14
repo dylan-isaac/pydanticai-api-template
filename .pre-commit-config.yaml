@@ -35,4 +35,5 @@ repos:
           "mcp",
           "pydantic_ai",
           "uvicorn",
+          "types-PyYAML",  # Added stubs for yaml
       ]

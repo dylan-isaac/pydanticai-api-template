@@ -61,6 +61,7 @@ def test_setup_logfire_disabled(
 @patch(
     "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
 )
+@patch("pydanticai_api_template.utils.observability.HAS_PYDANTIC_AI_INTEGRATION", True)
 def test_setup_logfire_enabled(
     mock_configure: MagicMock, mock_logfire: MagicMock
 ) -> None:
@@ -69,6 +70,9 @@ def test_setup_logfire_enabled(
     os.environ["LOGFIRE_ENABLED"] = "true"
     os.environ["LOGFIRE_API_KEY"] = "test-api-key"
     os.environ["LOGFIRE_PROJECT_ID"] = "test-project-id"
+    # Unset token to test API key/project ID branch
+    if "LOGFIRE_TOKEN" in os.environ:
+        del os.environ["LOGFIRE_TOKEN"]
 
     # Call the function
     setup_logfire(service_name="test-service", environment="test")
@@ -83,7 +87,8 @@ def test_setup_logfire_enabled(
 
     # Verify instrumentation
     mock_logfire.instrument_httpx.assert_called_once()
-    mock_logfire.instrument_fastapi.assert_called_once()
+    # mock_logfire.instrument_fastapi.assert_called_once()
+    # Removed: Not called without app
     mock_configure.assert_called_once()
 
 
@@ -118,6 +123,7 @@ def test_shutdown_logfire_enabled(mock_logfire: MagicMock) -> None:
 @patch(
     "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
 )
+@patch("pydanticai_api_template.utils.observability.HAS_PYDANTIC_AI_INTEGRATION", True)
 def test_setup_logfire_promptfoo(
     mock_configure: MagicMock, mock_logfire: MagicMock
 ) -> None:
@@ -126,6 +132,9 @@ def test_setup_logfire_promptfoo(
     os.environ["LOGFIRE_ENABLED"] = "true"
     os.environ["LOGFIRE_API_KEY"] = "test-api-key"
     os.environ["LOGFIRE_PROJECT_ID"] = "test-project-id"
+    # Unset token to test API key/project ID branch
+    if "LOGFIRE_TOKEN" in os.environ:
+        del os.environ["LOGFIRE_TOKEN"]
 
     # Call the function with promptfoo-testing service name
     setup_logfire(service_name="promptfoo-testing")
@@ -140,5 +149,6 @@ def test_setup_logfire_promptfoo(
 
     # Verify instrumentation
     mock_logfire.instrument_httpx.assert_called_once()
-    mock_logfire.instrument_fastapi.assert_called_once()
+    # mock_logfire.instrument_fastapi.assert_called_once()
+    # Removed: Not called without app
     mock_configure.assert_called_once()

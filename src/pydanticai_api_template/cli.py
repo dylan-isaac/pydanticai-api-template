@@ -7,6 +7,7 @@ from typing import Optional
 
 import typer
 import uvicorn
+import yaml  # Moved import to top level
 
 # Get the project name from pyproject.toml or define it
 PROJECT_NAME = "pydanticai-api-template"
@@ -15,7 +16,7 @@ CLI_NAME = "pat"  # New CLI command name
 app = typer.Typer(help=f"{PROJECT_NAME} CLI")
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def run(
     host: str = typer.Option(
         "0.0.0.0", "--host", "-h", help="Host address to bind the server to."
@@ -49,7 +50,7 @@ def run(
     )
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def version() -> None:
     """Show the application version."""
     try:
@@ -62,7 +63,7 @@ def version() -> None:
         )
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def install_completion(
     shell: Optional[str] = typer.Argument(
         None,
@@ -143,7 +144,7 @@ def install_completion(
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def validate() -> None:
     """Validate application configuration and environment."""
     typer.echo("🔍 Validating environment...")
@@ -177,10 +178,10 @@ def validate() -> None:
     else:
         typer.echo("ℹ️ Not running inside a known Docker container environment")
 
-    typer.echo("\nValidation complete. Basic checks passed. 👍")
+    typer.echo("\nValidation complete. Basic checks passed. ��")
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def cleanup() -> None:
     """Clean up temporary files and directories (like __pycache__)."""
     typer.echo("🧹 Cleaning up temporary files...")
@@ -220,7 +221,7 @@ def cleanup() -> None:
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def lint() -> None:
     """Run code quality checks using Ruff."""
     import shutil
@@ -295,7 +296,7 @@ def lint() -> None:
             raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def test() -> None:
     """Run tests using pytest."""
     import shutil
@@ -358,7 +359,7 @@ def test() -> None:
             raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def sync() -> None:
     """Synchronize project configuration files."""
     typer.echo("🔄 Synchronizing configuration files...")
@@ -398,7 +399,7 @@ def sync() -> None:
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def check() -> None:
     """Perform a quick status check of the development environment."""
     import shutil
@@ -434,7 +435,7 @@ def check() -> None:
     typer.echo("\n✨ Status check complete")
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def run_mcp(
     host: str = typer.Option(
         "0.0.0.0", "--host", "-h", help="Host address to bind the MCP server to."
@@ -475,7 +476,7 @@ def run_mcp(
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def prompt_test(
     config_path: str = typer.Option(
         "promptfoo/config.yaml",
@@ -526,44 +527,34 @@ def prompt_test(
     if verbose:
         try:
             # Try to import yaml in a way that mypy won't complain about
-            try:
-                import yaml  # type: ignore
+            # import yaml  # type: ignore # Removed from here
+            yaml_available = True
+        except ImportError:
+            yaml_available = False
 
-                yaml_available = True
-            except ImportError:
-                yaml_available = False
+        if yaml_available:
+            with open(config_file, "r") as f:
+                config = yaml.safe_load(f)
+                typer.echo("\n📋 Test Configuration:")
+                typer.echo(f"  Prompts: {len(config.get('prompts', []))} defined")
+                typer.echo(f"  Providers: {len(config.get('providers', []))} defined")
 
-            if yaml_available:
-                with open(config_file, "r") as f:
-                    config = yaml.safe_load(f)
-                    typer.echo("\n📋 Test Configuration:")
-                    typer.echo(f"  Prompts: {len(config.get('prompts', []))} defined")
+                test_cases = config.get("testCases", [])
+                typer.echo(f"  Test Cases: {len(test_cases)} defined")
+                for i, test in enumerate(test_cases):
                     typer.echo(
-                        f"  Providers: {len(config.get('providers', []))} defined"
+                        f"    {i + 1}. {test.get('description', 'Unnamed test')}"
                     )
-
-                    test_cases = config.get("testCases", [])
-                    typer.echo(f"  Test Cases: {len(test_cases)} defined")
-                    for i, test in enumerate(test_cases):
-                        typer.echo(
-                            f"    {i + 1}. {test.get('description', 'Unnamed test')}"
-                        )
-                        input_text = test.get("vars", {}).get("input", "None")
-                        # Truncate long inputs for display
-                        truncated_input = (
-                            input_text[:50] + "..."
-                            if len(input_text) > 50
-                            else input_text
-                        )
-                        typer.echo(f"       Input: {truncated_input}")
-                        typer.echo(f"       Assertions: {len(test.get('assert', []))}")
-                    typer.echo("")
-            else:
-                typer.echo(
-                    "⚠️ PyYAML not installed. Skipping verbose test case display."
-                )
-        except Exception as e:
-            typer.echo(f"⚠️ Error reading test configuration: {e}")
+                    input_text = test.get("vars", {}).get("input", "None")
+                    # Truncate long inputs for display
+                    truncated_input = (
+                        input_text[:50] + "..." if len(input_text) > 50 else input_text
+                    )
+                    typer.echo(f"       Input: {truncated_input}")
+                    typer.echo(f"       Assertions: {len(test.get('assert', []))}")
+                typer.echo("")
+        else:
+            typer.echo("⚠️ PyYAML not installed. Skipping verbose test case display.")
 
     try:
         # Use npm directly for running promptfoo commands
@@ -610,7 +601,7 @@ def prompt_test(
         raise typer.Exit(code=1)
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def setup_logfire() -> None:
     """Set up Logfire authentication and project configuration.
 

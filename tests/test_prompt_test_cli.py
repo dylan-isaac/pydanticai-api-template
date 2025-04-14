@@ -15,7 +15,7 @@ from pydanticai_api_template.cli import app
 runner = CliRunner()
 
 
-@pytest.fixture
+@pytest.fixture  # type: ignore[misc]
 def mock_config_file(tmp_path: Path) -> str:
     """Create a temporary config file for testing."""
     config_dir = tmp_path / "promptfoo"
@@ -44,10 +44,10 @@ testCases:
     return str(config_file)
 
 
-@patch("pydanticai_api_template.cli.load_dotenv")
-@patch("pydanticai_api_template.cli.setup_logfire")
-@patch("pydanticai_api_template.cli.subprocess.run")
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("dotenv.load_dotenv")
+@patch("pydanticai_api_template.utils.observability.setup_logfire")
+@patch("subprocess.run")
+@patch("shutil.which")
 def test_prompt_test_command(
     mock_which: Mock,
     mock_run: Mock,
@@ -83,10 +83,10 @@ def test_prompt_test_command(
     assert not any("view" in str(call) for call in mock_run.call_args_list)
 
 
-@patch("pydanticai_api_template.cli.load_dotenv")
-@patch("pydanticai_api_template.cli.setup_logfire")
-@patch("pydanticai_api_template.cli.subprocess.run")
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("dotenv.load_dotenv")
+@patch("pydanticai_api_template.utils.observability.setup_logfire")
+@patch("subprocess.run")
+@patch("shutil.which")
 def test_prompt_test_with_view(
     mock_which: Mock,
     mock_run: Mock,
@@ -109,10 +109,10 @@ def test_prompt_test_with_view(
     assert any("view" in str(call) for call in mock_run.call_args_list)
 
 
-@patch("pydanticai_api_template.cli.load_dotenv")
-@patch("pydanticai_api_template.cli.setup_logfire")
-@patch("pydanticai_api_template.cli.subprocess.run")
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("dotenv.load_dotenv")
+@patch("pydanticai_api_template.utils.observability.setup_logfire")
+@patch("subprocess.run")
+@patch("shutil.which")
 def test_prompt_test_with_verbose(
     mock_which: Mock,
     mock_run: Mock,
@@ -160,7 +160,7 @@ def test_prompt_test_with_verbose(
     )
 
 
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("shutil.which")
 def test_prompt_test_npm_not_found(mock_which: Mock, mock_config_file: str) -> None:
     """Test the prompt_test command when npm is not found."""
     # Set up mock to return None (npm not found)
@@ -174,7 +174,7 @@ def test_prompt_test_npm_not_found(mock_which: Mock, mock_config_file: str) -> N
     assert "npm command not found" in result.stdout
 
 
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("shutil.which")
 def test_prompt_test_config_not_found(mock_which: Mock) -> None:
     """Test the prompt_test command when config file is not found."""
     # Set up mock to return path to npm
@@ -188,10 +188,10 @@ def test_prompt_test_config_not_found(mock_which: Mock) -> None:
     assert "Config file not found" in result.stdout
 
 
-@patch("pydanticai_api_template.cli.load_dotenv")
-@patch("pydanticai_api_template.cli.setup_logfire")
-@patch("pydanticai_api_template.cli.subprocess.run")
-@patch("pydanticai_api_template.cli.shutil.which")
+@patch("dotenv.load_dotenv")
+@patch("pydanticai_api_template.utils.observability.setup_logfire")
+@patch("subprocess.run")
+@patch("shutil.which")
 def test_prompt_test_command_fails(
     mock_which: Mock,
     mock_run: Mock,
