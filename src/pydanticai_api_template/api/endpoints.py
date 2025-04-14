@@ -158,7 +158,9 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
                 "Chat request failed: PydanticAI Agent not initialized or "
                 "OpenAI key missing."
             )
-            span.set_status("error", "AI service not available")
+            span.set_attributes(
+                {"error": True, "error.message": "AI service not available"}
+            )
             raise HTTPException(
                 status_code=503,  # Service Unavailable
                 detail=(
@@ -204,7 +206,7 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
         except Exception as e:
             # Catch-all for any other exceptions that might occur
             logger.exception(f"Error in chat_with_agent: {e}")
-            span.set_status("error", str(e))
+            span.set_attributes({"error": True, "error.message": str(e)})
             # We don't want to expose internal errors to clients
             raise HTTPException(
                 status_code=500,
@@ -241,7 +243,9 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
                 "Story idea request failed: PydanticAI Agent not initialized or "
                 "OpenAI key missing."
             )
-            span.set_status("error", "AI service not available")
+            span.set_attributes(
+                {"error": True, "error.message": "AI service not available"}
+            )
             raise HTTPException(
                 status_code=503,  # Service Unavailable
                 detail=(
@@ -267,57 +271,36 @@ async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
             agent_run_result = await story_agent.run(enhanced_prompt)
 
             # Get the result data
-            story_idea_data = agent_run_result.data
+            response_data = agent_run_result.data
 
             # Ensure we have a StoryIdea object
-            if isinstance(story_idea_data, StoryIdea):
-                story_idea = story_idea_data
-            else:
-                # Create a StoryIdea with the data we have
-                try:
-                    # Try to convert from a dictionary if possible
-                    if hasattr(story_idea_data, "get"):
-                        story_idea = StoryIdea(
-                            title=story_idea_data.get("title", "Generated Story"),
-                            premise=story_idea_data.get(
-                                "premise", str(story_idea_data)
-                            ),
-                        )
-                    else:
-                        # Fallback for string or other types
-                        story_idea = StoryIdea(
-                            title="Generated Story", premise=str(story_idea_data)
-                        )
-                except Exception as e:
-                    logger.warning(f"Error converting to StoryIdea: {e}")
-                    # Ultimate fallback
-                    story_idea = StoryIdea(
-                        title="Generated Story", premise="A mysterious tale unfolds."
-                    )
-
-            # Track completion metrics
+            if isinstance(response_data, StoryIdea):
+                story_idea = response_data
+                span.set_attributes(
+                    {
+                        "response_title": story_idea.title,
+                        "response_premise_length": len(story_idea.premise),
+                        "success": True,
+                        "completion_type": "structured",
+                        "latency_ms": int(
+                            (getattr(agent_run_result, "completion_time", 0) or 0)
+                            * 1000
+                        ),
+                    }
+                )
+                logger.info("Agent returned story idea.")
+                return story_idea
+            logger.error(f"Agent returned unexpected data type: {type(response_data)}")
             span.set_attributes(
-                {
-                    "title_length": len(story_idea.title),
-                    "premise_length": len(story_idea.premise),
-                    "success": True,
-                    "completion_type": "structured",
-                    "response_complexity": "high"
-                    if len(story_idea.premise) > 200
-                    else "medium",
-                    "latency_ms": int(
-                        (getattr(agent_run_result, "completion_time", 0) or 0) * 1000
-                    ),
-                }
+                {"error": True, "error.message": "Invalid response format"}
             )
-
-            logger.info(f"Generated story idea with title: {story_idea.title}")
-            return story_idea
+            raise HTTPException(
+                status_code=500,
+                detail="AI agent returned an unexpected response format.",
+            )
         except Exception as e:
-            # Catch-all for any other exceptions that might occur
-            logger.exception(f"Error in generate_story_idea: {e}")
-            span.set_status("error", str(e))
-            # We don't want to expose internal errors to clients
+            logger.exception(f"Error generating story idea: {e}")
+            span.set_attributes({"error": True, "error.message": str(e)})
             raise HTTPException(
                 status_code=500,
                 detail=(

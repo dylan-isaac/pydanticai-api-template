@@ -60,22 +60,12 @@ def setup_logfire(
             service_name=service_name,
             environment=env,
         )
-    else:
-        # Legacy configuration with API key and project ID
-        api_key = os.getenv("LOGFIRE_API_KEY")
-        if api_key and project_id:
-            logfire.configure(
-                api_key=api_key,
-                project_id=project_id,
-                service_name=service_name,
-                environment=env,
-            )
-        else:
-            logfire.info(
-                "LogFire configuration incomplete. "
-                "Set LOGFIRE_TOKEN or both LOGFIRE_API_KEY and LOGFIRE_PROJECT_ID."
-            )
-            return
+    elif not (os.getenv("LOGFIRE_API_KEY") and project_id):
+        # If neither token nor API_KEY+PROJECT_ID are set, log info and return
+        logfire.info(
+            "LogFire configuration incomplete. Set LOGFIRE_TOKEN environment variable."
+        )
+        return
 
     # Set up instrumentation for common libraries
     logfire.instrument_httpx()  # HTTP client monitoring
@@ -87,7 +77,7 @@ def setup_logfire(
         if app is not None:
             # Suppress linter warning - app parameter is required according to
             # documentation but linter thinks it's not
-            logfire.instrument_fastapi(app)  # type: ignore
+            logfire.instrument_fastapi(app)
         else:
             logfire.warning("No FastAPI app provided, skipping FastAPI instrumentation")
     except Exception as e:

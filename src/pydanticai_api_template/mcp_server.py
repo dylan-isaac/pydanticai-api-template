@@ -118,7 +118,9 @@ async def chat(message: str) -> str:
         "mcp_chat", message=message[:100], operation_type="chat", model="gpt-4o"
     ) as span:
         if not ai_agent:
-            span.set_status("error", "AI service not available")
+            span.set_attributes(
+                {"error": True, "error.message": "AI service not available"}
+            )
             return "AI service is not available. Please check server configuration."
 
         try:
@@ -162,7 +164,7 @@ async def chat(message: str) -> str:
             return reply
         except Exception as e:
             logger.exception(f"Error in MCP chat tool: {e}")
-            span.set_status("error", str(e))
+            span.set_attributes({"error": True, "error.message": str(e)})
             return f"An error occurred while processing your request: {str(e)}"
 
 
@@ -185,7 +187,9 @@ async def story(message: str) -> dict:
         model="gpt-4o",
     ) as span:
         if not story_agent:
-            span.set_status("error", "AI service not available")
+            span.set_attributes(
+                {"error": True, "error.message": "AI service not available"}
+            )
             return {
                 "error": (
                     "AI service is not available. Please check server configuration."
@@ -232,11 +236,13 @@ async def story(message: str) -> dict:
                     }
                 )
                 return story_dict
-            span.set_status("error", "Failed to generate proper story idea")
+            span.set_attributes(
+                {"error": True, "error.message": "Failed to generate proper story idea"}
+            )
             return {"error": "Failed to generate a proper story idea"}
         except Exception as e:
             logger.exception(f"Error in MCP story tool: {e}")
-            span.set_status("error", str(e))
+            span.set_attributes({"error": True, "error.message": str(e)})
             return {
                 "error": f"An error occurred while processing your request: {str(e)}"
             }
