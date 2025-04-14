@@ -72,7 +72,8 @@ def setup_logfire(
             )
         else:
             logfire.info(
-                "LogFire configuration incomplete. Set LOGFIRE_TOKEN or both LOGFIRE_API_KEY and LOGFIRE_PROJECT_ID.",
+                "LogFire configuration incomplete. "
+                "Set LOGFIRE_TOKEN or both LOGFIRE_API_KEY and LOGFIRE_PROJECT_ID."
             )
             return
 
@@ -84,8 +85,8 @@ def setup_logfire(
     try:
         # For type safety, we ignore the type checker
         if app is not None:
-            # Suppress linter warning - app parameter is required according to documentation
-            # but linter thinks it's not
+            # Suppress linter warning - app parameter is required according to
+            # documentation but linter thinks it's not
             logfire.instrument_fastapi(app)  # type: ignore
         else:
             logfire.warning("No FastAPI app provided, skipping FastAPI instrumentation")

@@ -69,5 +69,6 @@
             ]
         }
     },
-    "postCreateCommand": "chmod +x scripts/dev/welcome.sh && scripts/dev/welcome.sh && python scripts/dev/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B to start both REST API and MCP servers, or type \"start\" in the terminal.'"
+    "postCreateCommand": "chmod +x scripts/dev/welcome.sh && scripts/dev/welcome.sh && python scripts/dev/install_hooks.py && echo 'Dev container created! Use Cmd+Shift+B to start both REST API and MCP servers, or type \"start\" in the terminal.'",
+    "postAttachCommand": "pre-commit install"
 }
