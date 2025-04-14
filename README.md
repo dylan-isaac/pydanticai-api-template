@@ -49,7 +49,6 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Observability**: Complete visibility with Logfire integration
 - **Cursor Rules**: Smart AI-assisted development with contextual reminders
 - **Repomix Runner**: Easily bundle project files for providing context to AI assistants ([VS Code Extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner))
-- **Task Management**: Integrated AI-powered task management with [Claude Task Master](https://github.com/eyaltoledano/claude-task-master)
 
 ## AI-Assisted Development with Cursor
 
@@ -69,40 +68,6 @@ To get started with the Cursor Rules:
 
 For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
 
-## AI Task Management with Claude Task Master
-
-This template includes [Claude Task Master](https://github.com/eyaltoledano/claude-task-master), an AI-powered task management system integrated via MCP for seamless use within Cursor.
-
-**Key Features:**
-
-*   **PRD Parsing:** Automatically generate tasks from Product Requirements Documents.
-*   **Task Management:** Create, prioritize, track, and manage development tasks.
-*   **AI Assistance:** Get help implementing or expanding specific tasks directly in chat.
-*   **Structured Output:** Tasks are stored in a predictable format in the `.tasks/` directory.
-
-**Setup:**
-
-1.  **API Key:** Add your `ANTHROPIC_API_KEY` to your `.env` file in the project root:
-    ```
-    ANTHROPIC_API_KEY=your_claude_api_key_here
-    ```
-    If you don't provide it, Cursor will prompt you when the tool is first used. The specific Claude model (`claude-3-opus-20240229` by default) and other parameters can be adjusted in `.cursor/mcp.json`.
-2.  **Rebuild Container:** Ensure the tool is installed by rebuilding your dev container (`Cmd/Ctrl+Shift+P` -> `Dev Containers: Rebuild Container`).
-3.  **Enable MCP:** Make sure the `taskmaster-ai` server is enabled in Cursor's MCP settings.
-
-**Usage:**
-
-Once set up, you can interact with Task Master through Cursor chat:
-
-1.  **Initialize:** `"Can you please initialize taskmaster-ai into my project?"` (Creates the `.tasks/` directory)
-2.  **Parse PRD:** `"Can you parse my PRD at <path/to/prd.txt>?"`
-3.  **Get Next Task:** `"What's the next task I should work on?"`
-4.  **Implement Task:** `"Can you help me implement task <number> (e.g., task 3)?"`
-5.  **Expand Task:** `"Can you help me expand task <number> with more detail?"`
-6.  **List Tasks:** `"List all tasks."`
-
-Task Master will create and manage tasks as markdown files within a `.tasks/` directory in your project root. For more details, see the [Developer Guide](./docs/DEVELOPER.md).
-
 ## Project Structure
 
 ```
@@ -120,7 +85,6 @@ Task Master will create and manage tasks as markdown files within a `.tasks/` di
 │       └── cli.py   # Command-line interface
 ├── tests/           # Test suite
 ├── wishlist/        # Future improvements and feature ideas
-├── .tasks/          # Claude Task Master generated tasks (created on init)
 ├── pyproject.toml   # Project dependencies and config
 └── Makefile         # Common development commands
 ```
