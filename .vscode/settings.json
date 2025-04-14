@@ -3,6 +3,7 @@
         "appuser",
         "batcat",
         "fastmcp",
+        "filetree",
         "healthcheck",
         "logfire",
         "mypy",
@@ -19,6 +20,8 @@
         "PYTHONUNBUFFERED",
         "PYTHONWARNINGS",
         "repomix",
+        "repomixignore",
+        "Typer",
         "uvicorn",
         "venv"
     ]

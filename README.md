@@ -17,8 +17,8 @@ A modern Python project template for building AI-powered APIs with PydanticAI, F
 
 3. **Start Development**:
    - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux)
-   - Visit http://localhost:8000/docs for API documentation
-   - For the MCP server: `pat run-mcp` (accessible at http://localhost:3001)
+   - Visit <http://localhost:8000/docs> for API documentation
+   - For the MCP server: `pat run-mcp` (accessible at <http://localhost:3001>)
 
 ## Documentation Map
 
@@ -52,12 +52,18 @@ This README provides a high-level overview. For detailed information, refer to:
 
 ## AI-Assisted Development with Cursor
 
-This project includes custom [Cursor Rules](./docs/CURSOR_RULES.md) to enhance your development experience when using [Cursor](https://cursor.sh/), an AI-powered code editor:
+This project includes custom [Cursor Rules](./docs/CURSOR_RULES.md) to enhance your
+development experience when using [Cursor](https://cursor.sh/), an AI-powered code
+editor:
 
-- **Documentation Reminders**: Get contextual reminders to update documentation when changing code
+- **Documentation Reminders**: Get contextual reminders to update documentation when
+  changing code
 - **Type Safety Enforcement**: Maintain type safety throughout the codebase
-- **Director Pattern Detection**: Identify opportunities for implementing autonomous AI workflows
-- **Repomix Integration**: Use the [Repomix Runner extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner) (automatically installed in the dev container) to easily bundle files or directories and copy them to the clipboard for pasting into AI chat prompts.
+- **Director Pattern Detection**: Identify opportunities for implementing autonomous AI
+  workflows
+- **Repomix Integration**: Use the [Repomix Runner extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner)
+  (automatically installed in the dev container) to easily bundle files or directories
+  and copy them to the clipboard for pasting into AI chat prompts.
 
 To get started with the Cursor Rules:
 
@@ -70,7 +76,7 @@ For detailed information, see the [Cursor Rules Guide](./docs/CURSOR_RULES.md).
 
 ## Project Structure
 
-```
+```text
 ├── .cursor          # Cursor AI rules and configuration
 ├── .devcontainer    # Dev container configuration
 ├── .vscode          # VS Code settings and tasks
@@ -110,12 +116,13 @@ result = await story_agent.run("Give me a sci-fi story idea")
 You can generate story ideas using the `/story` endpoint:
 
 ```bash
-curl -X POST "http://localhost:8000/story" \
-  -H "Content-Type: application/json" \
+cURL -X POST "http://localhost:8000/story" \\
+  -H "Content-Type: application/json" \\
   -d '{"message":"Give me a sci-fi story about time travel"}'
 ```
 
 Response:
+
 ```json
 {
   "title": "Echoes of Tomorrow",
@@ -144,6 +151,7 @@ The project includes a `wishlist/` directory for capturing future improvements a
 3. **Collaborative Planning**: A way to track ideas from the entire team for future sprints
 
 Current wishlist items:
+
 - Templateizing and CookieCutter integration for project scaffolding
 
 To contribute to the wishlist, add markdown files to the `wishlist/` directory with detailed descriptions of proposed features or improvements.
@@ -168,7 +176,8 @@ use-logfire      # Set the current project
 ### Production Setup
 
 Set these environment variables:
-```
+
+```dotenv
 LOGFIRE_TOKEN="your-write-token"
 LOGFIRE_ENABLED="true"
 ```
@@ -179,7 +188,7 @@ For detailed instructions, see [Observability](./docs/OBSERVABILITY.md).
 
 Create a `.env` file in the project root with your API keys:
 
-```
+```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_claude_api_key_here
 ```

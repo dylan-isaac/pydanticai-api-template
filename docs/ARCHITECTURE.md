@@ -6,7 +6,7 @@ This document describes the system design and architecture of the PydanticAI API
 
 The PydanticAI API Template is built on the following key components:
 
-```
+```text
 ┌───────────────────────────────────────────────────────┐
 │                     FastAPI App                        │
 │                                                       │
@@ -92,7 +92,7 @@ The project includes an MCP (Model Context Protocol) server that exposes AI func
 
 ### Components
 
-```
+```text
                   ┌──────────────────┐
                   │   MCP Client     │
                   │  (Any Protocol-  │

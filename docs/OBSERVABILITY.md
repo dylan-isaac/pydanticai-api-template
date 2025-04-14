@@ -10,7 +10,7 @@ The project includes integration with [LogFire](https://logfire.pydantic.dev/doc
 
 Observability is configured through environment variables:
 
-```
+```dotenv
 LOGFIRE_TOKEN="your-write-token"
 LOGFIRE_PROJECT_ID="pydantic-ai-template"
 LOGFIRE_ENABLED="true"
@@ -31,6 +31,7 @@ logfire projects use pydantic-ai-template
 ```
 
 When using the development container, you can use these convenient aliases:
+
 - `auth-logfire` - Authenticate with Logfire
 - `use-logfire` - Set the current project to pydantic-ai-template
 

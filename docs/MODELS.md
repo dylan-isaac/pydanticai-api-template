@@ -177,7 +177,7 @@ The PydanticAI API Template creates a robust architecture where Pydantic models 
 
 Here's how data flows through the system, with type checking at each step:
 
-```
+```text
 User Request → FastAPI Endpoint → Pydantic Model Validation →
 PydanticAI Agent (with result_type) → LLM Processing →
 Structured Response → Pydantic Model Validation → JSON Response
@@ -261,6 +261,7 @@ agent = Agent(
 ```
 
 This provides visibility into:
+
 - Input/output validation
 - LLM requests and responses
 - Retry attempts

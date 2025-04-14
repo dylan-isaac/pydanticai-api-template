@@ -20,6 +20,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 **Description**: Simple root endpoint that returns a welcome message.
 
 **Response**:
+
 ```json
 {
   "message": "Welcome to the PydanticAI API Template!"
@@ -31,6 +32,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 **Description**: Sends a message to the PydanticAI agent and receives a structured reply.
 
 **Request**:
+
 ```json
 {
   "message": "Your message to the AI agent"
@@ -38,6 +40,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 ```
 
 **Response**:
+
 ```json
 {
   "reply": "The AI agent's response"
@@ -45,6 +48,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 ```
 
 **Notes**:
+
 - Requires `OPENAI_API_KEY` environment variable to be set
 - Uses the `gpt-4o` model by default
 
@@ -53,6 +57,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 **Description**: Generates a story idea with a title and premise based on the user's input.
 
 **Request**:
+
 ```json
 {
   "message": "Give me a sci-fi story about time travel"
@@ -60,6 +65,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 ```
 
 **Response**:
+
 ```json
 {
   "title": "Echoes of Tomorrow",
@@ -68,6 +74,7 @@ Currently, no authentication is required for API endpoints in development. In pr
 ```
 
 **Notes**:
+
 - Requires `OPENAI_API_KEY` environment variable to be set
 - Uses the `gpt-4o` model by default
 - Input can specify genre, themes, or characters to guide the story idea generation

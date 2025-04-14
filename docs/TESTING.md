@@ -34,7 +34,7 @@ The HTML report will be generated in the `htmlcov/` directory.
 
 ## Testing the MCP Server
 
-### Automated Tests
+### MCP Server Automated Tests
 
 The MCP server has unit tests in `tests/test_mcp_server.py` that test:
 
@@ -47,11 +47,13 @@ The MCP server has unit tests in `tests/test_mcp_server.py` that test:
 #### Prerequisites
 
 1. Install dependencies:
+
    ```bash
    pip install -e ".[test]"
    ```
 
 2. Set up environment variables:
+
    ```bash
    # Create a .env file with your OpenAI API key
    echo "OPENAI_API_KEY=your_api_key_here" > .env
@@ -65,7 +67,7 @@ Start the MCP server:
 pat run-mcp
 ```
 
-The server will start on http://localhost:3001 by default.
+The server will start on <http://localhost:3001> by default.
 
 #### Using the Example Client
 
@@ -247,6 +249,7 @@ mypy src/pydanticai_api_template/api/models.py
 ### Common Type Issues and Solutions
 
 1. **Untyped decorators**: Add specific module overrides in pyproject.toml:
+
    ```toml
    [[tool.mypy.overrides]]
    module = "pydanticai_api_template.api.models"
@@ -254,6 +257,7 @@ mypy src/pydanticai_api_template/api/models.py
    ```
 
 2. **Missing return types**: Always add return types to functions:
+
    ```python
    def process_data(data: dict) -> dict:  # Add return type
        # Function implementation
@@ -261,6 +265,7 @@ mypy src/pydanticai_api_template/api/models.py
    ```
 
 3. **Optional values**: Use `Optional` for values that might be None:
+
    ```python
    from typing import Optional
 

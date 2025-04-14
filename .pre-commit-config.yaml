@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.6.0
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -8,7 +8,7 @@ repos:
   - id: check-toml
   - id: check-added-large-files
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.0
+  rev: v0.4.10
   hooks:
   - id: ruff
     args:
@@ -54,3 +54,11 @@ repos:
         # Project itself - necessary for mypy to find local modules
         ".",
     ]
+- repo: local
+  hooks:
+  - id: markdownlint-fix
+    name: markdownlint (fix)
+    entry: markdownlint --fix
+    language: system
+    files: \\.md$
+    stages: [pre-commit] # Run on commit

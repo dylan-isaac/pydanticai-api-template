@@ -17,21 +17,10 @@ validate:
 # Code quality commands - note: dependencies are already installed in the container
 # If running locally outside the container, these will install dependencies first
 lint:
-	if [ -f "/.dockerenv" ]; then \
-		uv pip install --system -e ".[dev]"; \
-	else \
-		uv pip install -e ".[dev]"; \
-	fi
-	ruff check .
-	ruff format --check .
+	pat lint
 
 test:
-	if [ -f "/.dockerenv" ]; then \
-		uv pip install --system -e ".[dev,test]"; \
-	else \
-		uv pip install -e ".[dev,test]"; \
-	fi
-	pytest
+	pat test
 
 clean:
 	rm -rf .venv dist build *.egg-info

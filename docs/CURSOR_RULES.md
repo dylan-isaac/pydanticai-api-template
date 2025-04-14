@@ -63,7 +63,7 @@ When asking Cursor to modify PydanticAI code, structure your prompts as:
 3. **Detail**: Provide specifics of what should change
 
 Example:
-```
+```text
 UPDATE src/pydanticai_api_template/api/models.py:
 ADD field publication_date to StoryIdea model
 Make it Optional[datetime] with ISO format validation
@@ -73,7 +73,7 @@ Make it Optional[datetime] with ISO format validation
 
 For MCP server development, include relevant context:
 
-```
+```text
 @src/pydanticai_api_template/mcp_server.py
 
 Add a new tool that provides text summarization
@@ -83,7 +83,7 @@ Add a new tool that provides text summarization
 
 Reference documentation for context:
 
-```
+```text
 @docs/MODELS.md
 
 Update the ProductRecommendation model based on these patterns

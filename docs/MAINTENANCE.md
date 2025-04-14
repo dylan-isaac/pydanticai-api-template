@@ -6,7 +6,7 @@ This document explains how the project's configuration files are structured, how
 
 The development environment uses VS Code's Dev Containers to provide a consistent, isolated environment.
 
-```
+```text
 ┌─────────────────────────────────┐
 │         Host Machine            │
 │                                 │
@@ -46,7 +46,7 @@ The development environment uses VS Code's Dev Containers to provide a consisten
 2. **Volume Mounting**:
    - Source code from the host is mounted into the container
    - Host's Git configuration is mounted for seamless Git operations
-   - Container-specific directories (.venv, __pycache__) stay in the container for performance
+   - Container-specific directories (.venv, **pycache**) stay in the container for performance
 
 3. **Development Workflow**:
    - The container starts without automatically launching the application
@@ -109,6 +109,7 @@ python scripts/update_configs.py
 ```
 
 This will:
+
 - Update pre-commit hook versions from dev dependencies
 - Generate VS Code tasks based on available CLI commands
 - Keep configurations in sync
@@ -122,6 +123,7 @@ Run this tool whenever you make significant changes to dependencies or CLI comma
 When adding new dependencies:
 
 1. Update `pyproject.toml` first:
+
    ```bash
    # For regular dependencies
    uv add <package-name>
@@ -131,11 +133,13 @@ When adding new dependencies:
    ```
 
 2. Run the config sync tool:
+
    ```bash
    make sync-configs
    ```
 
 3. Update Docker images if needed:
+
    ```bash
    # Rebuild Docker images with new dependencies
    docker compose build
@@ -148,9 +152,11 @@ When modifying the CLI:
 1. Update `src/pydanticai_api_template/cli.py` to add or modify commands
 2. Update automated tests as needed
 3. Run the config sync tool to update VS Code tasks:
+
    ```bash
    make sync-configs
    ```
+
 4. If necessary, manually update:
    - Makefile commands
    - README.md documentation
@@ -207,26 +213,29 @@ When changing code quality tools:
 
 1. Update configurations in `pyproject.toml` (ruff, ruff format, mypy sections)
 2. Run the config sync tool to update pre-commit hook versions:
+
    ```bash
    make sync-configs
    ```
+
 3. Consider running linting on entire codebase after changes
 
 ### Updating Core Dependencies
 
 When updating major dependencies like Python, FastAPI, or UV:
 
-1.  **Review Changelogs**: Check the official changelogs for breaking changes or important migration notes.
-2.  **Update `pyproject.toml`**: Modify the version constraints as needed (e.g., `python = ">=3.12"`). Use `uv add <package>@latest` or specify versions.
-3.  **Update `Dockerfile` / `.devcontainer`**: Ensure the base images (e.g., `python:3.12-slim`) or setup steps reflect the new versions.
-4.  **Run `uv sync`**: Update the `uv.lock` file.
-5.  **Run `make sync-configs`**: Update any related config files.
-6.  **Thorough Testing**: Run all tests (`make test`) and manually test key features, especially those related to the updated dependency.
-7.  **Update Documentation**: Note the new versions in `README.md` or relevant places if significant.
+1. **Review Changelogs**: Check the official changelogs for breaking changes or important migration notes.
+2. **Update `pyproject.toml`**: Modify the version constraints as needed (e.g., `python = ">=3.12"`). Use `uv add <package>@latest` or specify versions.
+3. **Update `Dockerfile` / `.devcontainer`**: Ensure the base images (e.g., `python:3.12-slim`) or setup steps reflect the new versions.
+4. **Run `uv sync`**: Update the `uv.lock` file.
+5. **Run `make sync-configs`**: Update any related config files.
+6. **Thorough Testing**: Run all tests (`make test`) and manually test key features, especially those related to the updated dependency.
+7. **Update Documentation**: Note the new versions in `README.md` or relevant places if significant.
 
 ### Maintaining External Tool Versions
 
 When using external tools like promptfoo (Node.js), maintain version consistency across:
+
 - `pyproject.toml`: `promptfoo==0.1.0` in dev dependencies
 - `Dockerfile.dev`: `npm install -g promptfoo@0.1.0`
 - CI/CD configurations in your workflow files
@@ -237,7 +246,7 @@ When upgrading, update all occurrences simultaneously to prevent version conflic
 
 Here's how the configuration files depend on each other:
 
-```
+```text
 pyproject.toml           # Primary source of truth for dependencies
     │
     ├── Dockerfile       # Uses dependencies from pyproject.toml
@@ -272,6 +281,7 @@ When adding new development tools:
 ### Container-related Issues
 
 If the CLI doesn't work in containers:
+
 1. Verify the installation path in the Dockerfile or check if it's on PATH: `which pat`
 2. Check Python path and installation: `python -m pydanticai_api_template.cli --help`
 3. Debug with `docker compose exec pydanticai-api-template-dev which pat`
@@ -280,6 +290,7 @@ If the CLI doesn't work in containers:
 ### Application Startup Issues
 
 If the server doesn't start when expected:
+
 1. Make sure you're running `start` or pressing Cmd+Shift+B to manually start the server
 2. Check for errors in the terminal output
 3. Verify that port 8000 is not in use by another application
@@ -288,6 +299,7 @@ If the server doesn't start when expected:
 ### VS Code Dev Container Issues
 
 If VS Code dev containers don't work:
+
 1. Check Docker installation and permissions
 2. Verify Dev Containers extension is installed
 3. Try rebuilding: Command Palette → "Dev Containers: Rebuild Container"
@@ -296,6 +308,7 @@ If VS Code dev containers don't work:
 ### Make Command Issues
 
 If Make commands fail:
+
 1. Verify Make is installed: `make --version`
 2. Check command formatting in Makefile
 3. Run with verbose output: `make -v <command>`
@@ -310,6 +323,7 @@ For CI/CD integration:
 4. Use health checks to verify deployment
 
 Example GitHub Actions workflow fragment:
+
 ```yaml
 - uses: actions/checkout@v4
 ```
@@ -321,6 +335,7 @@ Documentation should evolve alongside code to maintain accuracy and usefulness. 
 ### Documentation Structure
 
 The project's documentation is organized as follows:
+
 1. **README.md** - Project overview, quick start guide, and navigation hub
 2. **docs/** - Detailed technical documentation for specific topics
    - ARCHITECTURE.md - System design and component relationships

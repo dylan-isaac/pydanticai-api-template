@@ -223,77 +223,103 @@ def cleanup() -> None:
 
 @app.command()
 def lint() -> None:
-    """Run code quality checks using Ruff."""
+    """Run code quality checks using Ruff and Markdownlint."""
     import shutil
     import subprocess
 
     typer.echo("🔍 Running code quality checks...")
+    errors_found = False
 
     # Check if we're inside a dev container
     in_container = Path("/.dockerenv").exists()
 
-    # Check if 'make' is available
-    if shutil.which("make"):
+    # --- Direct commands ---
+    typer.echo("--- Running lint commands ---")
+    commands = [
+        ("Ruff check", ["ruff", "check", "."]),
+        ("Ruff format check", ["ruff", "format", "--check", "."]),
+        ("Markdownlint", ["markdownlint", "README.md", "docs/"]),
+    ]
+
+    # Check if tools are available, install dev dependencies if needed
+    required_tools = ["ruff", "markdownlint"]
+    missing_tools = [tool for tool in required_tools if not shutil.which(tool)]
+
+    if missing_tools:
+        typer.echo(
+            f"Missing tools: {', '.join(missing_tools)}. Installing dev dependencies..."
+        )
+        install_cmd = ["uv", "pip", "install", "-e", ".[dev]"]
+        if in_container:
+            typer.echo("Installing development dependencies with system flag...")
+            install_cmd.insert(3, "--system")
+        else:
+            typer.echo("Installing development dependencies...")
         try:
-            # Use Make command which handles dependency installation if needed
+            # Run install command, suppress output unless error
             result = subprocess.run(
-                ["make", "lint"], check=True, capture_output=True, text=True
+                install_cmd, check=True, capture_output=True, text=True
             )
-            typer.echo(result.stdout)
-            typer.echo("✅ Linting complete!")
+            typer.echo("✅ Dev dependencies installed.")
         except subprocess.CalledProcessError as e:
-            if in_container:
-                # If in container and make failed, try direct commands
-                # with --system flag
-                typer.echo("Make command failed, trying direct commands...")
-                try:
-                    # Run Ruff check
-                    typer.echo("Running Ruff check...")
-                    subprocess.run(["ruff", "check", "."], check=True)
-
-                    # Run Ruff format check
-                    typer.echo("Running Ruff format check...")
-                    subprocess.run(["ruff", "format", "--check", "."], check=True)
-
-                    typer.echo("✅ Linting complete!")
-                    return
-                except subprocess.CalledProcessError:
-                    pass
-            # If we get here, both approaches failed
-            typer.echo(f"❌ Linting failed:\n{e.stdout}\n{e.stderr}", err=True)
+            typer.echo(f"❌ Failed to install dependencies: {e.stderr}", err=True)
             raise typer.Exit(code=1)
-    else:
-        # Fallback to direct commands if Make is not available
+        # Verify tools are now available after install
+        if any(not shutil.which(tool) for tool in missing_tools):
+            # Format the error message to fit within the line limit
+            tools_str = ", ".join(missing_tools)
+            error_msg = (
+                f"❌ Failed to install required tools ({tools_str}) "
+                "even after attempting dependency installation."
+            )
+            typer.echo(error_msg, err=True)
+            raise typer.Exit(code=1)
+
+    # Run individual linting commands
+    for name, cmd in commands:
+        # Ensure the command executable is available before running
+        executable = cmd[0]
+        if not shutil.which(executable):
+            typer.echo(
+                f"⚠️ Skipping {name}: Command '{executable}' not found.", err=True
+            )
+            errors_found = True  # Mark as error if a required tool is missing
+            continue
+
+        typer.echo(f"Running {name}...")
         try:
-            # Install dev dependencies if not in container (container should have them)
-            if not in_container:
-                typer.echo("Installing development dependencies...")
-                subprocess.run(
-                    ["uv", "pip", "install", "-e", ".[dev]"],
-                    check=True,
-                    capture_output=True,
-                )
+            # Use run instead of check=True initially to capture output on failure
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if result.returncode != 0:
+                typer.echo(f"❌ {name} failed:", err=True)
+                if result.stdout:
+                    typer.echo(result.stdout, err=True)
+                if result.stderr:
+                    typer.echo(result.stderr, err=True)
+                errors_found = True
             else:
-                # In container, use --system flag to avoid venv issues
-                typer.echo("Installing development dependencies with system flag...")
-                subprocess.run(
-                    ["uv", "pip", "install", "--system", "-e", ".[dev]"],
-                    check=True,
-                    capture_output=True,
-                )
+                typer.echo(f"✅ {name} passed!")
+                # Optionally print stdout even on success if verbose flag added later
+                # if verbose and result.stdout:
+                #     typer.echo(result.stdout)
 
-            # Run Ruff check
-            typer.echo("Running Ruff check...")
-            subprocess.run(["ruff", "check", "."], check=True)
+        except FileNotFoundError:
+            # Format the error message to fit within the line limit
+            error_msg = (
+                f"❌ Command '{executable}' not found. "
+                "Please ensure it's installed and in PATH."
+            )
+            typer.echo(error_msg, err=True)
+            errors_found = True
+        except Exception as e:
+            typer.echo(f"❌ An unexpected error occurred running {name}: {e}", err=True)
+            errors_found = True
 
-            # Run Ruff format check
-            typer.echo("Running Ruff format check...")
-            subprocess.run(["ruff", "format", "--check", "."], check=True)
-
-            typer.echo("✅ Linting complete!")
-        except subprocess.CalledProcessError:
-            typer.echo("❌ Linting failed!", err=True)
-            raise typer.Exit(code=1)
+    if errors_found:
+        typer.echo("❌ Linting failed!", err=True)
+        raise typer.Exit(code=1)
+    else:
+        typer.echo("✅ All lint checks passed!")
 
 
 @app.command()
@@ -306,57 +332,60 @@ def test() -> None:
 
     # Check if we're inside a dev container
     in_container = Path("/.dockerenv").exists()
+    pytest_exec = shutil.which("pytest")
 
-    # Check if 'make' is available
-    if shutil.which("make"):
+    # Install dependencies if pytest is not found
+    if not pytest_exec:
+        typer.echo("Pytest not found. Installing test dependencies...")
+        install_cmd = ["uv", "pip", "install", "-e", ".[dev,test]"]
+        if in_container:
+            typer.echo("Installing with --system flag for container...")
+            install_cmd.insert(3, "--system")
         try:
-            # Use Make command which handles dependency installation if needed
+            # Suppress output unless error
             result = subprocess.run(
-                ["make", "test"], check=True, capture_output=True, text=True
+                install_cmd, check=True, capture_output=True, text=True
             )
-            typer.echo(result.stdout)
-            typer.echo("✅ Tests complete!")
+            typer.echo("✅ Test dependencies installed.")
+            pytest_exec = shutil.which("pytest")  # Update path after installation
+            if not pytest_exec:
+                typer.echo(
+                    "❌ Pytest still not found after installing dependencies.", err=True
+                )
+                raise typer.Exit(code=1)
         except subprocess.CalledProcessError as e:
-            if in_container:
-                # If in container and make failed, try direct command
-                typer.echo("Make command failed, trying direct command...")
-                try:
-                    subprocess.run(["pytest"], check=True)
-                    typer.echo("✅ Tests complete!")
-                    return
-                except subprocess.CalledProcessError:
-                    pass
-            # If we get here, both approaches failed
-            typer.echo(f"❌ Tests failed:\n{e.stdout}\n{e.stderr}", err=True)
+            typer.echo(f"❌ Failed to install test dependencies: {e.stderr}", err=True)
             raise typer.Exit(code=1)
-    else:
-        # Fallback to direct commands if Make is not available
-        try:
-            # Install test dependencies if not in container (container should have them)
-            if not in_container:
-                typer.echo("Installing test dependencies...")
-                subprocess.run(
-                    ["uv", "pip", "install", "-e", ".[dev,test]"],
-                    check=True,
-                    capture_output=True,
-                )
-            else:
-                # In container, use --system flag to avoid venv issues
-                typer.echo("Installing test dependencies with system flag...")
-                subprocess.run(
-                    ["uv", "pip", "install", "--system", "-e", ".[dev,test]"],
-                    check=True,
-                    capture_output=True,
-                )
 
-            # Run pytest
-            typer.echo("Running pytest...")
-            subprocess.run(["pytest"], check=True)
+    # Run pytest
+    typer.echo(f"Running pytest (using {pytest_exec})...")
+    try:
+        # Use subprocess.run to capture output properly
+        result = subprocess.run([pytest_exec], capture_output=True, text=True)
 
-            typer.echo("✅ Tests complete!")
-        except subprocess.CalledProcessError:
+        # Print stdout/stderr
+        if result.stdout:
+            typer.echo(result.stdout)
+        if result.stderr:
+            # Pytest often uses stderr for test summary, print it unless it's empty
+            typer.echo(result.stderr, err=True)
+
+        # Check return code for success/failure
+        if result.returncode != 0:
             typer.echo("❌ Tests failed!", err=True)
             raise typer.Exit(code=1)
+        else:
+            typer.echo("✅ Tests complete!")
+
+    except FileNotFoundError:
+        # This case should ideally be caught by the initial check, but good to have
+        typer.echo(
+            "❌ Command 'pytest' not found. Installation might have failed.", err=True
+        )
+        raise typer.Exit(code=1)
+    except Exception as e:
+        typer.echo(f"❌ An unexpected error occurred during testing: {e}", err=True)
+        raise typer.Exit(code=1)
 
 
 @app.command()

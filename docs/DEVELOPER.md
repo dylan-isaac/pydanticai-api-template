@@ -15,18 +15,21 @@ This provides the most seamless experience:
    - A [Nerd Font](https://www.nerdfonts.com/) for terminal icons (optional but recommended)
 
 2. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/pydanticai-api-template.git
    cd pydanticai-api-template
    ```
 
 3. Open in VS Code/Cursor:
+
    ```bash
    code .  # Or open using the editor's UI
    ```
 
 4. When prompted, click "Reopen in Container" or use the Command Palette:
-   ```
+
+   ```text
    Dev Containers: Reopen in Container
    ```
 
@@ -42,8 +45,8 @@ Once the dev container is running:
    - Use VS Code's tasks menu
 
 2. **Access the API:**
-   - API documentation: http://localhost:8000/docs
-   - ReDoc: http://localhost:8000/redoc
+   - API documentation: <http://localhost:8000/docs>
+   - ReDoc: <http://localhost:8000/redoc>
 
 3. **Run common tasks:**
    - `lint` - Check code quality
@@ -67,7 +70,7 @@ Once the dev container is running:
 
 Create a `.env` file in the project root to store your API keys and other configuration:
 
-```
+```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_claude_api_key_here
 # Add other environment variables as needed (e.g., LOGFIRE_TOKEN)
@@ -77,7 +80,7 @@ The application will load these variables automatically at runtime. Note that th
 
 ## Project Structure
 
-```
+```text
 src/
 └── pydanticai_api_template/    # Main Python package
     ├── __init__.py             # Package marker, exports version
@@ -141,33 +144,35 @@ This project includes tools to streamline AI-assisted development workflows.
 - **Purpose**: Easily bundle files or directories into a single text block for pasting into AI chat prompts, providing necessary context.
 - **Integration**: The [Repomix Runner VS Code extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner) is automatically installed when you open this project in the Dev Container.
 - **Usage**:
-    - Open the **REPOMIX** custom view in the VS Code sidebar.
-    - Select files or folders in the Explorer.
-    - Click "Run Repomix on selection" in the REPOMIX view.
-    - The bundled content will be copied to your clipboard, ready to be pasted into your AI assistant (like Cursor).
-    - You can also create and manage reusable bundles for commonly referenced parts of the codebase.
+  - Open the **REPOMIX** custom view in the VS Code sidebar.
+  - Select files or folders in the Explorer.
+  - Click "Run Repomix on selection" in the REPOMIX view.
+  - The bundled content will be copied to your clipboard, ready to be pasted into your AI assistant (like Cursor).
+  - You can also create and manage reusable bundles for commonly referenced parts of the codebase.
 
 ### Repomix CLI Tool
 
 - **Purpose**: Generate a comprehensive text representation of your project or specific parts of it, suitable for providing context to Large Language Models (LLMs).
 - **Installation**: The `repomix` CLI tool is installed globally within the dev container via the `Dockerfile`.
 - **Basic Usage**:
-    - Open the integrated terminal in VS Code/Cursor (`Terminal > New Terminal`).
-    - Navigate to the project root directory (`cd /app` if not already there).
-    - Run the command:
+  - Open the integrated terminal in VS Code/Cursor (`Terminal > New Terminal`).
+  - Navigate to the project root directory (`cd /app` if not already there).
+  - Run the command:
+
       ```bash
       repomix
       ```
-    - By default, this command reads `.gitignore` and `.repomixignore` (if present) to exclude files and generates an output file named `repomix_output.txt` in the current directory.
-    - This output file contains the bundled code and project structure, which you can then copy and paste into your AI assistant.
+
+  - By default, this command reads `.gitignore` and `.repomixignore` (if present) to exclude files and generates an output file named `repomix_output.txt` in the current directory.
+  - This output file contains the bundled code and project structure, which you can then copy and paste into your AI assistant.
 - **Common Options**:
-    - **Specify output file**: `repomix -o custom_output.md`
-    - **Specify input directory/files**: `repomix src/ tests/` (bundles only `src/` and `tests/`)
-    - **Include specific patterns**: `repomix -p "src/**/*.py" -p "*.md"` (uses glob patterns)
-    - **Ignore additional patterns**: `repomix -i "**/__pycache__" -i "*.log"`
-    - **Copy to clipboard instead of file**: `repomix -c`
-    - **Use a specific configuration file**: `repomix --config path/to/repomix.config.json`
-    - **See all options**: `repomix --help`
+  - **Specify output file**: `repomix -o custom_output.md`
+  - **Specify input directory/files**: `repomix src/ tests/` (bundles only `src/` and `tests/`)
+  - **Include specific patterns**: `repomix -p "src/**/*.py" -p "*.md"` (uses glob patterns)
+  - **Ignore additional patterns**: `repomix -i "**/__pycache__" -i "*.log"`
+  - **Copy to clipboard instead of file**: `repomix -c`
+  - **Use a specific configuration file**: `repomix --config path/to/repomix.config.json`
+  - **See all options**: `repomix --help`
 - **Sane Defaults & Configuration**: Repomix uses sensible defaults (like ignoring `node_modules`, `.git`, etc.). You can customize behavior further by creating a `repomix.config.json` file in the project root. See the official [Repomix documentation](https://github.com/yamadashy/repomix?tab=readme-ov-file#configuration) for details.
 - **When to Use**: Use the CLI when you need more control over the bundling process than the VS Code extension provides, such as specifying complex include/exclude patterns, using configuration files, or integrating repomix into scripts.
 
