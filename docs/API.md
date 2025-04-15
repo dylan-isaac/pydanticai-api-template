@@ -11,7 +11,27 @@ All API endpoints are relative to the base URL:
 
 ## Authentication
 
-Currently, no authentication is required for API endpoints in development. In production, you should implement appropriate authentication mechanisms.
+The API uses API key authentication to protect endpoints. Include your API key in the `X-API-Key` header with each request:
+
+```http
+X-API-Key: your_api_key_here
+```
+
+### Generating an API Key
+
+Use the CLI tool to generate a secure API key:
+
+```bash
+pat generate-api-key
+```
+
+This will generate a random API key with the format `pydanticai_<random_hex>`. Add this key to your `.env` file:
+
+```
+PYDANTICAI_API_KEY="your_generated_key"
+```
+
+If no API key is set in the environment, authentication will be skipped with a warning in the logs (suitable for development, but not recommended for production).
 
 ## Endpoints
 
@@ -86,6 +106,7 @@ The API uses standard HTTP status codes to indicate the success or failure of a 
 ### Common Error Codes
 
 - **400 Bad Request**: Invalid request format
+- **401 Unauthorized**: Invalid or missing API key
 - **500 Internal Server Error**: Server-side error
 - **502 Bad Gateway**: Error communicating with LLM provider
 - **503 Service Unavailable**: AI service is not available (e.g., missing API key)
@@ -126,10 +147,10 @@ The project includes an MCP (Model Context Protocol) server that allows AI agent
 
 ### Available Tools
 
-| Tool Name | Description | Parameters |
-|-----------|-------------|------------|
-| `chat` | Chat with the AI assistant | `message`: The message to send to the assistant |
-| `story` | Generate a story idea | `message`: The input to guide story generation (e.g., genre, theme) |
+| Tool Name | Description                | Parameters                                                          |
+| --------- | -------------------------- | ------------------------------------------------------------------- |
+| `chat`    | Chat with the AI assistant | `message`: The message to send to the assistant                     |
+| `story`   | Generate a story idea      | `message`: The input to guide story generation (e.g., genre, theme) |
 
 ### Example Usage
 

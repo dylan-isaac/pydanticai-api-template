@@ -1,13 +1,14 @@
 import importlib.metadata
 import importlib.util
 import os
+import secrets
 import sys
 from pathlib import Path
 from typing import Optional
 
 import typer
 import uvicorn
-import yaml  # Moved import to top level
+import yaml
 
 # Get the project name from pyproject.toml or define it
 PROJECT_NAME = "pydanticai-api-template"
@@ -664,6 +665,44 @@ def setup_logfire() -> None:
     except subprocess.CalledProcessError as e:
         typer.echo(f"❌ Error setting up Logfire: {e}", err=True)
         raise typer.Exit(code=1)
+
+
+@app.command()
+def generate_api_key() -> None:
+    """Generate a secure API key for use with the PydanticAI API.
+
+    This command generates a random, secure API key that can be used
+    to authenticate requests to the PydanticAI API endpoints (e.g., /chat).
+
+    Copy the generated key and add it to your .env file:
+    PYDANTICAI_API_KEY="generated_key_here"
+    """
+    # Generate a secure random key with a prefix for clarity
+    key_bytes = secrets.token_bytes(16)  # 128 bits of randomness
+    key_hex = key_bytes.hex()
+    api_key = f"pydanticai_{key_hex}"
+
+    # Display the key with instructions
+    typer.echo("✅ Generated new API key:\n")
+    typer.echo(api_key)
+    typer.echo("\n📋 Add this key to your .env file as follows:")
+    typer.echo(f'PYDANTICAI_API_KEY="{api_key}"')
+
+    # Optional help for those who might need it
+    typer.echo("\n💡 For local development:")
+    typer.echo("1. Open your .env file in the project root")
+    typer.echo("2. Add or replace the PYDANTICAI_API_KEY line with the above value")
+    typer.echo(
+        "3. Save the file. If the server is running with auto-reload, it will "
+        "pick up the change automatically"
+    )
+
+    typer.echo("\n🌐 For cloud deployment:")
+    typer.echo("1. Store this key in a secure secrets manager")
+    typer.echo(
+        "2. Update your environment configuration to inject the secret into the "
+        "container environment"
+    )
 
 
 if __name__ == "__main__":

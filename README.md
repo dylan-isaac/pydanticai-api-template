@@ -219,4 +219,27 @@ Create a `.env` file in the project root with your API keys:
 ```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_claude_api_key_here
+PYDANTICAI_API_KEY=your_api_key_here  # For API authentication
 ```
+
+### API Authentication
+
+The API endpoints are protected with API key authentication. To generate a secure API key:
+
+```bash
+# Run the API key generation command
+pat generate-api-key
+```
+
+This will generate a secure random key that you can add to your `.env` file as `PYDANTICAI_API_KEY`.
+
+When making requests to protected endpoints like `/chat` or `/story`, include the API key in the `X-API-Key` header:
+
+```bash
+curl -X POST "http://localhost:8000/chat" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your_api_key_here" \
+  -d '{"message":"Tell me a joke"}'
+```
+
+If no API key is set in the environment, authentication will be skipped (with a warning in the logs).

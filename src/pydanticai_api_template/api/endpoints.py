@@ -11,8 +11,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import logfire
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import APIKeyHeader
 from pydantic_ai import Agent
 
 from pydanticai_api_template.api.models import (
@@ -40,12 +41,43 @@ logger = logging.getLogger(__name__)
 
 # --- Configuration ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+PYDANTICAI_API_KEY = os.getenv("PYDANTICAI_API_KEY")
 
 if not OPENAI_API_KEY:
     logger.warning(
         "OPENAI_API_KEY environment variable not set (or not found in .env). "
         "The /chat endpoint will not work."
     )
+
+# --- API Key Authentication ---
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+async def verify_api_key(api_key: str = Depends(api_key_header)) -> bool:
+    """Verify the API key for protected endpoints.
+
+    Returns True if the key is valid, raises HTTPException if not.
+    When no API key is set in the environment, authentication is skipped (with warning).
+    """
+    if not PYDANTICAI_API_KEY:
+        # Skip auth if no key is set (with warning)
+        logger.warning(
+            "API key validation skipped - no PYDANTICAI_API_KEY set in environment"
+        )
+        return True
+
+    if api_key != PYDANTICAI_API_KEY:
+        # If API key doesn't match, raise 401 Unauthorized
+        logger.warning("Invalid API key provided")
+        raise HTTPException(
+            status_code=401,
+            detail=(
+                "Invalid API key. Please provide a valid key in the X-API-Key header."
+            ),
+        )
+
+    return True
+
 
 # --- Pydantic Models ---
 # Models moved to src/pydanticai_api_template/api/models.py
@@ -132,7 +164,9 @@ async def read_root() -> Dict[str, str]:
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
+async def chat_with_agent(
+    chat_message: ChatMessage, authorized: bool = Depends(verify_api_key)
+) -> ChatResponse:
     """Endpoint to chat with the PydanticAI agent."""
     # Use logfire for structured logging with context
     with logfire.span(
@@ -217,7 +251,9 @@ async def chat_with_agent(chat_message: ChatMessage) -> ChatResponse:
 
 
 @app.post("/story", response_model=StoryIdea)
-async def generate_story_idea(chat_message: ChatMessage) -> StoryIdea:
+async def generate_story_idea(
+    chat_message: ChatMessage, authorized: bool = Depends(verify_api_key)
+) -> StoryIdea:
     """Endpoint to generate a story idea with title and premise."""
     # Use logfire for structured logging with context
     with logfire.span(
