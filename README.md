@@ -28,12 +28,12 @@ The development environment uses modern CLI tools like `eza` with icons enabled 
 
 **Note:** If you see boxes (`□`) or missing icons in the terminal after rebuilding the container, it likely means the font name specified in `.devcontainer/devcontainer.json` doesn't exactly match a Nerd Font installed and recognized on your host system. Double-check the font name in your OS font manager and the `devcontainer.json` setting.
 
-2. **Open in Dev Container**:
+1. **Open in Dev Container**:
    - Clone this repository
    - Open in VS Code/Cursor
    - Click "Reopen in Container" when prompted
 
-3. **Start Development**:
+2. **Start Development**:
    - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux)
    - Visit <http://localhost:8000/docs> for API documentation
    - For the MCP server: `pat run-mcp` (accessible at <http://localhost:3001>)
