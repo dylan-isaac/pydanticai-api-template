@@ -148,3 +148,33 @@ The project includes an MCP (Model Context Protocol) server that exposes AI func
   - `ANTHROPIC_API_KEY`: For Claude model access.
 
 ## Maintenance
+
+Maintaining the project involves several key areas to ensure consistency, security, and optimal performance. Key maintenance activities include:
+
+- **Dependency Management**: Use `uv` to manage Python dependencies in `pyproject.toml`.
+- **Configuration Synchronization**: Run `make sync-configs` to update related configuration files (e.g., pre-commit hooks, VS Code tasks) after changes to `pyproject.toml` or CLI commands.
+- **Docker Images**: Rebuild Docker images (`docker compose build`) after adding dependencies or modifying Dockerfiles.
+- **CLI Updates**: Keep the `Makefile`, `README.md`, and potentially VS Code tasks (`.vscode/tasks.json` - though often handled by `make sync-configs`) synchronized with changes in `src/pydanticai_api_template/cli.py`.
+- **Core Dependency Upgrades**: Follow a careful process when upgrading major dependencies like Python, FastAPI, or PydanticAI, including reviewing changelogs and thorough testing.
+
+For detailed procedures on these and other maintenance tasks, such as managing the wishlist, updating VS Code settings, and modifying linting rules, refer to the [Project Maintenance Guide](./MAINTENANCE.md).
+
+## Framework Interactions and Workarounds
+
+### FastAPI and Pydantic
+
+FastAPI leverages Pydantic extensively for request/response validation and serialization. Define clear Pydantic models in `api/models.py` for robust API contracts.
+
+### PydanticAI and LLMs
+
+PydanticAI agents use Pydantic models (`agents/` or `models/`) to structure prompts and parse LLM responses, ensuring predictable outputs.
+
+### FastMCP Tool Parameter Types
+
+We encountered an issue where the FastMCP framework had difficulty registering tool parameters defined with complex optional types like `Optional[Dict[str, Any]]` or even `Optional[str]`, resulting in "type undefined" errors even after server restarts.
+
+The successful workaround was to define the problematic parameter (`config` in the MCP tool) as a **non-optional dictionary with a default empty value**: `config: Dict[str, Any] = {}`.
+
+Inside the tool function, we check if the received `config` dictionary is non-empty before attempting to parse it into the corresponding Pydantic model (`LinterConfig`). If the client doesn't provide the `config` parameter in the tool call, it correctly defaults to the empty dictionary `{}`.
+
+This approach satisfies the framework's apparent requirement for simpler, non-optional type hints in the tool signature while still allowing optional configuration data to be passed and validated internally using Pydantic.

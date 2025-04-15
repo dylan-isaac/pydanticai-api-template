@@ -68,6 +68,10 @@ This README provides a high-level overview. For detailed information, refer to:
 - **Cursor Rules**: Smart AI-assisted development with contextual reminders
 - **Repomix Runner**: Easily bundle project files for providing context to AI assistants ([VS Code Extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner))
 
+## Project Maintenance
+
+Maintaining this project involves keeping dependencies up-to-date, synchronizing configuration files, and managing Docker environments. For detailed instructions on managing dependencies, CLI commands, Docker configurations, and more, please refer to the [Project Maintenance Guide](./docs/MAINTENANCE.md).
+
 ## AI-Assisted Development with Cursor
 
 This project includes custom [Cursor Rules](./docs/CURSOR_RULES.md) to enhance your

@@ -18,6 +18,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "typing-extensions>=4.7.0",
     "logfire>=0.16.0",
+    "httpx>=0.24.1",
 ]
 
 [project.optional-dependencies]
@@ -32,12 +33,7 @@ dev = [
     "pytest>=8.0.0",
     "types-PyYAML>=6.0",
 ]
-test = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "httpx>=0.24.1",
-    "pytest-asyncio>=0.23.0",
-]
+test = ["pytest>=7.4.0", "pytest-cov>=4.1.0", "pytest-asyncio>=0.23.0"]
 
 [project.scripts]
 pat = "pydanticai_api_template.cli:app"
