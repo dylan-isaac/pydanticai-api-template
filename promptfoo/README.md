@@ -5,11 +5,13 @@ This directory contains the [PromptFoo](https://promptfoo.dev/) configuration fo
 ## Setup
 
 1. Make sure you have the development dependencies installed:
+
    ```bash
    uv pip install -e ".[dev]"
    ```
 
 2. Set up environment variables for API keys:
+
    ```bash
    # Copy and edit the .env file
    cp .env.example .env
