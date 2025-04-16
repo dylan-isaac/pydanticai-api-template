@@ -31,18 +31,18 @@ docker-build:
 	docker compose build
 
 docker-up:
-	docker compose up pydanticai-api-template-dev
+	docker compose up {{ cookiecutter.project_slug }}-dev
 
 docker-down:
 	docker compose down
 
 # Enter container shell
 docker-shell:
-	docker compose exec pydanticai-api-template-dev zsh
+	docker compose exec {{ cookiecutter.project_slug }}-dev zsh
 
 # Configuration management
 # Use this when you:
-# 1. Add/change CLI commands in src/pydanticai_api_template/cli.py (updates VS Code tasks)
+# 1. Add/change CLI commands in src/{{ cookiecutter.project_slug }}/cli.py (updates VS Code tasks)
 # 2. Update development tool versions in pyproject.toml (syncs pre-commit hooks)
 sync-configs:
 	if [ -f "/.dockerenv" ]; then \
@@ -52,7 +52,7 @@ sync-configs:
 
 # View logs for the development container
 logs:
-	docker compose logs -f pydanticai-api-template-dev
+	docker compose logs -f {{ cookiecutter.project_slug }}-dev
 
 # Complete setup command (for new developers, primarily outside Dev Containers)
 setup: install docker-build shell-completion validate
@@ -62,7 +62,7 @@ setup: install docker-build shell-completion validate
 
 install-completion:
 	@echo "Installing shell completion..."
-	@python -m $(PROJECT_NAME).cli install-completion
+	@python -m {{ cookiecutter.project_slug }}.cli install-completion
 
 rules:
 	@echo "Processing temporary rule files..."

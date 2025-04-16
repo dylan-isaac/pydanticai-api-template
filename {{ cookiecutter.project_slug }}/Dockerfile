@@ -45,13 +45,17 @@ RUN chown -R appuser:appuser /app /usr/local/lib/python3.12/site-packages
 USER appuser
 WORKDIR /app
 
-# Set default environment variables for Logfire
+# Set default environment variables for Logfire (Static - remove if Logfire unused)
 ENV LOGFIRE_ENABLED="true"
 ENV ENVIRONMENT="production"
 
-# Expose the port the app runs on
+# Expose ports (Static - remove MCP port if unused)
+# Default API Port: {{ cookiecutter.default_port }}
 EXPOSE 8000
+# Optional MCP Port: {% if cookiecutter.use_mcp_server == 'y' %}{{ cookiecutter.mcp_server_port }}{% else %}Not Used{% endif %}
+EXPOSE 3001
 
 # Command to run the application using the CLI entry point defined in pyproject.toml
 # Ensures it runs as the non-root user
-CMD ["pat", "run", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--log-level", "info"] # Use CLI command
+# Using 'pat' as the static CLI command name defined in cli.py
+CMD ["pat", "run", "--host", "0.0.0.0", "--port", "{{ cookiecutter.default_port }}", "--workers", "1", "--log-level", "info"]

@@ -1,0 +1,6 @@
+{% if cookiecutter.open_source_license != 'None' %}
+{% include 'licenses/' + cookiecutter.open_source_license %}
+{% else %}
+# No license selected during project generation.
+# Add your license text here or remove this file if Licensing is not applicable.
+{% endif %}

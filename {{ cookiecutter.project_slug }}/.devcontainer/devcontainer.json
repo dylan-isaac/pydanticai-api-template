@@ -1,16 +1,16 @@
 {
-    "name": "PydanticAI API Template Dev Container",
+    "name": "{{ cookiecutter.project_name }} Dev Container",
     "dockerComposeFile": [
         "../docker-compose.yml"
     ],
-    "service": "pydanticai-api-template-dev",
+    "service": "{{ cookiecutter.project_slug }}-dev",
     "workspaceFolder": "/app",
     "forwardPorts": [
-        8000,
-        3001
+        8000, // {{ cookiecutter.default_port }}
+        3001  // {% if cookiecutter.use_mcp_server == 'y' %}{{ cookiecutter.mcp_server_port }}{% else %}Optional MCP Port{% endif %}
     ],
     "runServices": [
-        "pydanticai-api-template-dev"
+        "{{ cookiecutter.project_slug }}-dev"
     ],
     "shutdownAction": "stopCompose",
     "customizations": {

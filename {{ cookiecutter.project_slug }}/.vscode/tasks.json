@@ -1,0 +1,108 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Open Host Terminal (Outside Container)",
+            "type": "shell",
+            "command": "${command:workbench.action.terminal.openNativeConsole}",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never"
+            },
+            "detail": "Opens a terminal on the host system outside the dev container."
+        },
+        {
+            "label": "Setup Logfire",
+            "type": "shell",
+            "command": "pat setup-logfire",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": false
+            },
+            "detail": "Authenticates with Logfire. Run only if Logfire is enabled."
+        },
+        {
+            "label": "Run MCP Server",
+            "type": "shell",
+            "command": "pat run-mcp",
+            "problemMatcher": [],
+            "detail": "Runs the MCP (Model Context Protocol) server. Run only if MCP server is enabled.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            }
+        },
+        {
+            "label": "Run All Servers (Default Build Task)",
+            "dependsOn": [
+                "Setup Logfire",
+                "Run Dev Server (API)",
+                "Run MCP Server"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Launches the API server and potentially MCP server/Logfire setup."
+        },
+        {
+            "label": "Run Dev Server (API)",
+            "type": "shell",
+            "command": "pat run --reload",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Runs the FastAPI server with hot reload using the CLI.",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            }
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "make lint",
+            "group": "test",
+            "problemMatcher": [
+                "$ruff"
+            ],
+            "detail": "Runs Ruff linter and formatter checks using Make."
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "make test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Runs pytest using Make."
+        },
+        {
+            "label": "Validate",
+            "type": "shell",
+            "command": "pat validate",
+            "problemMatcher": [],
+            "detail": "Runs the CLI validation command."
+        },
+        {
+            "label": "Cleanup",
+            "type": "shell",
+            "command": "pat cleanup",
+            "problemMatcher": [],
+            "detail": "Runs the CLI cleanup command."
+        },
+        {
+            "label": "Sync Configs",
+            "type": "shell",
+            "command": "make sync-configs",
+            "problemMatcher": [],
+            "detail": "Runs the configuration synchronization script."
+        }
+    ]
+}

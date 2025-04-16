@@ -1,6 +1,6 @@
-# PydanticAI API Template
+# {{ cookiecutter.project_name }}
 
-A modern Python project template for building AI-powered APIs with PydanticAI, FastAPI, and Docker.
+{{ cookiecutter.description }}
 
 ## Quick Start (Recommended)
 
@@ -35,8 +35,8 @@ The development environment uses modern CLI tools like `eza` with icons enabled 
 
 2. **Start Development**:
    - Inside the container, run `start` or press `Cmd+Shift+B` (macOS) / `Ctrl+Shift+B` (Windows/Linux)
-   - Visit <http://localhost:8000/docs> for API documentation
-   - For the MCP server: `pat run-mcp` (accessible at <http://localhost:3001>)
+   - Visit <http://localhost:{{ cookiecutter.default_port }}/docs> for API documentation
+{% if cookiecutter.use_mcp_server == 'y' %}   - For the MCP server: `pat run-mcp` (accessible at <http://localhost:{{ cookiecutter.mcp_server_port }}>){% endif %}
 
 ## Documentation Map
 
@@ -51,7 +51,7 @@ This README provides a high-level overview. For detailed information, refer to:
 | [API Reference](./docs/API.md)               | API endpoints, parameters, and response formats         |
 | [Testing Guide](./docs/TESTING.md)           | Testing strategies and examples                         |
 | [Maintenance](./docs/MAINTENANCE.md)         | Configuration management and project maintenance        |
-| [Observability](./docs/OBSERVABILITY.md)     | Logging, tracing, and monitoring with Logfire           |
+{% if cookiecutter.use_logfire == 'y' %}| [Observability](./docs/OBSERVABILITY.md)     | Logging, tracing, and monitoring with Logfire           |{% endif %}
 | [Cursor Rules](./docs/CURSOR_RULES.md)       | AI-assisted development with Cursor                     |
 | [Wishlist](./wishlist/)                      | Future improvements and feature ideas                   |
 
@@ -59,12 +59,12 @@ This README provides a high-level overview. For detailed information, refer to:
 
 - **PydanticAI**: Structured interactions with LLMs using Pydantic models
 - **FastAPI**: High-performance API framework with automatic docs
-- **MCP Server**: Model Context Protocol server for AI agent access
+{% if cookiecutter.use_mcp_server == 'y' %}- **MCP Server**: Model Context Protocol server for AI agent access{% endif %}
 - **Type Safety**: End-to-end type checking with mypy and Pydantic
 - **Docker**: Containerization for consistent development and deployment
 - **Modern Tooling**: Ruff, MyPy, UV package manager, and more
 - **Prompt Testing**: Automated testing for LLM prompts with CI/CD integration
-- **Observability**: Complete visibility with Logfire integration
+{% if cookiecutter.use_logfire == 'y' %}- **Observability**: Complete visibility with Logfire integration{% endif %}
 - **Cursor Rules**: Smart AI-assisted development with contextual reminders
 - **Repomix Runner**: Easily bundle project files for providing context to AI assistants ([VS Code Extension](https://marketplace.cursorapi.com/items?itemName=DorianMassoulier.repomix-runner))
 
@@ -115,11 +115,11 @@ This ensures the files are correctly formatted and placed without potential conf
 ├── docs/            # Detailed documentation
 ├── promptfoo/       # Prompt testing configuration
 ├── src/             # Source code
-│   └── pydanticai_api_template/
+│   └── {{ cookiecutter.project_slug }}/
 │       ├── api/     # FastAPI routes and endpoints
 │       ├── agents/  # PydanticAI agent definitions
 │       ├── models/  # Pydantic data models
-│       ├── mcp/     # MCP server implementation
+{% if cookiecutter.use_mcp_server == 'y' %}│       ├── mcp/     # MCP server implementation{% endif %}
 │       └── cli.py   # Command-line interface
 ├── tests/           # Test suite
 ├── wishlist/        # Future improvements and feature ideas
@@ -148,7 +148,7 @@ result = await story_agent.run("Give me a sci-fi story idea")
 You can generate story ideas using the `/story` endpoint:
 
 ```bash
-cURL -X POST "http://localhost:8000/story" \\
+cURL -X POST "http://localhost:{{ cookiecutter.default_port }}/story" \\
   -H "Content-Type: application/json" \\
   -d '{"message":"Give me a sci-fi story about time travel"}'
 ```
@@ -162,6 +162,7 @@ Response:
 }
 ```
 
+{% if cookiecutter.use_mcp_server == 'y' %}
 ### MCP Server Connection
 
 Connect any MCP-compatible client to access tools:
@@ -170,9 +171,10 @@ Connect any MCP-compatible client to access tools:
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerHTTP
 
-server = MCPServerHTTP(url='http://localhost:3001/sse')
+server = MCPServerHTTP(url='http://localhost:{{ cookiecutter.mcp_server_port }}/sse')
 agent = Agent('openai:gpt-4o', mcp_servers=[server])
 ```
+{% endif %}
 
 ## Wishlist
 
@@ -188,6 +190,7 @@ Current wishlist items:
 
 To contribute to the wishlist, add markdown files to the `wishlist/` directory with detailed descriptions of proposed features or improvements.
 
+{% if cookiecutter.use_logfire == 'y' %}
 ## Observability with Logfire
 
 This template comes with built-in observability powered by Logfire. Key features include:
@@ -215,6 +218,7 @@ LOGFIRE_ENABLED="true"
 ```
 
 For detailed instructions, see [Observability](./docs/OBSERVABILITY.md).
+{% endif %}
 
 ## Environment Setup
 
@@ -223,7 +227,7 @@ Create a `.env` file in the project root with your API keys:
 ```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_claude_api_key_here
-PYDANTICAI_API_KEY=your_api_key_here  # For API authentication
+{{ cookiecutter.api_key_env_var }}=your_api_key_here  # For API authentication
 ```
 
 ### API Authentication
@@ -235,12 +239,12 @@ The API endpoints are protected with API key authentication. To generate a secur
 pat generate-api-key
 ```
 
-This will generate a secure random key that you can add to your `.env` file as `PYDANTICAI_API_KEY`.
+This will generate a secure random key that you can add to your `.env` file as `{{ cookiecutter.api_key_env_var }}`.
 
 When making requests to protected endpoints like `/chat` or `/story`, include the API key in the `X-API-Key` header:
 
 ```bash
-curl -X POST "http://localhost:8000/chat" \
+curl -X POST "http://localhost:{{ cookiecutter.default_port }}/chat" \
   -H "Content-Type: application/json" \
   -H "X-API-Key: your_api_key_here" \
   -d '{"message":"Tell me a joke"}'

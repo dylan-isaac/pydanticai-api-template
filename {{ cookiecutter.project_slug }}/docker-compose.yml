@@ -1,8 +1,8 @@
-name: pydanticai-api-template
+name: "{{ cookiecutter.repo_name }}"
 
 services:
   # Development service with hot reload
-  pydanticai-api-template-dev:
+  "{{ cookiecutter.project_slug }}-dev":
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -42,7 +42,7 @@ services:
     command: ["tail", "-f", "/dev/null"]
 
   # Production-like service (without hot reload or dev tools)
-  pydanticai-api-template:
+  "{{ cookiecutter.project_slug }}":
     build:
       context: .
       # Uses the production Dockerfile by default
@@ -59,7 +59,7 @@ services:
     restart: unless-stopped # Restart policy for production-like scenarios
     healthcheck:
       # Same health check as the development service
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      test: ["CMD", "curl", "-f", "http://localhost:{{ cookiecutter.default_port }}/docs"]
       interval: 30s
       timeout: 10s
       retries: 3

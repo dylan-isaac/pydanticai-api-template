@@ -1,23 +1,24 @@
 [project]
-name = "pydanticai-api-template"
+name = "{{ cookiecutter.project_slug }}"
 version = "0.1.0"
-description = "A template for building FastAPI applications with PydanticAI."
+description = "{{ cookiecutter.description }}"
 readme = "README.md"
+authors = [{ name = "{{ cookiecutter.author_name }}", email = "{{ cookiecutter.author_email }}" }]
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "pydantic>=2.11.3,<3.0.0",
-    "pydantic-ai[mcp]>=0.0.55",
+    "pydantic-ai{% if cookiecutter.use_mcp_server == 'y' %}[mcp]{% endif %}>=0.0.55",
     "openai>=1.0.0",
     "typer>=0.9.0",
     "rich>=13.5.0",
     "shellingham>=1.5.0",
     "uvicorn==0.29.0",
     "websockets==12.0.0",
-    "mcp>=0.5.0",
+    {% if cookiecutter.use_mcp_server == 'y' %}"mcp>=0.5.0",{% endif %}
     "python-dotenv>=1.1.0",
     "typing-extensions>=4.7.0",
-    "logfire>=0.16.0",
+    {% if cookiecutter.use_logfire == 'y' %}"logfire>=0.16.0",{% endif %}
     "httpx>=0.24.1",
 ]
 
@@ -36,13 +37,13 @@ dev = [
 test = ["pytest>=7.4.0", "pytest-cov>=4.1.0", "pytest-asyncio>=0.23.0"]
 
 [project.scripts]
-pat = "pydanticai_api_template.cli:app"
+pat = "{{ cookiecutter.project_slug }}.cli:app"
 
 [tool.hatch.build]
 artifacts = ["src/**/*.py", "src/**/py.typed"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pydanticai_api_template"]
+packages = ["src/{{ cookiecutter.project_slug }}"]
 
 [tool.ruff]
 line-length = 88
@@ -78,16 +79,18 @@ follow_imports = "skip"
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
-module = "pydanticai_api_template.api.models"
+module = "{{ cookiecutter.project_slug }}.models.*"
 disallow_untyped_decorators = false
 
+{% if cookiecutter.use_logfire == 'y' %}
 [[tool.mypy.overrides]]
 module = "logfire.*"
 ignore_missing_imports = true
+{% endif %}
 
 # Relax decorator checks for tests and CLI due to pytest/typer interaction
 [[tool.mypy.overrides]]
-module = ["tests.*", "pydanticai_api_template.cli"]
+module = ["tests.*", "{{ cookiecutter.project_slug }}.cli"]
 disallow_untyped_decorators = false
 
 [tool.pydantic-mypy]
