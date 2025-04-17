@@ -239,17 +239,29 @@ def lint() -> None:
     commands = [
         ("Ruff check", ["ruff", "check", "."]),
         ("Ruff format check", ["ruff", "format", "--check", "."]),
+        (
+            "Mypy type check",
+            [
+                "env",
+                "MYPYPATH=src",
+                "mypy",
+                "--config-file",
+                "pyproject.toml",
+                "src",
+                "tests",
+            ],
+        ),
         ("Markdownlint", ["markdownlint", "README.md", "docs/"]),
     ]
 
     # Check if tools are available, install dev dependencies if needed
-    required_tools = ["ruff", "markdownlint"]
+    required_tools = ["ruff", "mypy", "markdownlint"]
     missing_tools = [tool for tool in required_tools if not shutil.which(tool)]
 
     if missing_tools:
-        typer.echo(
-            f"Missing tools: {', '.join(missing_tools)}. Installing dev dependencies..."
-        )
+        # Format the message to fit within the line limit
+        tools_list_str = ", ".join(missing_tools)
+        typer.echo(f"Missing tools: {tools_list_str}. Installing dev dependencies...")
         install_cmd = ["uv", "pip", "install", "-e", ".[dev]"]
         if in_container:
             typer.echo("Installing development dependencies with system flag...")

@@ -4,13 +4,11 @@ import sys  # Import sys to configure logging output stream
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Dict, Optional
 
+import logfire
+
 # Load environment variables from .env file BEFORE other imports
 # This ensures they are available when other modules might need them
 from dotenv import load_dotenv
-
-load_dotenv()
-
-import logfire
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader
@@ -26,6 +24,9 @@ from pydanticai_api_template.utils.observability import (
     setup_logfire,
     shutdown_logfire,
 )
+
+load_dotenv()
+
 
 # Initialize LogFire if enabled - MOVED: Now called after app creation
 

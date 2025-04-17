@@ -135,6 +135,64 @@ The Wishlist directory provides a structured way to plan and implement future im
    - Consider dependencies and prerequisites
    - Update or remove items as the project evolves
 
+## Type Safety and mypy Best Practices
+
+**Why is mypy so strict?**
+
+mypy brings static type checking to Python, a dynamic language. This is powerful for catching bugs early and improving maintainability, but it can feel verbose or "picky"—especially when working with dynamic libraries (like Pydantic, FastAPI, or LLM agents) or strict settings (e.g., `no-any-return`).
+
+### Key Principles
+
+- **Type safety at boundaries:** Use precise types for public APIs and at the edges of your system. Limit the use of `Any` to places where you truly can't know the type in advance (e.g., external API responses).
+- **Explicit is better than implicit:** When mypy can't infer a type, use explicit type annotations or `cast()` to clarify your intent.
+- **Contain dynamic code:** Use type-safe adapters or utility functions to convert dynamic results (like LLM outputs) into well-typed objects before returning them from functions.
+- **Balance strictness and productivity:** It's okay to relax strictness (e.g., disable a specific mypy check for a file or function) if the cost of compliance outweighs the benefit. Always document why.
+
+### Practical Tips for Using mypy
+
+- **Use `cast()` at dynamic boundaries:** When you know the runtime type but mypy can't infer it, use `from typing import cast` and wrap your return value:
+
+  ```python
+  from typing import cast, Dict, Any
+  return cast(Dict[str, Any], result)
+  ```
+
+  Add a comment explaining why the cast is safe.
+- **Limit `Any` to the edges:** Avoid propagating `Any` through your codebase. Convert to a concrete type as soon as possible.
+- **Document exceptions:** If you need to use `# type: ignore`, specify the error code and add a comment explaining why.
+- **Relax strictness selectively:** If a check like `no-any-return` causes excessive boilerplate, consider disabling it for that file or function with a clear comment:
+
+  ```python
+  # mypy: disable-error-code=no-any-return
+  ```
+
+- **Test type boundaries:** Write tests for utility functions that convert dynamic data to typed models.
+
+### Example: Type-Safe Adapter
+
+```python
+from typing import cast, Dict, Any
+
+def safe_story_response(result: Any) -> Dict[str, Any]:
+    if isinstance(result, StoryResponse):
+        return result.model_dump()
+    if isinstance(result, dict):
+        return {"error": "Unexpected dict", "data": result}
+    return {"error": "Unknown result type", "data_type": str(type(result))}
+```
+
+### When to Relax mypy Strictness
+
+- When working with highly dynamic code (e.g., LLM outputs, plugin systems)
+- In test code or glue code where type safety is less critical
+- When a strict check causes more friction than value—always document the reason
+
+### Summary
+
+- mypy is a powerful tool for maintainability and reliability, but it requires a balance between strictness and productivity.
+- Use type annotations, `cast`, and utility functions to keep your codebase type-safe and readable.
+- Don't be afraid to relax strictness in well-documented cases where it improves developer experience.
+
 ## AI Development Tools
 
 This project includes tools to streamline AI-assisted development workflows.

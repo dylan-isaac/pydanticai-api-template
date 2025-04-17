@@ -27,7 +27,7 @@ pat generate-api-key
 
 This will generate a random API key with the format `pydanticai_<random_hex>`. Add this key to your `.env` file:
 
-```
+```env
 PYDANTICAI_API_KEY="your_generated_key"
 ```
 

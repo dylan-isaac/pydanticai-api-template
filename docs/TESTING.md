@@ -276,6 +276,19 @@ mypy src/pydanticai_api_template/api/models.py
        return user
    ```
 
+## Type Checking Philosophy and mypy Best Practices
+
+For a detailed discussion of mypy's philosophy, strictness, and best practices for type safety in this project, see:
+
+👉 [Type Safety and mypy Best Practices](./DEVELOPER.md#type-safety-and-mypy-best-practices)
+
+This section covers:
+
+- Why mypy is strict and how to balance strictness with productivity
+- Practical tips for using `cast`, limiting `Any`, and documenting exceptions
+- When and how to relax strictness (with examples)
+- Type-safe adapter patterns for dynamic results
+
 ## Testing Checklist
 
 - [ ] Unit tests for all models

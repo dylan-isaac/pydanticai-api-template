@@ -76,3 +76,49 @@ class StoryIdea(BaseModel):
             }
         }
     }
+
+
+# --- Chat Endpoint Models ---
+
+
+class ChatRequest(BaseModel):
+    """Model for chat request."""
+
+    message: str = Field(..., description="The user's message to the AI assistant.")
+
+    model_config: ClassVar[dict] = {
+        "json_schema_extra": {"example": {"message": "Tell me about PydanticAI"}}
+    }
+
+
+class StoryRequest(BaseModel):
+    """Model for story generation request."""
+
+    message: str = Field(
+        ..., description="The user's prompt for generating a story idea."
+    )
+
+    model_config: ClassVar[dict] = {
+        "json_schema_extra": {
+            "example": {"message": "Give me a sci-fi story about space exploration"}
+        }
+    }
+
+
+class StoryResponse(BaseModel):
+    """Model for story generation response."""
+
+    title: str = Field(..., description="The title of the generated story idea.")
+    premise: str = Field(..., description="The premise of the generated story idea.")
+
+    model_config: ClassVar[dict] = {
+        "json_schema_extra": {
+            "example": {
+                "title": "Quantum Echoes",
+                "premise": (
+                    "A team of scientists accidentally discovers a parallel universe "
+                    "where history took a different turn."
+                ),
+            }
+        }
+    }
