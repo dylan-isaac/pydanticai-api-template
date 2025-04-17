@@ -39,12 +39,8 @@ def test_is_logfire_enabled() -> None:
 
 
 @patch("pydanticai_api_template.utils.observability.logfire")
-@patch(
-    "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
-)
-def test_setup_logfire_disabled(
-    mock_configure: MagicMock, mock_logfire: MagicMock
-) -> None:
+@patch("pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation")
+def test_setup_logfire_disabled(mock_configure: MagicMock, mock_logfire: MagicMock) -> None:
     """Test setup_logfire when LogFire is disabled."""
     # Ensure LogFire is disabled
     os.environ["LOGFIRE_ENABLED"] = "false"
@@ -58,13 +54,9 @@ def test_setup_logfire_disabled(
 
 
 @patch("pydanticai_api_template.utils.observability.logfire")
-@patch(
-    "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
-)
+@patch("pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation")
 @patch("pydanticai_api_template.utils.observability.HAS_PYDANTIC_AI_INTEGRATION", True)
-def test_setup_logfire_enabled(
-    mock_configure: MagicMock, mock_logfire: MagicMock
-) -> None:
+def test_setup_logfire_enabled(mock_configure: MagicMock, mock_logfire: MagicMock) -> None:
     """Test setup_logfire when LogFire is enabled via LOGFIRE_TOKEN."""
     # Enable LogFire and set token
     os.environ["LOGFIRE_ENABLED"] = "true"
@@ -118,13 +110,9 @@ def test_shutdown_logfire_enabled(mock_logfire: MagicMock) -> None:
 
 
 @patch("pydanticai_api_template.utils.observability.logfire")
-@patch(
-    "pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation"
-)
+@patch("pydanticai_api_template.utils.observability.configure_pydantic_ai_instrumentation")
 @patch("pydanticai_api_template.utils.observability.HAS_PYDANTIC_AI_INTEGRATION", True)
-def test_setup_logfire_promptfoo(
-    mock_configure: MagicMock, mock_logfire: MagicMock
-) -> None:
+def test_setup_logfire_promptfoo(mock_configure: MagicMock, mock_logfire: MagicMock) -> None:
     """Test setup_logfire when called from prompt_test command via LOGFIRE_TOKEN."""
     # Enable LogFire and set token
     os.environ["LOGFIRE_ENABLED"] = "true"

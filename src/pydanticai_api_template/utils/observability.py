@@ -62,8 +62,7 @@ def setup_logfire(
     else:
         # If token is not set, log info and return
         logfire.info(
-            "LogFire configuration incomplete. "
-            "Set LOGFIRE_TOKEN environment variable or use 'logfire auth'."
+            "LogFire configuration incomplete. " "Set LOGFIRE_TOKEN environment variable or use 'logfire auth'."
         )
         return
 

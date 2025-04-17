@@ -22,9 +22,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 def run_shell_command(command: str, cwd: Path | None = None) -> None:
     """Run a shell command and print output/errors."""
     try:
-        process = subprocess.run(
-            command, shell=True, check=True, capture_output=True, text=True, cwd=cwd
-        )
+        process = subprocess.run(command, shell=True, check=True, capture_output=True, text=True, cwd=cwd)
         if process.stdout:
             print(f"Output:\n{process.stdout.strip()}")
         if process.stderr:
@@ -119,9 +117,7 @@ def remove_egg_info() -> None:
         else:
             print(".egg-info directories are ignored and none were found.")
     else:
-        print(
-            ".egg-info directories are not specified in .gitignore, skipping removal."
-        )
+        print(".egg-info directories are not specified in .gitignore, skipping removal.")
 
 
 def main() -> None:

@@ -19,18 +19,10 @@ app = typer.Typer(help=f"{PROJECT_NAME} CLI")
 
 @app.command()
 def run(
-    host: str = typer.Option(
-        "0.0.0.0", "--host", "-h", help="Host address to bind the server to."
-    ),
-    port: int = typer.Option(
-        8000, "--port", "-p", help="Port number to bind the server to."
-    ),
-    reload: bool = typer.Option(
-        True, "--reload", help="Enable auto-reload on code changes."
-    ),
-    workers: int = typer.Option(
-        1, "--workers", "-w", help="Number of worker processes."
-    ),
+    host: str = typer.Option("0.0.0.0", "--host", "-h", help="Host address to bind the server to."),
+    port: int = typer.Option(8000, "--port", "-p", help="Port number to bind the server to."),
+    reload: bool = typer.Option(True, "--reload", help="Enable auto-reload on code changes."),
+    workers: int = typer.Option(1, "--workers", "-w", help="Number of worker processes."),
     log_level: str = typer.Option(
         "info",
         "--log-level",
@@ -58,20 +50,14 @@ def version() -> None:
         pkg_version = importlib.metadata.version(PROJECT_NAME)
         typer.echo(f"{PROJECT_NAME} version: {pkg_version}")
     except importlib.metadata.PackageNotFoundError:
-        typer.echo(
-            f"{PROJECT_NAME} version: unknown "
-            "(package not installed or metadata missing?)"
-        )
+        typer.echo(f"{PROJECT_NAME} version: unknown " "(package not installed or metadata missing?)")
 
 
 @app.command()
 def install_completion(
     shell: Optional[str] = typer.Argument(
         None,
-        help=(
-            "The shell to install completion for. "
-            "If not provided, detects the current shell."
-        ),
+        help=("The shell to install completion for. " "If not provided, detects the current shell."),
         show_default=False,  # Don't show default value in help
     ),
 ) -> None:
@@ -149,9 +135,7 @@ def install_completion(
 def validate() -> None:
     """Validate application configuration and environment."""
     typer.echo("🔍 Validating environment...")
-    python_version = (
-        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    )
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     typer.echo(f"✅ Python version: {python_version}")
 
     # Check key dependencies
@@ -161,10 +145,7 @@ def validate() -> None:
             version = importlib.metadata.version(dep)
             typer.echo(f"✅ {dep} version: {version}")
         except importlib.metadata.PackageNotFoundError:
-            typer.echo(
-                f"⚠️ {dep} package not found "
-                "(might be OK if not needed for current task)"
-            )
+            typer.echo(f"⚠️ {dep} package not found " "(might be OK if not needed for current task)")
 
     # Check OpenAI Key (optional)
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -195,27 +176,19 @@ def cleanup() -> None:
 
     try:
         # Dynamically import and run the main function from the cleanup script
-        spec = importlib.util.spec_from_file_location(
-            "cleanup_script", str(cleanup_script_path)
-        )
+        spec = importlib.util.spec_from_file_location("cleanup_script", str(cleanup_script_path))
         if spec and spec.loader:
             cleanup_module = importlib.util.module_from_spec(spec)
-            sys.modules["cleanup_script"] = (
-                cleanup_module  # Add to sys.modules temporarily
-            )
+            sys.modules["cleanup_script"] = cleanup_module  # Add to sys.modules temporarily
             spec.loader.exec_module(cleanup_module)
             if hasattr(cleanup_module, "main"):  # Check if main function exists
                 cleanup_module.main()  # Execute the main function
                 typer.echo("✅ Cleanup complete!")
             else:
-                typer.echo(
-                    f"❌ 'main' function not found in {cleanup_script_path}", err=True
-                )
+                typer.echo(f"❌ 'main' function not found in {cleanup_script_path}", err=True)
                 raise typer.Exit(code=1)
         else:
-            typer.echo(
-                f"❌ Could not load cleanup script from {cleanup_script_path}", err=True
-            )
+            typer.echo(f"❌ Could not load cleanup script from {cleanup_script_path}", err=True)
             raise typer.Exit(code=1)
     except Exception as e:
         typer.echo(f"❌ An error occurred during cleanup: {e}", err=True)
@@ -270,9 +243,7 @@ def lint() -> None:
             typer.echo("Installing development dependencies...")
         try:
             # Run install command, suppress output unless error
-            result = subprocess.run(
-                install_cmd, check=True, capture_output=True, text=True
-            )
+            result = subprocess.run(install_cmd, check=True, capture_output=True, text=True)
             typer.echo("✅ Dev dependencies installed.")
         except subprocess.CalledProcessError as e:
             typer.echo(f"❌ Failed to install dependencies: {e.stderr}", err=True)
@@ -282,8 +253,7 @@ def lint() -> None:
             # Format the error message to fit within the line limit
             tools_str = ", ".join(missing_tools)
             error_msg = (
-                f"❌ Failed to install required tools ({tools_str}) "
-                "even after attempting dependency installation."
+                f"❌ Failed to install required tools ({tools_str}) " "even after attempting dependency installation."
             )
             typer.echo(error_msg, err=True)
             raise typer.Exit(code=1)
@@ -293,9 +263,7 @@ def lint() -> None:
         # Ensure the command executable is available before running
         executable = cmd[0]
         if not shutil.which(executable):
-            typer.echo(
-                f"⚠️ Skipping {name}: Command '{executable}' not found.", err=True
-            )
+            typer.echo(f"⚠️ Skipping {name}: Command '{executable}' not found.", err=True)
             errors_found = True  # Mark as error if a required tool is missing
             continue
 
@@ -318,10 +286,7 @@ def lint() -> None:
 
         except FileNotFoundError:
             # Format the error message to fit within the line limit
-            error_msg = (
-                f"❌ Command '{executable}' not found. "
-                "Please ensure it's installed and in PATH."
-            )
+            error_msg = f"❌ Command '{executable}' not found. " "Please ensure it's installed and in PATH."
             typer.echo(error_msg, err=True)
             errors_found = True
         except Exception as e:
@@ -356,15 +321,11 @@ def test() -> None:
             install_cmd.insert(3, "--system")
         try:
             # Suppress output unless error
-            result = subprocess.run(
-                install_cmd, check=True, capture_output=True, text=True
-            )
+            result = subprocess.run(install_cmd, check=True, capture_output=True, text=True)
             typer.echo("✅ Test dependencies installed.")
             pytest_exec = shutil.which("pytest")  # Update path after installation
             if not pytest_exec:
-                typer.echo(
-                    "❌ Pytest still not found after installing dependencies.", err=True
-                )
+                typer.echo("❌ Pytest still not found after installing dependencies.", err=True)
                 raise typer.Exit(code=1)
         except subprocess.CalledProcessError as e:
             typer.echo(f"❌ Failed to install test dependencies: {e.stderr}", err=True)
@@ -392,9 +353,7 @@ def test() -> None:
 
     except FileNotFoundError:
         # This case should ideally be caught by the initial check, but good to have
-        typer.echo(
-            "❌ Command 'pytest' not found. Installation might have failed.", err=True
-        )
+        typer.echo("❌ Command 'pytest' not found. Installation might have failed.", err=True)
         raise typer.Exit(code=1)
     except Exception as e:
         typer.echo(f"❌ An unexpected error occurred during testing: {e}", err=True)
@@ -406,9 +365,7 @@ def sync() -> None:
     """Synchronize project configuration files."""
     typer.echo("🔄 Synchronizing configuration files...")
     # Updated path to the sync script
-    sync_script_path = (
-        Path(__file__).parent.parent.parent / "scripts" / "tasks" / "update_configs.py"
-    )
+    sync_script_path = Path(__file__).parent.parent.parent / "scripts" / "tasks" / "update_configs.py"
 
     if not sync_script_path.exists():
         typer.echo(f"❌ Sync script not found at: {sync_script_path}", err=True)
@@ -416,9 +373,7 @@ def sync() -> None:
 
     try:
         # Dynamically import and run the main function from the sync script
-        spec = importlib.util.spec_from_file_location(
-            "sync_script", str(sync_script_path)
-        )
+        spec = importlib.util.spec_from_file_location("sync_script", str(sync_script_path))
         if spec and spec.loader:
             sync_module = importlib.util.module_from_spec(spec)
             sys.modules["sync_script"] = sync_module  # Add to sys.modules temporarily
@@ -427,14 +382,10 @@ def sync() -> None:
                 sync_module.main()  # Execute the main function
                 typer.echo("✅ Configuration synchronization complete!")
             else:
-                typer.echo(
-                    f"❌ 'main' function not found in {sync_script_path}", err=True
-                )
+                typer.echo(f"❌ 'main' function not found in {sync_script_path}", err=True)
                 raise typer.Exit(code=1)
         else:
-            typer.echo(
-                f"❌ Could not load sync script from {sync_script_path}", err=True
-            )
+            typer.echo(f"❌ Could not load sync script from {sync_script_path}", err=True)
             raise typer.Exit(code=1)
     except Exception as e:
         typer.echo(f"❌ An error occurred during synchronization: {e}", err=True)
@@ -479,15 +430,9 @@ def check() -> None:
 
 @app.command()
 def run_mcp(
-    host: str = typer.Option(
-        "0.0.0.0", "--host", "-h", help="Host address to bind the MCP server to."
-    ),
-    port: int = typer.Option(
-        3001, "--port", "-p", help="Port number to bind the MCP server to."
-    ),
-    reload: bool = typer.Option(
-        True, "--reload", help="Enable auto-reload on code changes."
-    ),
+    host: str = typer.Option("0.0.0.0", "--host", "-h", help="Host address to bind the MCP server to."),
+    port: int = typer.Option(3001, "--port", "-p", help="Port number to bind the MCP server to."),
+    reload: bool = typer.Option(True, "--reload", help="Enable auto-reload on code changes."),
     log_level: str = typer.Option(
         "info",
         "--log-level",
@@ -526,12 +471,8 @@ def prompt_test(
         "-c",
         help="Path to the promptfoo config file.",
     ),
-    view: bool = typer.Option(
-        False, "--view", "-v", help="Open the web UI after running tests."
-    ),
-    verbose: bool = typer.Option(
-        False, "--verbose", help="Show detailed logs during test execution."
-    ),
+    view: bool = typer.Option(False, "--view", "-v", help="Open the web UI after running tests."),
+    verbose: bool = typer.Option(False, "--verbose", help="Show detailed logs during test execution."),
 ) -> None:
     """Test prompts using promptfoo."""
     import shutil
@@ -584,14 +525,10 @@ def prompt_test(
                 test_cases = config.get("testCases", [])
                 typer.echo(f"  Test Cases: {len(test_cases)} defined")
                 for i, test in enumerate(test_cases):
-                    typer.echo(
-                        f"    {i + 1}. {test.get('description', 'Unnamed test')}"
-                    )
+                    typer.echo(f"    {i + 1}. {test.get('description', 'Unnamed test')}")
                     input_text = test.get("vars", {}).get("input", "None")
                     # Truncate long inputs for display
-                    truncated_input = (
-                        input_text[:50] + "..." if len(input_text) > 50 else input_text
-                    )
+                    truncated_input = input_text[:50] + "..." if len(input_text) > 50 else input_text
                     typer.echo(f"       Input: {truncated_input}")
                     typer.echo(f"       Assertions: {len(test.get('assert', []))}")
                 typer.echo("")
@@ -609,9 +546,7 @@ def prompt_test(
         if "PATH" in env:
             paths = env["PATH"].split(os.pathsep)
             # Filter out paths that might contain pip-installed binaries
-            filtered_paths = [
-                p for p in paths if not (p.endswith("/bin") and "python" in p)
-            ]
+            filtered_paths = [p for p in paths if not (p.endswith("/bin") and "python" in p)]
             # Ensure node path is first
             if node_path not in filtered_paths:
                 filtered_paths.insert(0, node_path)
@@ -657,9 +592,7 @@ def setup_logfire() -> None:
     # Check if logfire is available
     logfire_exec = shutil.which("logfire")
     if not logfire_exec:
-        typer.echo(
-            "❌ logfire command not found. Please ensure it's installed.", err=True
-        )
+        typer.echo("❌ logfire command not found. Please ensure it's installed.", err=True)
         raise typer.Exit(code=1)
 
     try:
@@ -669,9 +602,7 @@ def setup_logfire() -> None:
 
         # Set project to pydantic-ai-template
         typer.echo("🔧 Setting Logfire project to pydantic-ai-template...")
-        subprocess.run(
-            ["logfire", "projects", "use", "pydantic-ai-template"], check=True
-        )
+        subprocess.run(["logfire", "projects", "use", "pydantic-ai-template"], check=True)
 
         typer.echo("✅ Logfire setup complete!")
     except subprocess.CalledProcessError as e:
@@ -705,16 +636,12 @@ def generate_api_key() -> None:
     typer.echo("1. Open your .env file in the project root")
     typer.echo("2. Add or replace the PYDANTICAI_API_KEY line with the above value")
     typer.echo(
-        "3. Save the file. If the server is running with auto-reload, it will "
-        "pick up the change automatically"
+        "3. Save the file. If the server is running with auto-reload, it will " "pick up the change automatically"
     )
 
     typer.echo("\n🌐 For cloud deployment:")
     typer.echo("1. Store this key in a secure secrets manager")
-    typer.echo(
-        "2. Update your environment configuration to inject the secret into the "
-        "container environment"
-    )
+    typer.echo("2. Update your environment configuration to inject the secret into the " "container environment")
 
 
 if __name__ == "__main__":

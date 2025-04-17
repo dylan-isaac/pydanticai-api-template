@@ -7,10 +7,10 @@ from unittest.mock import Mock, patch
 
 # Third-party imports
 import pytest
-from typer.testing import CliRunner
 
 # Local imports
 from pydanticai_api_template.cli import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
@@ -130,15 +130,11 @@ def test_prompt_test_with_verbose(
         mock_yaml.safe_load.return_value = {
             "prompts": [{"id": "test"}],
             "providers": [{"id": "test-provider"}],
-            "testCases": [
-                {"description": "Test case", "vars": {"input": "test"}, "assert": [{}]}
-            ],
+            "testCases": [{"description": "Test case", "vars": {"input": "test"}, "assert": [{}]}],
         }
 
         # Run the command with verbose option
-        result = runner.invoke(
-            app, ["prompt-test", "--config", mock_config_file, "--verbose"]
-        )
+        result = runner.invoke(app, ["prompt-test", "--config", mock_config_file, "--verbose"])
 
     # Verify command executed successfully
     assert result.exit_code == 0

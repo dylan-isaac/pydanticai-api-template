@@ -33,10 +33,7 @@ class ChatResponse(BaseModel):
 
     model_config: ClassVar[dict[str, Any]] = {
         "json_schema_extra": {
-            "example": {
-                "reply": "Pydantic is a Python library for data validation "
-                "and settings management."
-            }
+            "example": {"reply": "Pydantic is a Python library for data validation " "and settings management."}
         }
     }
 
@@ -60,10 +57,7 @@ class StoryIdea(BaseModel):
     premise: str = Field(
         ...,
         description="A brief description of the story premise.",
-        examples=[
-            "In a distant future, humanity discovers an alien civilization "
-            "that communicates through dreams."
-        ],
+        examples=["In a distant future, humanity discovers an alien civilization " "that communicates through dreams."],
     )
 
     model_config: ClassVar[dict[str, Any]] = {
@@ -86,22 +80,16 @@ class ChatRequest(BaseModel):
 
     message: str = Field(..., description="The user's message to the AI assistant.")
 
-    model_config: ClassVar[dict] = {
-        "json_schema_extra": {"example": {"message": "Tell me about PydanticAI"}}
-    }
+    model_config: ClassVar[dict] = {"json_schema_extra": {"example": {"message": "Tell me about PydanticAI"}}}
 
 
 class StoryRequest(BaseModel):
     """Model for story generation request."""
 
-    message: str = Field(
-        ..., description="The user's prompt for generating a story idea."
-    )
+    message: str = Field(..., description="The user's prompt for generating a story idea.")
 
     model_config: ClassVar[dict] = {
-        "json_schema_extra": {
-            "example": {"message": "Give me a sci-fi story about space exploration"}
-        }
+        "json_schema_extra": {"example": {"message": "Give me a sci-fi story about space exploration"}}
     }
 
 
@@ -122,3 +110,15 @@ class StoryResponse(BaseModel):
             }
         }
     }
+
+
+class RagRequest(BaseModel):
+    """Model for Retrieval‑Augmented Generation (RAG) requests."""
+
+    question: str = Field(..., description="The user's question for the RAG agent.")
+
+
+class RagResponse(BaseModel):
+    """Model for Retrieval‑Augmented Generation (RAG) responses."""
+
+    answer: str = Field(..., description="The RAG agent's response with retrieved context.")

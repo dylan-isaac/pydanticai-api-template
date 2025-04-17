@@ -19,6 +19,7 @@ dependencies = [
     "typing-extensions>=4.7.0",
     "logfire>=0.16.0",
     "httpx>=0.24.1",
+    "pinecone>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -45,7 +46,7 @@ artifacts = ["src/**/*.py", "src/**/py.typed"]
 packages = ["src/pydanticai_api_template"]
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]

@@ -61,9 +61,7 @@ try:
     if ai_agent:
         logger.info("PydanticAI Agent initialized with openai:gpt-4o for MCP server")
     else:
-        logger.warning(
-            "PydanticAI Agent not initialized due to missing OPENAI_API_KEY."
-        )
+        logger.warning("PydanticAI Agent not initialized due to missing OPENAI_API_KEY.")
 except Exception as e:
     logger.exception(f"Error initializing PydanticAI Agent: {e}")
     ai_agent = None
@@ -79,13 +77,9 @@ async def chat(message: str) -> str:
 
     Send a message to the AI assistant and receive a response.
     """
-    with logfire.span(
-        "mcp_chat", message=message[:100], operation_type="chat", model="gpt-4o"
-    ) as span:
+    with logfire.span("mcp_chat", message=message[:100], operation_type="chat", model="gpt-4o") as span:
         if not ai_agent:
-            span.set_attributes(
-                {"error": True, "error.message": "AI service not available"}
-            )
+            span.set_attributes({"error": True, "error.message": "AI service not available"})
             return "AI service is not available. Please check server configuration."
 
         try:
@@ -153,21 +147,12 @@ async def story(message: str) -> dict[str, Any]:
         model="gpt-4o",
     ) as span:
         if not story_agent:
-            span.set_attributes(
-                {"error": True, "error.message": "AI service not available"}
-            )
-            return {
-                "error": (
-                    "AI service is not available. Please check server configuration."
-                )
-            }
+            span.set_attributes({"error": True, "error.message": "AI service not available"})
+            return {"error": ("AI service is not available. Please check server configuration.")}
 
         try:
             # Enhance the prompt to get high-quality story ideas
-            enhanced_prompt = (
-                f"Generate a creative and original story idea based on this input: "
-                f"{message}"
-            )
+            enhanced_prompt = f"Generate a creative and original story idea based on this input: " f"{message}"
 
             # Track token count for the prompt
             span.set_attributes(
@@ -196,11 +181,7 @@ async def story(message: str) -> dict[str, Any]:
                         "story_title": story_dict.get("title", "N/A"),
                         "premise_length": len(story_dict.get("premise", "")),
                         "completion_type": "structured",
-                        "response_complexity": (
-                            "high"
-                            if len(story_dict.get("premise", "")) > 200
-                            else "medium"
-                        ),
+                        "response_complexity": ("high" if len(story_dict.get("premise", "")) > 200 else "medium"),
                     }
                 )
                 return cast(dict[str, Any], story_dict)
@@ -210,9 +191,7 @@ async def story(message: str) -> dict[str, Any]:
                 span.set_attributes(
                     {
                         "error": True,
-                        "error.message": (
-                            "Unexpected dict result, expected StoryResponse"
-                        ),
+                        "error.message": ("Unexpected dict result, expected StoryResponse"),
                         "warning": ("Unexpected dict result, expected StoryResponse"),
                     }
                 )

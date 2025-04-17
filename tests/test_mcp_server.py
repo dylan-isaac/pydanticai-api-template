@@ -6,10 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI
+from pydanticai_api_template.mcp_server import chat, create_app
 from starlette.applications import Starlette
 from starlette.routing import Mount
-
-from pydanticai_api_template.mcp_server import chat, create_app
 
 
 @pytest.fixture
@@ -32,9 +31,7 @@ def test_create_app(app: FastAPI) -> None:
             break
 
     assert mount_route is not None, "No Mount found at root path ('')"
-    assert isinstance(mount_route.app, (FastAPI, Starlette)), (
-        "Mounted app is not a FastAPI or Starlette instance"
-    )
+    assert isinstance(mount_route.app, (FastAPI, Starlette)), "Mounted app is not a FastAPI or Starlette instance"
 
     # Verify the mounted app has the /sse route internally
     sse_route_found = False
