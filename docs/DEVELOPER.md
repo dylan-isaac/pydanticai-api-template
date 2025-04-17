@@ -234,6 +234,25 @@ This project includes tools to streamline AI-assisted development workflows.
 - **Sane Defaults & Configuration**: Repomix uses sensible defaults (like ignoring `node_modules`, `.git`, etc.). You can customize behavior further by creating a `repomix.config.json` file in the project root. See the official [Repomix documentation](https://github.com/yamadashy/repomix?tab=readme-ov-file#configuration) for details.
 - **When to Use**: Use the CLI when you need more control over the bundling process than the VS Code extension provides, such as specifying complex include/exclude patterns, using configuration files, or integrating repomix into scripts.
 
+### Codex CLI Editor
+
+- **Purpose**: The [OpenAI Codex CLI](https://github.com/openai/codex#quickstart) provides AI-powered, in-terminal coding assistance.
+- **Installation (host, optional):**
+  ```bash
+  npm install -g @openai/codex
+  ```
+- **Usage inside the dev container:**
+  - `codex` → opens an interactive shell
+  - `codex "explain this codebase to me"` → one-shot prompt
+  - Pipe in a file path:
+    ```bash
+    codex src/pydanticai_api_template/api/endpoints.py
+    ```
+- **VS Code Task:**
+  - Open Command Palette → "Run Task" → "Codex: Interactive"
+- **API Key:**
+  - The `OPENAI_API_KEY` environment variable is automatically passed into the dev container for Codex CLI usage. Add your key to your `.env` file as shown in the Environment Variables section.
+
 ### Using the CLI
 
 The project includes a command-line interface powered by Typer.

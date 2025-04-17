@@ -143,7 +143,8 @@
         "vscode",
         "websockets",
         "yaml",
-        "yml"
+        "yml",
+        "codex"
     ],
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint": "explicit"

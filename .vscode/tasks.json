@@ -219,6 +219,22 @@
             "command": "make sync-configs",
             "problemMatcher": [],
             "detail": "Runs the configuration synchronization script."
+        },
+        {
+            "label": "Codex: Interactive",
+            "type": "shell",
+            "command": "codex",
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": [],
+            "detail": "Launch the OpenAI Codex CLI for live coding assistance"
+        },
+        {
+            "label": "Codex: Explain Codebase",
+            "type": "shell",
+            "command": "codex \"explain this codebase to me\"",
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": [],
+            "detail": "Run Codex once to summarize the current codebase"
         }
     ]
 }

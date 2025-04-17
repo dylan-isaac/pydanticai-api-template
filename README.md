@@ -174,6 +174,29 @@ server = MCPServerHTTP(url='http://localhost:3001/sse')
 agent = Agent('openai:gpt-4o', mcp_servers=[server])
 ```
 
+## Codex CLI Editor
+
+We bundle the [OpenAI Codex CLI](https://github.com/openai/codex#quickstart) into our dev container for AI-powered, in-terminal coding assistance.
+
+**Install (on your host, if you ever need it locally):**
+```bash
+npm install -g @openai/codex
+```
+
+**Usage inside the container:**
+- `codex` → opens an interactive shell
+- `codex "explain this codebase to me"` → one-shot prompt
+- You can also pipe in a file path:
+  ```bash
+  codex src/pydanticai_api_template/api/endpoints.py
+  ```
+
+**VS Code Task:**
+- Open Command Palette → "Run Task" → "Codex: Interactive"
+
+**API Key:**
+- The `OPENAI_API_KEY` environment variable is automatically passed into the dev container for Codex CLI usage. Add your key to your `.env` file as shown in the Environment Setup section.
+
 ## Wishlist
 
 The project includes a `wishlist/` directory for capturing future improvements and feature ideas. This serves as:

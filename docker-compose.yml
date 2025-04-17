@@ -16,6 +16,8 @@ services:
       # Mount Git config and credentials from host for seamless Git operations within the container
       - ~/.gitconfig:/root/.gitconfig:ro # Read-only mount
       - ~/.git-credentials:/root/.git-credentials:ro # Read-only mount
+    env_file:
+      - .env
     environment:
       - PYTHONPATH=/app
       # Disable Python bytecode generation in development for faster reloads
